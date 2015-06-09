@@ -1,9 +1,11 @@
-package NodeManager;
+package NodeManager.Things;
 
+import NodeManager.Thing;
+import NodeManager.Type;
 
-public class Temperature extends Thing {
+public class DoorSensor extends Thing {
 
-	public Temperature(Type type, int id) {
+	public DoorSensor(Type type, int id) {
 		mType = type;
 		mId = id;
 	}
@@ -44,6 +46,9 @@ public class Temperature extends Thing {
 		
 	}
 
-
-
+	@Override
+	public void doCommand() {
+		// TODO Auto-generated method stub
+		
+	}
 }

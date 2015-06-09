@@ -2,10 +2,6 @@ package NodeManager;
 
 import java.util.List;
 
-enum Type {
-	Door, Light, Presense, Temperature, DoorSensor, Alarm, MialBox, Unknown
-}
-
 public class NodeManager {
 	// Singletone
 	private static NodeManager uniqueInstance = new NodeManager();

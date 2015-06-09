@@ -13,4 +13,6 @@ public abstract class Thing {
     //
     public abstract void GetValue();
     public abstract void SetValue();
+    
+    public abstract void doCommand();
 }

@@ -1,9 +1,12 @@
-package NodeManager;
+package NodeManager.Things;
+
+import NodeManager.Thing;
+import NodeManager.Type;
 
 
-public class Light extends Thing {
+public class Door extends Thing {
 
-	public Light(Type type, int id) {
+	public Door(Type type, int id) {
 		mType = type;
 		mId = id;
 	}
@@ -11,25 +14,25 @@ public class Light extends Thing {
 	@Override
 	public int GetID() {
 		// TODO Auto-generated method stub
-		return 0;
+		return this.mId;
 	}
 
 	@Override
 	public void SetID(int id) {
 		// TODO Auto-generated method stub
-		
+		this.mId = id;
 	}
 
 	@Override
 	public Type GetType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.mType;
 	}
 
 	@Override
 	public void SetType(Type type) {
 		// TODO Auto-generated method stub
-		
+		this.mType = type;
 	}
 
 	@Override
@@ -44,6 +47,9 @@ public class Light extends Thing {
 		
 	}
 
-
-
+	@Override
+	public void doCommand() {
+		// TODO Auto-generated method stub
+		
+	}
 }
