@@ -1,5 +1,7 @@
 package NodeManager.Things;
 
+import org.json.simple.JSONObject;
+
 import NodeManager.Thing;
 import NodeManager.Type;
 
@@ -36,9 +38,13 @@ public class Door extends Thing {
 	}
 
 	@Override
-	public void GetValue() {
-		// TODO Auto-generated method stub
+	public JSONObject GetValue(JSONObject JSONMsg) {
+		JSONMsg.put("Value", "Unknown");
 		
+		// add thing id
+		JSONMsg.put("ThingID", Integer.toString(mId));
+		
+		return JSONMsg;
 	}
 
 	@Override

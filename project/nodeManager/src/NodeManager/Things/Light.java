@@ -1,5 +1,7 @@
 package NodeManager.Things;
 
+import org.json.simple.JSONObject;
+
 import NodeManager.Thing;
 import NodeManager.Type;
 
@@ -36,7 +38,8 @@ public class Light extends Thing {
 	}
 
 	@Override
-	public void GetValue() {
+	public JSONObject GetValue(JSONObject JSONMsg) {
+		return null;
 		// TODO Auto-generated method stub
 		
 	}

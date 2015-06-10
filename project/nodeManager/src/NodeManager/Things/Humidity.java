@@ -5,9 +5,9 @@ import org.json.simple.JSONObject;
 import NodeManager.Thing;
 import NodeManager.Type;
 
-public class DoorSensor extends Thing {
+public class Humidity extends Thing {
 
-	public DoorSensor(Type type, int id) {
+	public Humidity(Type type, int id) {
 		mType = type;
 		mId = id;
 	}
@@ -38,9 +38,8 @@ public class DoorSensor extends Thing {
 
 	@Override
 	public JSONObject GetValue(JSONObject JSONMsg) {
-		return null;
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 	@Override
@@ -54,4 +53,5 @@ public class DoorSensor extends Thing {
 		// TODO Auto-generated method stub
 		
 	}
+
 }

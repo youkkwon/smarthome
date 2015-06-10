@@ -2,6 +2,8 @@ package NodeManager;
 
 import java.util.List;
 
+import org.json.simple.JSONObject;
+
 public class Node {
 	private int nodeId;
 	private String ipAddress;
@@ -62,6 +64,14 @@ public class Node {
 	
 	public void setHostName(String hostName) {
 		this.hostName = hostName;
+	}
+	
+	public JSONObject getThingInfo(int thingId, JSONObject JSONMsg) {
+		JSONObject ret = Things.get(thingId).GetValue(JSONMsg);
+		// add node id
+		ret.put("NodeID", Integer.toString(nodeId));
+		
+		return ret;
 	}
 	
 }

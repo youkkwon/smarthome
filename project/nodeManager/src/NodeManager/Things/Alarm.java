@@ -1,5 +1,7 @@
 package NodeManager.Things;
 
+import org.json.simple.JSONObject;
+
 import NodeManager.Thing;
 import NodeManager.Type;
 
@@ -35,9 +37,16 @@ public class Alarm extends Thing {
 	}
 
 	@Override
-	public void GetValue() {
-		// TODO Auto-generated method stub
+	public JSONObject GetValue(JSONObject JSONMsg) {
+		if (mValue == 0)
+			JSONMsg.put("Value", "Unset");
+		else
+			JSONMsg.put("Value", "Set");
 		
+		// add thing id
+		JSONMsg.put("ThingID", Integer.toString(mId));
+		
+		return JSONMsg;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package NodeManager;
 
+import org.json.simple.JSONObject;
+
 public abstract class Thing {
 	protected int mId = 0;
 	protected int mValue = 0;
@@ -11,7 +13,7 @@ public abstract class Thing {
     public abstract Type GetType();
     public abstract void SetType(Type type);
     //
-    public abstract void GetValue();
+    public abstract JSONObject GetValue(JSONObject JSONMsg);
     public abstract void SetValue();
     
     public abstract void doCommand();

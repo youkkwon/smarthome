@@ -2,6 +2,11 @@ package NodeManager;
 
 import java.util.List;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import EventBus.*;
+
 public class NodeManager {
 	// Singletone
 	private static NodeManager uniqueInstance = new NodeManager();
@@ -9,6 +14,8 @@ public class NodeManager {
 		return uniqueInstance;
 	}
 	
+	NM_EventBusReceiver nm_rcv = NM_EventBusReceiver.getInstance();
+	IoTMSEventBus ev_bus = IoTMSEventBus.getInstance();
 	private List<Node> Nodes;
 	
 	// This method is called when command by UI via Event-Bus
@@ -47,5 +54,21 @@ public class NodeManager {
 	public void ShowThingsInfo(int id) { 
 		String info = Nodes.get(id).ShowInfo();
 		//EventBus.push(info);
+	}
+	
+	public void ShowThingInfo(JSONObject JSONMsg) {
+		int nodeId = Integer.parseInt((String)JSONMsg.get("NodeID"));
+		int thingId = Integer.parseInt((String)JSONMsg.get("ThingID"));
+		JSONObject info = new JSONObject(); 
+		info = Nodes.get(nodeId).getThingInfo(thingId, info);
+		
+		// address target
+		JSONArray targets = new JSONArray();
+		targets.add("UI");
+		info.put("Targets", targets);
+		
+		System.out.println ("[EventBus] ShowThingInfo: " + info);
+		
+		ev_bus.postEvent(info);
 	}
 }

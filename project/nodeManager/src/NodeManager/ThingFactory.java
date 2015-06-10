@@ -3,6 +3,7 @@ package NodeManager;
 import NodeManager.Things.Alarm;
 import NodeManager.Things.Door;
 import NodeManager.Things.DoorSensor;
+import NodeManager.Things.Humidity;
 import NodeManager.Things.Light;
 import NodeManager.Things.MialBox;
 import NodeManager.Things.Presense;
@@ -28,10 +29,13 @@ public class ThingFactory extends Factory {
 		case Temperature:
 			Thing temperature = new Temperature(type, id);
 			return temperature;
+		case Humidity:
+			Thing humidity = new Humidity(type, id);
+			return humidity;
 		case DoorSensor:
 			Thing doorSensor = new DoorSensor(type, id);
 			return doorSensor;
-		case Alarm:
+		case AlarmLamp:
 			Thing alarm = new Alarm(type, id);
 			return alarm;
 		case MialBox:
