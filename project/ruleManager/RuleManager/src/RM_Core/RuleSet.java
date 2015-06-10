@@ -23,29 +23,36 @@ public class RuleSet {
 		return ruleset;		
 	}
 	
-	public void addRule (String[] condStr, String[] actStr) throws InvalidRuleException 
+	public void addRule (String[] condStr, String[] actStr) 
 	{
 		boolean 			exist = false; 
 		ListIterator<Rule>	iterator = rules.listIterator();
-		
+		try {
 		while (iterator.hasNext()) 
 		{
 			Rule rule = iterator.next();
 			if (rule.isSameCondition(condStr))
-			{
-				rule.addActions(actStr);
+			{			
+				rule.addActions(actStr);				
 				exist = true;
 				break;
 			}
 		}
 		if (!exist)
-			rules.add(new Rule(condStr, actStr));
+		{
+			Rule rule = new Rule(condStr, actStr);
+			rules.add(rule);
+		}
+		} catch (InvalidRuleException e) {
+			System.out.println(e.getExceptionMsg());
+		}
 	}
 	
-	public boolean deleteRule (String[] condStr, String[] actStr) throws InvalidRuleException
+	public boolean deleteRule (String[] condStr, String[] actStr)
 	{
 		ListIterator<Rule>	iterator = rules.listIterator();
 		
+		try {
 		while (iterator.hasNext()) 
 		{
 			Rule rule = iterator.next();
@@ -61,9 +68,12 @@ public class RuleSet {
 			}
 		}
 		
-		InvalidRuleException exception = new InvalidRuleException ("There is no such a rule");
-		throw exception;
+		} catch (InvalidRuleException e) {
+			System.out.println(e.getExceptionMsg());
+		}
 		
+		System.out.println ("There is no such a rule");
+		return false;
 	}
 	
 	// return rules on specific node.
@@ -89,8 +99,11 @@ public class RuleSet {
 	
 	public void setMode (String mode) throws InvalidRuleException
 	{
-		this.mode = mode.trim();
-		activeRulesBasedOnMode(mode);
+		this.mode = "*@8==" + mode.trim() + "#Alarm";
+		activeRulesBasedOnMode(this.mode);
+		
+		if (mode.equalsIgnoreCase("UnSet"))
+			Scheduler.getInstance().cancelStateAction();
 	}
 	
 	public String getMode ()
@@ -161,5 +174,16 @@ public class RuleSet {
 			}
 		}
 		return true;
+	}
+	
+	public void changeConfig (String type, String time) 
+	{
+		// TODO - FIX THIS
+		ListIterator<Rule>	iterator = rules.listIterator();
+		while (iterator.hasNext()) 
+		{
+			iterator.next().changeConfig(type, time);
+		}
+		Scheduler.getInstance().changeConfig(type, Integer.parseInt(time));
 	}
 }

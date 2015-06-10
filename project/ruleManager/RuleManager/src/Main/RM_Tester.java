@@ -8,11 +8,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import EventBus.IoTMSEventBus;
-import RM_Core.RuleSet;
+import RM_Exception.InvalidRuleException;
 
 public class RM_Tester {
-	
-
 	
 	/*
 	 * Thing ID				Action
@@ -27,7 +25,7 @@ public class RM_Tester {
 	 * Message		9 		Confirm/Emergency/MalFunction/Post
 	 */
 	@SuppressWarnings("unchecked")
-	public void testRuleEvent(String type, String[] conditions, String[] actions) 
+	public void testRuleEvent(String type, String nodeID, String[] conditions, String[] actions) 
 	{
 		JSONObject	JSONMsg = new JSONObject();
 		JSONArray 	targets = new JSONArray();
@@ -36,7 +34,7 @@ public class RM_Tester {
 		
 		JSONMsg.put("Job", "RuleCtrl");
 		JSONMsg.put("Type", type);
-		if (!type.equalsIgnoreCase("Search"))
+		if (type.equalsIgnoreCase("Add") || type.equalsIgnoreCase("delete"))
 		{
 			JSONArray	condArray = new JSONArray();
 			for (int i=0; i < conditions.length; i++)
@@ -48,6 +46,10 @@ public class RM_Tester {
 				actArray.add(actions[i]);
 	
 			JSONMsg.put("Actions",  actArray);
+		}
+		else if (type.equalsIgnoreCase("SearchNode"))
+		{
+			JSONMsg.put("Value", nodeID);
 		}
 
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
@@ -61,6 +63,7 @@ public class RM_Tester {
 		
 		targets.add("RuleManager");
 		JSONMsg.put("Targets", targets);
+		JSONMsg.put("ID",  nodeID);
 		JSONMsg.put("Job", "NodeCtrl");
 		JSONMsg.put("Value", alive);
 
@@ -115,83 +118,128 @@ public class RM_Tester {
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}
 	
-	public void test () {
+	@SuppressWarnings("unchecked")
+	public void testConfigEvent(String type, String value)
+	{
+		JSONObject	JSONMsg = new JSONObject();
+		JSONArray 	targets = new JSONArray();
+		
+		targets.add("RuleManager");
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("Job", "ConfigCtrl");
+		JSONMsg.put("Type",  type);
+		JSONMsg.put("Value", value);
+
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+	}
+	
+	public void test () throws InterruptedException {
 				
 		System.out.println ("[TestModule] Create Rule.");
 		// Alarm mode Set 시, AlarmLamp On 및 Door Open 불허
 		String[] conditions = new String[1];
 		String[] actions = new String[2];
-		conditions[0] = "0:8==Set#Alarm";
-		actions[0] = "!0:1=Open#Door";
-		actions[1] = "0:7=On#AlarmLamp";
-		testRuleEvent("Add", conditions, actions);
-		
-		/*
+		conditions[0] = "*@8==Set#Alarm";
+		actions[0] = "!0@1=Open#Door";
+		actions[1] = "0@7=On#AlarmLamp";
+		testRuleEvent("Add", null, conditions, actions);
 		
 		// Alarm mode UnSet 시, AlarmLamp Off
 		conditions = new String[1];
 		actions = new String[1];
-		conditions[0] = "0:8==UnSet#Alarm";
-		actions[0] = "0:7=Off#AlarmLamp";
-		testRuleEvent("Add", conditions, actions);
-		
+		conditions[0] = "*@8==UnSet#Alarm";
+		actions[0] = "0@7=Off#AlarmLamp";	
+		testRuleEvent("Add", null, conditions, actions);
+
 		// If Away, close door & set alarm in 5min, lamp off in 10 min
 		conditions = new String[1];
 		actions = new String[4];
-		conditions[0] = "0:3==Away#Presense";
-		actions[0] = "0:1:CloseIn30#Door";
-		actions[1] = "0:9=Confirm#Message";
-		actions[2] = "0:8=SetIn30#Alarm";
-		actions[3] = "0:2:Offin60#Light";
-		testRuleEvent("Add", conditions, actions);
+		conditions[0] = "0@3==Away#Presense";
+		actions[0] = "0@1=CloseIn30#Door";
+		actions[1] = "0@9=Confirm#Message";
+		actions[2] = "*@8=SetIn30#Alarm";
+		actions[3] = "0@2=OffIn60#Light";
+		testRuleEvent("Add", null, conditions, actions);
 		
 		// If AtHome while Alarm, Send Emergency Msg
 		conditions = new String[2];
 		actions = new String[1];
-		conditions[0] = "0:7==Set#Alarm";
-		conditions[1] = "0:3==AtHome#Presense";
-		actions[0] = "0:9=Emergency#Message";
-		testRuleEvent("Add", conditions, actions);
+		conditions[0] = "*@8==Set#Alarm";
+		conditions[1] = "0@3==AtHome#Presense";
+		actions[0] = "0@9=Emergency#Message";
+		testRuleEvent("Add", null, conditions, actions);
 		
 		// If AtHome while Alarm, Send Emergency Msg
 		conditions = new String[2];
 		actions = new String[1];
-		conditions[0] = "0:7==Set#Alarm";
-		conditions[1] = "0:1==Open#Door";
-		actions[0] = "0:9=Emergency#Message";
-		testRuleEvent("Add", conditions, actions);
-				
+		conditions[0] = "*@8==Set#Alarm";
+		conditions[1] = "0@1==Open#Door";
+		actions[0] = "0@9=Emergency#Message";
+		testRuleEvent("Add", null, conditions, actions);
+		
+		/* TEST..
+		// Close door if it open on node 0
+		conditions = new String[1];
+		actions = new String[1];
+		conditions[0] = "0@5==Open#DoorSensor";
+		actions[0] = "0@1=Close#Door";
+		testRuleEvent("Add", null, conditions, actions);
+		
+		// Close door if it open on node 1
+		conditions = new String[1];
+		actions = new String[1];
+		conditions[0] = "1@5==Open#DoorSensor";
+		actions[0] = "1@1=Close#Door";
+		testRuleEvent("Add", null, conditions, actions);
+		
+		// Close door if it open on node 0
+		conditions = new String[1];
+		actions = new String[1];
+		conditions[0] = "0@5==Open#DoorSensor";
+		actions[0] = "0@2=On#Light";
+		testRuleEvent("Add", null, conditions, actions);
+		
+		conditions = new String[1];
+		actions = new String[1];
+		conditions[0] = "0@5==Open#DoorSensor";
+		actions[0] = "0@1=Close#Door";
+		testRuleEvent("Delete", null, conditions, actions);*/
+	
+		//testNodeEvent("1", "DisConn");
+		//testNodeEvent("1", "Conn");
+		testRuleEvent("Search", null, null, null);
+		
 		// State Test (Alarm mode)
 		System.out.println ("[TestModule] Alarm mode set.");
 		testStateEvent ("Set");		
-		testRuleEvent("Search", null, null);
-	
+		testRuleEvent("Search", null, null, null);
+		
 		// Thing Test (Node ID : + Thing ID)
 		System.out.println ("[TestModule] open door.");
 		testActionEvent ("0", "1", "Door", "Open");
+		Thread.sleep(500);
 		
 		// State Test (Normal mode)
 		System.out.println ("[TestModule] Alarm mode unset.");
 		testStateEvent ("UnSet");	
-		testRuleEvent("Search", null, null);
-		
+			
 		// Thing Test (Node ID + Thing ID)
 		System.out.println ("[TestModule] open door.");
 		testActionEvent ("0", "1", "Door", "Open");
-		
+			
 		// Thing Test (Node ID + Thing ID)
 		System.out.println ("[TestModule] Light on.");
 		testThingEvent ("0", "2", "Light", "On");
 		
 		System.out.println ("[TestModule] Presense (Away)");
 		testThingEvent ("0", "3", "Presense", "Away");
-					
+		
 		System.out.println ("[TestModule] Alarm mode unset. (Cancel alarm mode expected)");
 		testStateEvent ("UnSet");		
-		testRuleEvent("Search", null, null);
+
+		testConfigEvent("Door", "3");
+		testRuleEvent ("Search", null, null, null);
 		
-		
-		 */
 		BufferedReader cin = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			String msg = cin.readLine();

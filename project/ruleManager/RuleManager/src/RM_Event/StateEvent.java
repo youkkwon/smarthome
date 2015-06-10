@@ -2,22 +2,28 @@ package RM_Event;
 
 import org.json.simple.JSONObject;
 
+import RM_Core.RuleSet;
 import RM_Exception.InvalidRuleException;
 
-public class StateEvent extends Event {
+public class StateEvent {
 
-	public StateEvent(JSONObject msg) {
-		super(msg);
-	}	
+	private static StateEvent stateEvent = new StateEvent();
 	
-	public void run()
+	private StateEvent() { 
+	}
+
+	public static StateEvent getInstance ()
+	{
+		return stateEvent;
+	}
+	
+	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[Process] Handle StateEvent : " + JSONMsg);
 		
 		String value = (String) JSONMsg.get("Value");
-		String mode = "Alarm" + "==" + value;			// Alarm==Set
 		try {
-			ruleset.setMode(mode);
+			RuleSet.getInstance().setMode(value);
 		} catch (InvalidRuleException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

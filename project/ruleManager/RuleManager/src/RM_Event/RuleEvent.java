@@ -7,81 +7,107 @@ import org.json.simple.JSONObject;
 
 import EventBus.IoTMSEventBus;
 import RM_Core.Rule;
+import RM_Core.RuleSet;
 import RM_Exception.InvalidRuleException;
 
-public class RuleEvent extends Event {
+public class RuleEvent {
 
-	private static final String[][] String = null;
+	private static RuleEvent ruleEvent = new RuleEvent();
 
-	public RuleEvent(JSONObject msg) {
-		super(msg);
+	private RuleEvent() {
+		
+	}
+
+	public static RuleEvent getInstance ()
+	{
+		return ruleEvent;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void run()
+	public void execute(JSONObject JSONMsg)
 	{
-		System.out.println("[Process] Handle RuleEvent : " + JSONMsg);
-		
+//		System.out.println("[Process] Handle RuleEvent : " + JSONMsg);
+		RuleSet ruleset = RuleSet.getInstance();
 		String type = (String) JSONMsg.get("Type");
 		
 		if (type.equalsIgnoreCase("Add") || type.equalsIgnoreCase("Delete"))
 		{
 			JSONArray condArray = (JSONArray) JSONMsg.get("Conditions");
 			JSONArray actArray = (JSONArray) JSONMsg.get("Actions");
-			if (condArray == null || actArray == null)
+			if (condArray != null && actArray != null)
 			{
-				return;
-			}
-				
-			String[] conditions = String[condArray.size()];
-			for (int i=0; i < condArray.size(); i++)
-			{
-				conditions[i] = (java.lang.String) condArray.get(i);
-			}
+				String[] conditions = new String[condArray.size()];
+				for (int i=0; i < condArray.size(); i++)
+				{
+					conditions[i] = (java.lang.String) condArray.get(i);
+				}
 					
-			String[] actions = String[actArray.size()];
-			for (int i=0; i < actArray.size(); i++)
-			{
-				actions[i] = (java.lang.String) actArray.get(i);
-			}
+				String[] actions = new String[actArray.size()];
+				for (int i=0; i < actArray.size(); i++)
+				{
+					actions[i] = (java.lang.String) actArray.get(i);
+				}
 			
-			if (type.equalsIgnoreCase("Add"))
-			{
-				try {
+				if (type.equalsIgnoreCase("Add"))
+				{
 					ruleset.addRule(conditions, actions);
-				} catch (InvalidRuleException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				}
+				else if (type.equalsIgnoreCase("Delete"))
+				{
+					ruleset.deleteRule(conditions, actions);
 				}
 			}
-			else if (type.equalsIgnoreCase("Delete"))
-				try {
-					ruleset.deleteRule(conditions, actions);
-				} catch (InvalidRuleException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 		}
 		else if (type.equalsIgnoreCase("Search"))
 		{
-			JSONObject	JSONMsg = new JSONObject();
-		
+			JSONObject	JSONOutMsg = new JSONObject();
+				
 			JSONArray 	targets = new JSONArray();
 			targets.add("UIControler");
-			
+		
 			JSONArray 	rules = new JSONArray();
+			
 			Iterator<Rule> iterator = ruleset.getWholeRule().iterator();
 			while (iterator.hasNext())
 			{
-				rules.add(iterator.next().getStatement());
+				Rule rule  = iterator.next();
+				System.out.println("[Process] Rules [" + rule.isActive() + "] - " + rule.getStatement());
+				rules.add(rule.getStatement());
+				//rules.add(iterator.next().getStatement());
 			}
 			
-			JSONMsg.put("Targets", targets);
-			JSONMsg.put("Job", "RuleSearch");			
-			JSONMsg.put("Rules", rules);
+			JSONOutMsg.put("Targets", targets);
+			JSONOutMsg.put("Job", "RuleSearch");			
+			JSONOutMsg.put("Rules", rules);
 					
 			// post event.
-			IoTMSEventBus.getInstance().postEvent(JSONMsg);
+			IoTMSEventBus.getInstance().postEvent(JSONOutMsg);
+		}
+		else if (type.equalsIgnoreCase("SearchNode"))
+		{
+			String nodeID = (String) JSONMsg.get("Value");
+			
+			JSONObject	JSONOutMsg = new JSONObject();
+			
+			JSONArray 	targets = new JSONArray();
+			targets.add("UIControler");				
+			
+			JSONArray 	rules = new JSONArray();
+			Iterator<Rule> iterator = ruleset.searchRules(nodeID).iterator();
+			while (iterator.hasNext())
+			{
+				Rule rule  = iterator.next();
+				System.out.println("[Process] Rules [" + rule.isActive() + "] - " + rule.getStatement());
+				rules.add(rule.getStatement());
+				//rules.add(iterator.next().getStatement());
+			}
+			
+			JSONOutMsg.put("Targets", targets);
+			JSONOutMsg.put("Job", "RuleSearch");			
+			JSONOutMsg.put("Rules", rules);
+					
+			// post event.
+			IoTMSEventBus.getInstance().postEvent(JSONOutMsg);
 		}
 	}
 }

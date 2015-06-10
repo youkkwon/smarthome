@@ -43,7 +43,7 @@ public class Rule {
 		
 		String actStatement = actString[0];		
 		for (int i = 1; i < actString.length; i++)
-			condStatement = ", " + actString[i];
+			actStatement = ", " + actString[i];
 		
 		String statement = "if " + condStatement + " then " + actStatement;
 		
@@ -53,9 +53,11 @@ public class Rule {
 	// for update rule (add more actions on condition)
 	public boolean isSameCondition (String[] condStr)
 	{
-		String condStatement = condStr[0];		
+		String condStatement = condStr[0];
 		for (int i = 1; i < condStr.length; i++)
+		{
 			condStatement = ", " + condStr[i];
+		}
 		
 		return this.condStatement.equals(condStatement);
 	}
@@ -65,8 +67,11 @@ public class Rule {
 		ListIterator<Action>	act_iterator;
 		ListIterator<Condition> cond_iterator = conditionList.listIterator();
 		
+		condStatement = null;
+		actStatement = null;
+		
 		if (cond_iterator.hasNext())
-			condStatement = condStatement + cond_iterator.next().getStatement();
+			condStatement = cond_iterator.next().getStatement();
 		while (cond_iterator.hasNext())
 		{
 			condStatement = condStatement + ", " + cond_iterator.next().getStatement();
@@ -74,15 +79,20 @@ public class Rule {
 				
 		act_iterator = actionList.listIterator();
 		if (act_iterator.hasNext())
-			actStatement = actStatement + act_iterator.next().getStatement();
+			actStatement = act_iterator.next().getStatement();
 		while (act_iterator.hasNext())
 		{
 			actStatement = actStatement + ", " + act_iterator.next().getStatement();
 		}
 		
 		act_iterator = noActionList.listIterator();
-		if (act_iterator.hasNext())
-			actStatement = actStatement + act_iterator.next().getStatement();
+		if (act_iterator.hasNext()) 
+		{
+			if ( actStatement == null)
+				actStatement = " not " + act_iterator.next().getStatement();
+			else
+				actStatement = actStatement + ", " + " not " + act_iterator.next().getStatement();
+		}
 		while (act_iterator.hasNext())
 		{
 			actStatement = actStatement + ", not " + act_iterator.next().getStatement();
@@ -157,7 +167,7 @@ public class Rule {
 		return false;
 	}
 	
-	public Action parseAction (String statement)
+	public Action parseAction (String statement) throws InvalidRuleException
 	{
 		int 	startIndex, endIndex;
 		String 	NodeID, ThingID, Value, Type, Time="";
@@ -167,17 +177,32 @@ public class Rule {
 		
 		startIndex = (statement.startsWith("!")) ? 1 : 0;
 		endIndex = statement.indexOf("@");
+		if (startIndex == -1 || endIndex == -1)
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
+			throw exception;
+		}
 		NodeID = statement.substring(startIndex, endIndex);
 		
 		startIndex = endIndex+1;
 		endIndex = statement.indexOf("=");
+		if (startIndex == -1 || endIndex == -1)
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
+			throw exception;
+		}
 		ThingID = statement.substring(startIndex, endIndex);
 		
 		startIndex = endIndex+1;
-		endIndex = statement.indexOf("in");
+		endIndex = statement.indexOf("In");
 		if (endIndex != -1)
 		{
 			delay = true;
+			if (startIndex == -1 || endIndex == -1)
+			{
+				InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
+				throw exception;
+			}
 			Value = statement.substring(startIndex, endIndex);
 			startIndex = endIndex+2;
 			endIndex = statement.indexOf("#");
@@ -187,9 +212,19 @@ public class Rule {
 		{
 			delay = false;
 			endIndex = statement.indexOf("#");
+			if (startIndex == -1 || endIndex == -1)
+			{
+				InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
+				throw exception;
+			}
 			Value = statement.substring(startIndex, endIndex);
 		}
 		startIndex = endIndex+1;
+		if (startIndex > statement.length())
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
+			throw exception;
+		}
 		Type = statement.substring(startIndex);		
 		
 		if (delay)
@@ -200,7 +235,7 @@ public class Rule {
 		return action;
 	}
 	
-	public Condition parseCondition (String statement)
+	public Condition parseCondition (String statement) throws InvalidRuleException
 	{
 		int 	startIndex, endIndex;
 		String 	NodeID, ThingID, Value, Type;
@@ -209,17 +244,37 @@ public class Rule {
 		
 		startIndex = 0;
 		endIndex = statement.indexOf("@");
+		if (startIndex == -1 || endIndex == -1)
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Condition statment is not valid");
+			throw exception;
+		}
 		NodeID = statement.substring(startIndex, endIndex);
 		
 		startIndex = endIndex+1;
-		endIndex = statement.indexOf("=");
+		endIndex = statement.indexOf("==");
+		if (startIndex == -1 || endIndex == -1)
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Condition statment is not valid");
+			throw exception;
+		}
 		ThingID = statement.substring(startIndex, endIndex);
 		
-		startIndex = endIndex+1;
+		startIndex = endIndex+2;
 		endIndex = statement.indexOf("#");
+		if (startIndex == -1 || endIndex == -1)
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Condition statment is not valid");
+			throw exception;
+		}
 		Value = statement.substring(startIndex, endIndex);
 
 		startIndex = endIndex+1;
+		if (startIndex > statement.length())
+		{
+			InvalidRuleException exception = new InvalidRuleException ("Condition statment is not valid");
+			throw exception;
+		}
 		Type = statement.substring(startIndex);		
 		
 		condition = new Condition(NodeID, ThingID, Value, Type);
@@ -267,13 +322,17 @@ public class Rule {
 	
 	// Parse statement and conditions and actions. (JSON Parting)
 	// Actions can be Instant and Delay one due to time condition presence.
-	public void generateRule(String[] condStr, String[] actString) 
+	public void generateRule(String[] condStr, String[] actString) throws InvalidRuleException 
 	{
+		boolean alarmMode_condition = false; 
 		boolean not_action = false;
 		
 		for (int i=0; i < condStr.length; i++)			
 		{
-			conditionList.add(parseCondition(condStr[i]));
+			Condition condition = parseCondition(condStr[i]);
+			if (condition.isAlarmModeCond())
+				alarmMode_condition = true;
+			conditionList.add(condition);
 		}
 		
 		for (int i=0; i < actString.length; i++)			
@@ -285,6 +344,8 @@ public class Rule {
 			else
 				actionList.add(action);
 		}
+		if (alarmMode_condition)
+			active = false;
 		updateStatement();
 	}
 
@@ -301,7 +362,7 @@ public class Rule {
 			if (condition.isConditionOn(cond))
 			{
 				active = true;		
-				System.out.println("[Process] Ruls is activated - " + statement);
+				//System.out.println("[Process] Ruls is activated - " + statement);
 				break;
 			}
 		}
@@ -318,7 +379,7 @@ public class Rule {
 			if (iterator.next().isConditionOn(cond))
 			{
 				active = false;		
-				System.out.println("[Process] Ruls is de-activated - " + statement);
+				//System.out.println("[Process] Ruls is de-activated - " + statement);
 				break;
 			}
 		}
@@ -335,8 +396,8 @@ public class Rule {
 			if (!condition.isModeCond())
 				break;
 			active = condition.isConditionMatch(mode);
-			System.out.print("[Process] active[" + active + "] rule - " + statement);
-			System.out.println(" based on " + mode);
+			//System.out.print("[Process] active[" + active + "] rule - " + statement);
+			//System.out.println(" based on " + mode);
 		}
 	}
 	
@@ -385,5 +446,17 @@ public class Rule {
 		}		
 					
 		return (match == true) ? noActionList : null;
+	}
+	
+	public void changeConfig (String type, String time) 
+	{
+		ListIterator<Action>	iterator = actionList.listIterator();
+		while (iterator.hasNext()) 
+		{
+			Action action = iterator.next();
+			if (action.isDelayAction())
+				iterator.next().changeConfigTime(type, time);
+		}
+		updateStatement();
 	}
 }

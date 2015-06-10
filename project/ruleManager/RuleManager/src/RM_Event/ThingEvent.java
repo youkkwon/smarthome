@@ -7,14 +7,21 @@ import org.json.simple.JSONObject;
 
 import RM_Core.Action;
 import RM_Core.Condition;
+import RM_Core.RuleSet;
 
-public class ThingEvent extends Event {
+public class ThingEvent {
 
-	public ThingEvent(JSONObject msg) {
-		super(msg);
+	private static ThingEvent thingEvent = new ThingEvent();
+	
+	private ThingEvent() { 
 	}
 
-	public void run()
+	public static ThingEvent getInstance ()
+	{
+		return thingEvent;
+	}
+	
+	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[Process] Handle ThingEvent : " + JSONMsg);
 		
@@ -25,7 +32,12 @@ public class ThingEvent extends Event {
 		
 		Condition condition = new Condition (nodeID, thingID, value, type);
 	
-		LinkedList<Action> actions = ruleset.getActions(condition.getStatement());
+		LinkedList<Action> actions = RuleSet.getInstance().getActions(condition.getStatement());
+		if (actions == null || actions.isEmpty())
+		{
+			System.out.println("No rule for this condition.");
+			return;
+		}
 		Iterator<Action> iterator = actions.iterator();
 		while (iterator.hasNext())
 			iterator.next().execute();		

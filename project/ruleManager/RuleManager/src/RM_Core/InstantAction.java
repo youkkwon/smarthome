@@ -12,5 +12,15 @@ public class InstantAction extends Action {
 		generateJSONMsg();
 		postEvent();
 	}
+	
+	public boolean isDelayAction ()
+	{
+		return false;
+	}
+	
+	public void changeConfigTime (String type, String timeStr)
+	{
+		// Do Nothing.
+	}
 }
 

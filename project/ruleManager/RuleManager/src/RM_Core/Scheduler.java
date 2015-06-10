@@ -1,18 +1,19 @@
 package RM_Core;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.Iterator;
+import java.util.concurrent.LinkedBlockingQueue;
 
 //Singleton
 public class Scheduler extends Thread {
 
 	private int period;
-	private LinkedList<DelayAction> actions;
-	private static Scheduler scheduler = new Scheduler(); 
+	private LinkedBlockingQueue<DelayAction> actions;
 	
+	private static Scheduler scheduler = new Scheduler(); 
+
 	private Scheduler()
 	{
-		actions =  new LinkedList<DelayAction>();
+		actions =  new LinkedBlockingQueue<DelayAction>();
 		period = 1;//5; 			// default 5 seconds;
 	}
 	
@@ -31,16 +32,16 @@ public class Scheduler extends Thread {
 		this.period = period;
 	}
 	
-	public void addAction (DelayAction action)
+	public synchronized void addAction (DelayAction action)
 	{
-		System.out.println("Scheduled Action is arrived.");
+		System.out.println("Scheduled Action is arrived." + action.getStatement());
 		deleteAction(action);	//	delete if there is already actions (same or confilct)
 		actions.add(action);
 	}
 	
 	public void deleteAction (Action cancle_action)
 	{
-		ListIterator<DelayAction>	iterator = actions.listIterator();
+		Iterator<DelayAction>	iterator = actions.iterator();
 		while (iterator.hasNext())
 		{
 			Action action = iterator.next();
@@ -52,11 +53,41 @@ public class Scheduler extends Thread {
 		}
 	}
 	
+	public void cancelStateAction ()
+	{
+		Iterator<DelayAction>	iterator = actions.iterator();
+		while (iterator.hasNext())
+		{
+			Action action = iterator.next();
+			if (action.isActionOn("*@8"))
+			{
+				System.out.println("delete action : " + action.getStatement());
+				actions.remove(action);
+			}
+		}
+	}
+	
+	public void changeConfig (String type, int time)
+	{
+		Iterator<DelayAction>	iterator = actions.iterator();
+		while (iterator.hasNext())
+		{
+			DelayAction action = iterator.next();
+			if (action.isActionOnType(type))
+			{
+				int timeDiff = action.getTime() - time;
+				action.setTimeLeft(timeDiff);
+				
+				System.out.println("delete action : " + action.getStatement());
+				actions.remove(action);
+			}
+		}
+	}
+	
 	// 가장 손쉽게는 thread 로 돌려서 period 마다 꺠서 확인하기. ㅎㅎㅎ  나중에 폼나게 바꿉시다요. 
 	// TODO expire 처리. 
 	public void run()
 	{
-		System.out.println ("Scheduler is activated : " + actions.size());
 		while (true) 
 		{
 			try {
@@ -64,15 +95,16 @@ public class Scheduler extends Thread {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-			updateScheduler();
+			if (!actions.isEmpty())
+				updateScheduler();
 		}
 	}
 	
-	public void updateScheduler()
+	public synchronized void updateScheduler()
 	{
-		//System.out.println ("updateScheduler : " + actions.size());
+		System.out.println ("[Scheduler] " + actions.size());
 		
-		ListIterator<DelayAction>	iterator = actions.listIterator();
+		Iterator<DelayAction>	iterator = actions.iterator();
 		while (iterator.hasNext())
 		{
 			DelayAction action = iterator.next();

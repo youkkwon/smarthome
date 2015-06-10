@@ -1,20 +1,18 @@
 package EventBus;
 
+import java.util.Observable;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import RM_Event.ActionEvent;
-import RM_Event.Event;
-import RM_Event.NodeEvent;
-import RM_Event.RuleEvent;
-import RM_Event.StateEvent;
-import RM_Event.ThingEvent;
+import RM_Event.RMEventHandler;
 
 import com.google.common.eventbus.Subscribe;
 
 // EventBus 와 이벤트를 주고 받는 것을 담당. 
-public class RM_EventBusReceiver extends Thread {
-
+//public class RM_EventBusReceiver extends Observable {
+public class RM_EventBusReceiver {
+	
 	protected JSONObject 	JSONMsg;
 	private	JSONArray		targets;
 	private String			ID;
@@ -29,38 +27,16 @@ public class RM_EventBusReceiver extends Thread {
 	@Subscribe
 	public void ProcessEvent(JSONObject JSONMsg)
 	{
-		System.out.println ("[EventBus] ProcessEvent : " + JSONMsg);
-		
 		targets = (JSONArray) JSONMsg.get("Targets");
 		for (int i=0; i < targets.size(); i++)
 		{
 			if (targets.get(i).equals(ID))
-				ProcessRuleManagerEvent(JSONMsg);			
+			{
+				RMEventHandler.getInstance().processEventMsg(JSONMsg);
+			//	RMEventHandler.getInstance().pushEvent(JSONMsg);
+			//	setChanged();
+			//	notifyObservers();
+			}
 		}
-	}
-	
-	private void ProcessRuleManagerEvent (JSONObject JSONMsg)
-	{	
-		System.out.println ("[EventBus] Process RuleManager Event : " + JSONMsg);
-		
-		Event event = null;
-		String job = (String) JSONMsg.get("Job");
-		
-		if (job.equalsIgnoreCase("Alarm") || job.equalsIgnoreCase("MessageCtrl"))
-			event = new StateEvent(JSONMsg);
-		else if (job.equalsIgnoreCase("RuleCtrl"))
-			event = new RuleEvent(JSONMsg);
-		else if (job.equalsIgnoreCase("NodeCtrl"))
-			event = new NodeEvent(JSONMsg);
-		else if (job.equalsIgnoreCase("ActionCtrl"))
-			event = new ActionEvent(JSONMsg);
-		else if (job.equalsIgnoreCase("ThingCtrl"))
-			event = new ThingEvent(JSONMsg);
-		else
-		{
-			System.out.println ("Not valid event, ignore it.");
-			return;
-		}
-		event.start();		
 	}	
 }

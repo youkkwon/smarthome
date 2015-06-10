@@ -4,15 +4,24 @@ import org.json.simple.JSONObject;
 
 import RM_Core.Action;
 import RM_Core.InstantAction;
+import RM_Core.RuleSet;
 import RM_Exception.InvalidRuleException;
 
-public class ActionEvent extends Event {
+public class ActionEvent {
 
-	public ActionEvent(JSONObject msg) { 
-		super(msg);
+	private RuleSet 	ruleset;
+	private static ActionEvent actEvent = new ActionEvent();
+	
+	private ActionEvent() { 
+		ruleset = RuleSet.getInstance();
 	}
 
-	public void run()
+	public static ActionEvent getInstance ()
+	{
+		return actEvent;
+	}
+	
+	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[Process] Handle ActionEvent : " + JSONMsg);
 		

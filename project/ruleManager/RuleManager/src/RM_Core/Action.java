@@ -10,7 +10,7 @@ public abstract class Action
 {
 	private String nodeID;
 	private String thingID;
-	private String type;
+	protected String type;
 	private String value;
 	
 	private String 			actionID;			// nodeID:thingID
@@ -25,8 +25,8 @@ public abstract class Action
 		this.thingID 	= thingID; 
 		this.value		= value;
 		this.type		= type;
-		actionID		= this.nodeID + ":" + this.thingID;
-		statement 		= this.nodeID + ":" + this.thingID + "=" + this.value;
+		actionID		= this.nodeID + "@" + this.thingID;
+		statement 		= this.nodeID + "@" + this.thingID + "=" + this.value + "#" + this.type; 
 	}
 
 	public String getStatement()
@@ -48,12 +48,17 @@ public abstract class Action
 	// indicate action is about which.
 	public boolean isActionOn (String actionID)
 	{
-		return thingID.equalsIgnoreCase(actionID);
+		return this.actionID.equalsIgnoreCase(actionID);
 	}
-
+	
 	public boolean isConflict (Action action)
 	{
 		return action.isActionOn(actionID);
+	}
+	
+	public boolean isActionOnType (String type)
+	{
+		return this.type.equalsIgnoreCase(type);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -86,5 +91,6 @@ public abstract class Action
 	}
 		
 	public abstract void execute();
-	
+	public abstract boolean isDelayAction();
+	public abstract void changeConfigTime(String type, String timeStr);
 }

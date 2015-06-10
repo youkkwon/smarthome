@@ -3,13 +3,17 @@ package RM_Core;
 // {Condition} := {NodeID}@{Thing ID}=={Value}{Type}
 public class Condition {
 	
+	private String			nodeID;
 	protected String 		statement;			// ex) If alarm mode (Mode == 1), If Light one (Light ID == 1)
 	private boolean 		modeOnly;			// Mode condition
+	private boolean			alarmMode;			// AlarmMode condition
 	
 	public Condition (String nodeID, String thingID, String value, String type)
 	{
-		statement 		= nodeID + ":" + thingID + "==" + value;
+		this.nodeID		= nodeID;
+		statement 		= nodeID + "@" + thingID + "==" + value + "#" + type;
 		modeOnly 		= type.equalsIgnoreCase("Alarm");	// Condition Type is alarm mode.
+		alarmMode		= value.equalsIgnoreCase("Set");
 	}
 	
 	public String getStatement()
@@ -19,7 +23,7 @@ public class Condition {
 	
 	public boolean isConditionOn (String cond)
 	{
-		return (statement.startsWith(cond));
+		return nodeID.equalsIgnoreCase(cond);
 	}
 	
 	// for cancel action
@@ -38,4 +42,8 @@ public class Condition {
 		return modeOnly;
 	}
 	
+	public boolean isAlarmModeCond()
+	{
+		return (modeOnly && alarmMode);
+	}
 }

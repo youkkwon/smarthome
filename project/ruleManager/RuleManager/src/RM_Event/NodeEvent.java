@@ -2,21 +2,29 @@ package RM_Event;
 
 import org.json.simple.JSONObject;
 
-public class NodeEvent extends Event {
+import RM_Core.RuleSet;
 
-	public NodeEvent(JSONObject msg) {
-		super(msg);
+public class NodeEvent{
+	
+	private static NodeEvent nodeEvent = new NodeEvent();
+	
+	private NodeEvent() { 
 	}
 
-	public void run()
+	public static NodeEvent getInstance ()
+	{
+		return nodeEvent;
+	}
+	
+	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[Process] Handle NodeEvent : " + JSONMsg);
 		
 		String nodeID = (String) JSONMsg.get("ID");
 		String value = (String) JSONMsg.get("Value");
 		if (value.equalsIgnoreCase("Conn"))
-			ruleset.activeRules(nodeID);
+			RuleSet.getInstance().activeRules(nodeID);
 		else if (value.equalsIgnoreCase("DisConn"))
-			ruleset.deactivateRules(nodeID);;
+			RuleSet.getInstance().deactivateRules(nodeID);;
 	}
 }
