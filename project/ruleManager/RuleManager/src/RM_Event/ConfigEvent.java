@@ -2,7 +2,7 @@ package RM_Event;
 
 import org.json.simple.JSONObject;
 
-import RM_Core.RuleSet;
+import RM_Core.Config;
 
 public class ConfigEvent {
 
@@ -23,6 +23,6 @@ public class ConfigEvent {
 		String type = (String) JSONMsg.get("Type");
 		String value = (String) JSONMsg.get("Value");
 		
-		RuleSet.getInstance().changeConfig(type, value);		
+		Config.getInstance().setConfig(type, Integer.parseInt(value));
 	}
 }

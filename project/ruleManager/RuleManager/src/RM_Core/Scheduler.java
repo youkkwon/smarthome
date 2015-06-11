@@ -67,22 +67,6 @@ public class Scheduler extends Thread {
 		}
 	}
 	
-	public void changeConfig (String type, int time)
-	{
-		Iterator<DelayAction>	iterator = actions.iterator();
-		while (iterator.hasNext())
-		{
-			DelayAction action = iterator.next();
-			if (action.isActionOnType(type))
-			{
-				int timeDiff = action.getTime() - time;
-				action.setTimeLeft(timeDiff);
-				
-				System.out.println("delete action : " + action.getStatement());
-				actions.remove(action);
-			}
-		}
-	}
 	
 	// 가장 손쉽게는 thread 로 돌려서 period 마다 꺠서 확인하기. ㅎㅎㅎ  나중에 폼나게 바꿉시다요. 
 	// TODO expire 처리. 
@@ -102,19 +86,18 @@ public class Scheduler extends Thread {
 	
 	public synchronized void updateScheduler()
 	{
-		System.out.println ("[Scheduler] " + actions.size());
-		
 		Iterator<DelayAction>	iterator = actions.iterator();
 		while (iterator.hasNext())
 		{
 			DelayAction action = iterator.next();
 			action.decreaseTime(period);
-			System.out.println ("Action : " + action.getStatement() + " time left : " + action.getTimeLeft());
+			//System.out.println ("Action : " + action.getStatement() + " time left : " + action.getTimeLeft());
 			if (action.isExpired())
 			{
+				System.out.println ("Scheduled action is executed." + action.getStatement());
 				action.postEvent();
 				actions.remove(action);
 			}
 		}
-	}	
+	}
 }

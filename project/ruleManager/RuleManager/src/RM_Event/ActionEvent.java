@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 import RM_Core.Action;
 import RM_Core.InstantAction;
 import RM_Core.RuleSet;
-import RM_Exception.InvalidRuleException;
+import RM_Utils.InvalidRuleException;
 
 public class ActionEvent {
 
