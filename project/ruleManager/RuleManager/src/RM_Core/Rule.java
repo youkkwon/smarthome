@@ -3,7 +3,7 @@ package RM_Core;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import RM_Exception.InvalidRuleException;
+import RM_Utils.InvalidRuleException;
 
 // {Rule} := if {Condition}+ then {Action}+
 public class Rule {
@@ -31,6 +31,7 @@ public class Rule {
 
 	public String getStatement()
 	{
+		updateStatement();
 		return statement;
 	}
 	
@@ -47,7 +48,7 @@ public class Rule {
 		
 		String statement = "if " + condStatement + " then " + actStatement;
 		
-		return this.statement.equals(statement);
+		return this.statement.startsWith(statement);
 	}
 	
 	// for update rule (add more actions on condition)
@@ -62,7 +63,7 @@ public class Rule {
 		return this.condStatement.equals(condStatement);
 	}
 	
-	public void updateStatement()
+	private void updateStatement()
 	{
 		ListIterator<Action>	act_iterator;
 		ListIterator<Condition> cond_iterator = conditionList.listIterator();
@@ -170,9 +171,7 @@ public class Rule {
 	public Action parseAction (String statement) throws InvalidRuleException
 	{
 		int 	startIndex, endIndex;
-		String 	NodeID, ThingID, Value, Type, Time="";
-		boolean delay;
-	
+		String 	NodeID, ThingID, Value, Type;
 		Action action;
 		
 		startIndex = (statement.startsWith("!")) ? 1 : 0;
@@ -194,41 +193,28 @@ public class Rule {
 		ThingID = statement.substring(startIndex, endIndex);
 		
 		startIndex = endIndex+1;
-		endIndex = statement.indexOf("In");
-		if (endIndex != -1)
+		endIndex = statement.indexOf("#");
+		if (startIndex == -1 || endIndex == -1)
 		{
-			delay = true;
-			if (startIndex == -1 || endIndex == -1)
-			{
-				InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
-				throw exception;
-			}
-			Value = statement.substring(startIndex, endIndex);
-			startIndex = endIndex+2;
-			endIndex = statement.indexOf("#");
-			Time = statement.substring(startIndex, endIndex);			
+			InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
+			throw exception;
 		}
-		else 
-		{
-			delay = false;
-			endIndex = statement.indexOf("#");
-			if (startIndex == -1 || endIndex == -1)
-			{
-				InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
-				throw exception;
-			}
-			Value = statement.substring(startIndex, endIndex);
-		}
+		Value = statement.substring(startIndex, endIndex);
+
 		startIndex = endIndex+1;
+		endIndex = statement.indexOf("Delay");
+		if (endIndex == -1)
+			endIndex = statement.length();
+		
 		if (startIndex > statement.length())
 		{
 			InvalidRuleException exception = new InvalidRuleException ("Action statment is not valid");
 			throw exception;
 		}
-		Type = statement.substring(startIndex);		
+		Type = statement.substring(startIndex, endIndex);		
 		
-		if (delay)
-			action = new DelayAction(NodeID, ThingID, Value, Time, Type);
+		if ((statement.indexOf("Delay") != -1))
+			action = new DelayAction(NodeID, ThingID, Value, Type);
 		else 
 			action = new InstantAction(NodeID, ThingID, Value, Type);
 		
@@ -446,17 +432,5 @@ public class Rule {
 		}		
 					
 		return (match == true) ? noActionList : null;
-	}
-	
-	public void changeConfig (String type, String time) 
-	{
-		ListIterator<Action>	iterator = actionList.listIterator();
-		while (iterator.hasNext()) 
-		{
-			Action action = iterator.next();
-			if (action.isDelayAction())
-				iterator.next().changeConfigTime(type, time);
-		}
-		updateStatement();
-	}
+	}	
 }

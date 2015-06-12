@@ -2,7 +2,7 @@ package Main;
 
 import EventBus.*;
 import RM_Core.Scheduler;
-import RM_Event.RMEventHandler;
+import RM_Event.RuleManager;
 
 public class Main {
 	
@@ -20,19 +20,20 @@ public class Main {
 	
 	public static void main(String[] args) {
 				
-		Scheduler 					rm_scheduler= Scheduler.getInstance();
-		RMEventHandler 				rm_event 	= RMEventHandler.getInstance();
-		
+		// Event bus for IoTMS
 		RM_EventBusReceiver 		rm 		= new RM_EventBusReceiver();
 		NM_EventBusReceiver 		nm 		= new NM_EventBusReceiver();
 		CM_EventBusReceiver 		cm 		= new CM_EventBusReceiver();				
 		Logger_EventBusReceiver 	logger 	= new Logger_EventBusReceiver();		
 		Message_EventBusReceiver 	message = new Message_EventBusReceiver();
 		
-		rm_scheduler.start();
-	//	rm.addObserver(rm_event);
-	//	rm_event.start();
+		// RuleManager
+		RuleManager 				rulemanager	= RuleManager.getInstance();		
+		Scheduler 					rm_scheduler= Scheduler.getInstance();
 		
+		rulemanager.start();							
+		rm_scheduler.start();
+	
 		testRuleManager();
 	}
 }

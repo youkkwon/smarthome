@@ -1,14 +1,9 @@
 package Main;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import EventBus.IoTMSEventBus;
-import RM_Exception.InvalidRuleException;
 
 public class RM_Tester {
 	
@@ -135,15 +130,16 @@ public class RM_Tester {
 	
 	public void test () throws InterruptedException {
 				
-		System.out.println ("[TestModule] Create Rule.");
 		// Alarm mode Set 시, AlarmLamp On 및 Door Open 불허
-		String[] conditions = new String[1];
-		String[] actions = new String[2];
+		/*String[] conditions = new String[1];
+		String[] actions = new String[3];
 		conditions[0] = "*@8==Set#Alarm";
 		actions[0] = "!0@1=Open#Door";
-		actions[1] = "0@7=On#AlarmLamp";
+		actions[1] = "0@1=Close#Door";					// Close Door before set Alarm.
+		actions[2] = "0@7=On#AlarmLamp";
 		testRuleEvent("Add", null, conditions, actions);
-		
+	
+
 		// Alarm mode UnSet 시, AlarmLamp Off
 		conditions = new String[1];
 		actions = new String[1];
@@ -151,14 +147,14 @@ public class RM_Tester {
 		actions[0] = "0@7=Off#AlarmLamp";	
 		testRuleEvent("Add", null, conditions, actions);
 
-		// If Away, close door & set alarm in 5min, lamp off in 10 min
+	
+		// If Away, close door & set alarm in 5min, lamp off in 10 min (Delayed action) add "Delay"
 		conditions = new String[1];
-		actions = new String[4];
+		actions = new String[3];
 		conditions[0] = "0@3==Away#Presense";
-		actions[0] = "0@1=CloseIn30#Door";
-		actions[1] = "0@9=Confirm#Message";
-		actions[2] = "*@8=SetIn30#Alarm";
-		actions[3] = "0@2=OffIn60#Light";
+		actions[0] = "0@9=Confirm#Message";
+		actions[1] = "*@8=Set#AlarmDelay";
+		actions[2] = "0@2=Off#LightDelay";
 		testRuleEvent("Add", null, conditions, actions);
 		
 		// If AtHome while Alarm, Send Emergency Msg
@@ -176,6 +172,7 @@ public class RM_Tester {
 		conditions[1] = "0@1==Open#Door";
 		actions[0] = "0@9=Emergency#Message";
 		testRuleEvent("Add", null, conditions, actions);
+		*/
 		
 		/* TEST..
 		// Close door if it open on node 0
@@ -204,50 +201,34 @@ public class RM_Tester {
 		conditions[0] = "0@5==Open#DoorSensor";
 		actions[0] = "0@1=Close#Door";
 		testRuleEvent("Delete", null, conditions, actions);*/
-	
+		
 		//testNodeEvent("1", "DisConn");
 		//testNodeEvent("1", "Conn");
 		testRuleEvent("Search", null, null, null);
-		
+			
 		// State Test (Alarm mode)
-		System.out.println ("[TestModule] Alarm mode set.");
 		testStateEvent ("Set");		
 		testRuleEvent("Search", null, null, null);
 		
 		// Thing Test (Node ID : + Thing ID)
-		System.out.println ("[TestModule] open door.");
-		testActionEvent ("0", "1", "Door", "Open");
-		Thread.sleep(500);
+		testActionEvent ("0", "1", "Door", "Open");			// Door open on Alarm mode
 		
 		// State Test (Normal mode)
-		System.out.println ("[TestModule] Alarm mode unset.");
 		testStateEvent ("UnSet");	
 			
 		// Thing Test (Node ID + Thing ID)
-		System.out.println ("[TestModule] open door.");
-		testActionEvent ("0", "1", "Door", "Open");
+		testActionEvent ("0", "1", "Door", "Open");			// Door open on Normal mode
 			
 		// Thing Test (Node ID + Thing ID)
-		System.out.println ("[TestModule] Light on.");
-		testThingEvent ("0", "2", "Light", "On");
+		testThingEvent ("0", "2", "Light", "On");			// Test no rule event
 		
-		System.out.println ("[TestModule] Presense (Away)");
-		testThingEvent ("0", "3", "Presense", "Away");
-		
-		System.out.println ("[TestModule] Alarm mode unset. (Cancel alarm mode expected)");
-		testStateEvent ("UnSet");		
+		testThingEvent ("0", "3", "Presense", "Away");		// Test schedule event
+		testStateEvent ("UnSet");							// Test cancel scheduled event
 
-		testConfigEvent("Door", "3");
-		testRuleEvent ("Search", null, null, null);
-		
-		BufferedReader cin = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			String msg = cin.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println ("Terminate test code");
+		testConfigEvent("Alarm", "3");						// Test config 
+		testConfigEvent("Light", "9");
+		//testRuleEvent ("Search", null, null, null);
+	
+		testThingEvent ("0", "3", "Presense", "Away");		// Check schedule job on chaged value		
 	}
-
 }

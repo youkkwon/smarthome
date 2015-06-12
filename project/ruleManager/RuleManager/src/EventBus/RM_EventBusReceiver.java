@@ -1,17 +1,14 @@
 package EventBus;
 
-import java.util.Observable;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import RM_Event.RMEventHandler;
+import RM_Event.RuleManager;
 
 import com.google.common.eventbus.Subscribe;
 
 // EventBus 와 이벤트를 주고 받는 것을 담당. 
-//public class RM_EventBusReceiver extends Observable {
-public class RM_EventBusReceiver {
+public class RM_EventBusReceiver { //extends Observable implements Runnable {
 	
 	protected JSONObject 	JSONMsg;
 	private	JSONArray		targets;
@@ -32,10 +29,7 @@ public class RM_EventBusReceiver {
 		{
 			if (targets.get(i).equals(ID))
 			{
-				RMEventHandler.getInstance().processEventMsg(JSONMsg);
-			//	RMEventHandler.getInstance().pushEvent(JSONMsg);
-			//	setChanged();
-			//	notifyObservers();
+				RuleManager.getInstance().pushEvent(JSONMsg);				
 			}
 		}
 	}	

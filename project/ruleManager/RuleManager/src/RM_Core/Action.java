@@ -66,6 +66,7 @@ public abstract class Action
 	{
 		JSONArray 	targets = new JSONArray();
 		
+		targets.add("Logger");
 		if (type.equalsIgnoreCase("Message"))
 		{
 			targets.add("Message");
@@ -92,5 +93,4 @@ public abstract class Action
 		
 	public abstract void execute();
 	public abstract boolean isDelayAction();
-	public abstract void changeConfigTime(String type, String timeStr);
 }

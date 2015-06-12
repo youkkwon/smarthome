@@ -2,42 +2,27 @@ package RM_Core;
 
 public class DelayAction extends Action {
 
-	private int time;
-	private int remainTime;
-	private String timeStr;
+	private int remainTime = 0;
 	
-	public DelayAction(String nodeID, String thingID, String value, String timeStr, String type) {
+	public DelayAction(String nodeID, String thingID, String value, String type) {
 		super(nodeID, thingID, value, type);
-		this.timeStr	= timeStr;
-		time			= Integer.parseInt(timeStr);
-		remainTime		= time;
-		statement 		= statement + " in " + timeStr;
 	}
 
+	public String getStatement()
+	{
+		String timeStr = statement; 
+		
+		if (type.equalsIgnoreCase("Alarm"))
+			timeStr = timeStr + " in " + Config.getInstance().getAlarmConfig() + " seconds";
+		else 
+			timeStr = timeStr + " in " + Config.getInstance().getLightConfig() + " seconds";
+		
+		return timeStr;			
+	}
+	
 	public boolean isDelayAction()
 	{
 		return true;
-	}
-	
-	public void changeConfigTime (String type, String timeStr)
-	{
-		// TOOD - Test
-		if (this.type.equalsIgnoreCase(type))
-		{
-			time = Integer.parseInt(timeStr);
-			statement.replaceAll(this.timeStr, timeStr);
-			this.timeStr = timeStr;
-		}		
-	}
-	
-	public int getTime()
-	{
-		return time;
-	}
-	
-	public void setTimeLeft(int left)
-	{
-		remainTime = left;
 	}
 	
 	public int getTimeLeft()
@@ -57,7 +42,13 @@ public class DelayAction extends Action {
 	
 	@Override
 	public void execute() {
+		
+		if (type.equalsIgnoreCase("Alarm"))
+			remainTime = Integer.parseInt(Config.getInstance().getAlarmConfig());
+		else 
+			remainTime = Integer.parseInt(Config.getInstance().getLightConfig());
+		
 		generateJSONMsg();
 		Scheduler.getInstance().addAction(this);
-	}	
+	}
 }

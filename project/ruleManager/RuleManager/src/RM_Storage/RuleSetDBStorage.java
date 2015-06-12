@@ -1,31 +1,32 @@
 package RM_Storage;
 
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import RM_Core.Rule;
 
 public class RuleSetDBStorage extends RuleSetStroage {
 
 	@Override
-	public LinkedList<Rule> RoadRuleSet() {
+	public ListIterator<String> loadRuleSet() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean StoreRuleSet(LinkedList<Rule> ruleset) {
+	public boolean storeRuleSet(LinkedList<Rule> rules) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean InsertRule(Rule rule) {
+	public boolean insertRule(Rule rule) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean DeleteRule(Rule rule) {
+	public boolean deleteRule(Rule rule) {
 		// TODO Auto-generated method stub
 		return false;
 	}

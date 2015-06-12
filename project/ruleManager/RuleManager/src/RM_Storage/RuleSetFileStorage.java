@@ -7,60 +7,80 @@ import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import RM_Core.Rule;
 
 public class RuleSetFileStorage extends RuleSetStroage {
 
 	String				filename;
-	BufferedReader		input;
-	BufferedWriter 		output;
-
-	public RuleSetFileStorage()
+	private static RuleSetFileStorage storage = new RuleSetFileStorage(); 
+	
+	private RuleSetFileStorage()
 	{
-		filename = "RuleManager.txt";
+		filename = "IoTMS.rule";
+	}
+
+	public static RuleSetFileStorage getInstance()
+	{
+		return storage;		
 	}
 	
+	
+	
 	@Override
-	public LinkedList<Rule> RoadRuleSet() {
+	public ListIterator<String> loadRuleSet() {
+	
+		String 	input = new String();
+		LinkedList<String> raw_rules = new LinkedList<String>();
 		
 		try {
-			input =  new BufferedReader(new FileReader(filename));
+			BufferedReader br = new BufferedReader(new FileReader(filename));		
+			while ( (input=br.readLine()) != null )
+			{				
+				if (input.length() != 0)
+				raw_rules.add(input);										
+			} 
+			br.close();
+		} catch (FileNotFoundException e) {
+			// Predefined Rule.
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return raw_rules.listIterator();
+	}
+
+	@Override
+	public boolean storeRuleSet(LinkedList<Rule> rules) {
+		
+		try {
+			BufferedWriter bw =  new BufferedWriter(new FileWriter(filename));	
+			ListIterator<Rule>	iterator = rules.listIterator();
 			
-			input.close();
+			while (iterator.hasNext()) 
+			{
+				bw.write(iterator.next().getStatement());
+				bw.newLine();
+			}
+			bw.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return false;
 	}
 
 	@Override
-	public boolean StoreRuleSet(LinkedList<Rule> ruleset) {
-		
-		try {
-			output =  new BufferedWriter(new FileWriter(filename));
-			
-			output.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public boolean insertRule(Rule rule) {
 		
 		return false;
 	}
 
 	@Override
-	public boolean InsertRule(Rule rule) {
+	public boolean deleteRule(Rule rule) {
 		return false;
 	}
-
-	@Override
-	public boolean DeleteRule(Rule rule) {
-		return false;
-	}
-
 }

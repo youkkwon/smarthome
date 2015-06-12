@@ -1,0 +1,6 @@
+if *@8==Set#Alarm 						then !0@1=Open#Door, 0@1=Close#Door, 0@7=On#AlarmLamp
+if *@8==UnSet#Alarm 					then 0@7=Off#AlarmLamp
+if 0@3==Away#Presense 					then 0@9=Confirm#Message, *@8=Set#AlarmDelay, 0@2=Off#LightDelay
+if *@8==Set#Alarm, 0@3==AtHome#Presense then 0@9=Emergency#Message
+if *@8==Set#Alarm, 0@1==Open#Door 		then 0@9=Emergency#Message
+
