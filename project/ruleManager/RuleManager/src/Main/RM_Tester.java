@@ -8,7 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import EventBus.IoTMSEventBus;
-import RM_Utils.InvalidRuleException;
+import RM_Exception.InvalidRuleException;
 
 public class RM_Tester {
 	
@@ -138,14 +138,12 @@ public class RM_Tester {
 		System.out.println ("[TestModule] Create Rule.");
 		// Alarm mode Set 시, AlarmLamp On 및 Door Open 불허
 		String[] conditions = new String[1];
-		String[] actions = new String[3];
+		String[] actions = new String[2];
 		conditions[0] = "*@8==Set#Alarm";
 		actions[0] = "!0@1=Open#Door";
-		actions[1] = "0@1=Close#Door";					// Close Door before set Alarm.
-		actions[2] = "0@7=On#AlarmLamp";
+		actions[1] = "0@7=On#AlarmLamp";
 		testRuleEvent("Add", null, conditions, actions);
-	
-
+		
 		// Alarm mode UnSet 시, AlarmLamp Off
 		conditions = new String[1];
 		actions = new String[1];
@@ -153,14 +151,14 @@ public class RM_Tester {
 		actions[0] = "0@7=Off#AlarmLamp";	
 		testRuleEvent("Add", null, conditions, actions);
 
-	
-		// If Away, close door & set alarm in 5min, lamp off in 10 min (Delayed action) add "Delay"
+		// If Away, close door & set alarm in 5min, lamp off in 10 min
 		conditions = new String[1];
-		actions = new String[3];
+		actions = new String[4];
 		conditions[0] = "0@3==Away#Presense";
-		actions[0] = "0@9=Confirm#Message";
-		actions[1] = "*@8=Set#AlarmDelay";
-		actions[2] = "0@2=Off#LightDelay";
+		actions[0] = "0@1=CloseIn30#Door";
+		actions[1] = "0@9=Confirm#Message";
+		actions[2] = "*@8=SetIn30#Alarm";
+		actions[3] = "0@2=OffIn60#Light";
 		testRuleEvent("Add", null, conditions, actions);
 		
 		// If AtHome while Alarm, Send Emergency Msg
@@ -206,11 +204,11 @@ public class RM_Tester {
 		conditions[0] = "0@5==Open#DoorSensor";
 		actions[0] = "0@1=Close#Door";
 		testRuleEvent("Delete", null, conditions, actions);*/
-		
+	
 		//testNodeEvent("1", "DisConn");
 		//testNodeEvent("1", "Conn");
 		testRuleEvent("Search", null, null, null);
-			
+		
 		// State Test (Alarm mode)
 		System.out.println ("[TestModule] Alarm mode set.");
 		testStateEvent ("Set");		
@@ -239,11 +237,8 @@ public class RM_Tester {
 		System.out.println ("[TestModule] Alarm mode unset. (Cancel alarm mode expected)");
 		testStateEvent ("UnSet");		
 
-		testConfigEvent("Alarm", "3");
-		testConfigEvent("Light", "9");
+		testConfigEvent("Door", "3");
 		testRuleEvent ("Search", null, null, null);
-		System.out.println ("[TestModule] Presense (Away)");
-		testThingEvent ("0", "3", "Presense", "Away");
 		
 		BufferedReader cin = new BufferedReader(new InputStreamReader(System.in));
 		try {

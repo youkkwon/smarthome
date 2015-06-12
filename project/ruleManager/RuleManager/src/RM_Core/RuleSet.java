@@ -3,7 +3,7 @@ package RM_Core;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import RM_Utils.InvalidRuleException;
+import RM_Exception.InvalidRuleException;
 
 // Singleton
 public class RuleSet {
@@ -174,5 +174,16 @@ public class RuleSet {
 			}
 		}
 		return true;
-	}	
+	}
+	
+	public void changeConfig (String type, String time) 
+	{
+		// TODO - FIX THIS
+		ListIterator<Rule>	iterator = rules.listIterator();
+		while (iterator.hasNext()) 
+		{
+			iterator.next().changeConfig(type, time);
+		}
+		Scheduler.getInstance().changeConfig(type, Integer.parseInt(time));
+	}
 }

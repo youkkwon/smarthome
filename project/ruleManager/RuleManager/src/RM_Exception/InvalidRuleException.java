@@ -1,4 +1,4 @@
-package RM_Utils;
+package RM_Exception;
 
 public class InvalidRuleException extends Exception {
 

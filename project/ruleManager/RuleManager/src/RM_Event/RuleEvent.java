@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import EventBus.IoTMSEventBus;
 import RM_Core.Rule;
 import RM_Core.RuleSet;
+import RM_Exception.InvalidRuleException;
 
 public class RuleEvent {
 

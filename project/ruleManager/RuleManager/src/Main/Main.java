@@ -31,6 +31,7 @@ public class Main {
 		
 		rm_scheduler.start();
 	//	rm.addObserver(rm_event);
+	//	rm_event.start();
 		
 		testRuleManager();
 	}

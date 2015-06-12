@@ -17,5 +17,10 @@ public class InstantAction extends Action {
 	{
 		return false;
 	}
+	
+	public void changeConfigTime (String type, String timeStr)
+	{
+		// Do Nothing.
+	}
 }
 

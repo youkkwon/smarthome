@@ -3,7 +3,7 @@ package RM_Event;
 import org.json.simple.JSONObject;
 
 import RM_Core.RuleSet;
-import RM_Utils.InvalidRuleException;
+import RM_Exception.InvalidRuleException;
 
 public class StateEvent {
 
