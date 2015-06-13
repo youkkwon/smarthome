@@ -13,11 +13,13 @@ public class RM_Tester {
 	 * Light		2		On/Off
 	 * Presense		3		AtHome/Away
 	 * Temperature	4		number
-	 * DoorSensor	5		Open/Close
-	 * MailBox		6		Empty/Mail
+	 * Humidity		5		number
+	 * DoorSensor	6		Open/Close
 	 * AlarmLamp	7		On/Off
-	 * Alarm		8		Set/UnSet
-	 * Message		9 		Confirm/Emergency/MalFunction/Post
+	 * MailBox		8		Empty/Mail
+	 * 
+	 * Alarm		10		Set/UnSet
+	 * Message		11 		Confirm/Emergency/MalFunction/Post
 	 */
 	@SuppressWarnings("unchecked")
 	public void testRuleEvent(String type, String nodeID, String[] conditions, String[] actions) 
@@ -106,9 +108,41 @@ public class RM_Tester {
 		JSONMsg.put("Targets", targets);
 		JSONMsg.put("Job", "ThingCtrl");
 		JSONMsg.put("NodeID", nodeID);
-		JSONMsg.put("ThingID", thingID);
-		JSONMsg.put("Type",  type);
-		JSONMsg.put("Value", value);
+
+		JSONArray	things	= new JSONArray();
+		JSONObject thing = new JSONObject();
+		thing.put ("ThingID", thingID);
+		thing.put ("Type", type);
+		thing.put ("Value", value);
+		things.add(thing);
+		JSONMsg.put("ThingsInfo", things);
+		
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void testThingBulkEvent(String nodeID, String[] thingID, String[] type, String[] value)
+	{
+		JSONObject	JSONMsg = new JSONObject();
+		JSONArray 	targets = new JSONArray();
+		JSONArray	things	= new JSONArray();
+		
+		targets.add("RuleManager");
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("Job", "ThingCtrl");
+		JSONMsg.put("NodeID", nodeID);		
+		if (thingID.length == type.length && thingID.length == value.length)
+		{
+			for (int i=0; i < thingID.length; i++)
+			{
+				JSONObject thing = new JSONObject();
+				thing.put ("ThingID", thingID[i]);
+				thing.put ("Type", type[i]);
+				thing.put ("Value", value[i]);
+				things.add(thing);
+			}
+		}
+		JSONMsg.put("ThingsInfo", things);
 
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}
@@ -230,5 +264,13 @@ public class RM_Tester {
 		//testRuleEvent ("Search", null, null, null);
 	
 		testThingEvent ("0", "3", "Presense", "Away");		// Check schedule job on chaged value		
+		
+		String[] IDs = new String[3];
+		String[] types = new String[3];
+		String[] values = new String[3];
+		IDs[0] = "5";	types[0] = "DoorSensor";		values[0] = "Open";
+		IDs[1] = "3";	types[1] = "Presense";			values[1] = "Away";
+		IDs[2] = "4";	types[2] = "Temperature";		values[2] = "32";		
+		testThingBulkEvent("0", IDs, types, values);
 	}
 }

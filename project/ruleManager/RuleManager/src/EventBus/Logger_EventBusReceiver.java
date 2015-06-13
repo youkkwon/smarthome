@@ -32,6 +32,6 @@ public class Logger_EventBusReceiver extends Thread {
 	
 	private void ProcessCommManagerEvent (JSONObject JSONMsg)
 	{	
-		System.out.println ("[EventBus] Process Message Event : " + JSONMsg);	
+		System.out.println ("[EventBus] Process Logger Event : " + JSONMsg);	
 	}	
 }

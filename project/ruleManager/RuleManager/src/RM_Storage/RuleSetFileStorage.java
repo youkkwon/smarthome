@@ -18,7 +18,7 @@ public class RuleSetFileStorage extends RuleSetStroage {
 	
 	private RuleSetFileStorage()
 	{
-		filename = "IoTMS.rule";
+		filename = "RM_resource/IoTMS.rule";
 	}
 
 	public static RuleSetFileStorage getInstance()

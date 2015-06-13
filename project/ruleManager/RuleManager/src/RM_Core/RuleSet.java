@@ -173,7 +173,8 @@ public class RuleSet {
 	
 	public void setMode (String mode) throws InvalidRuleException
 	{
-		this.mode = "*@8==" + mode.trim() + "#Alarm";
+		// TODO - hard card value
+		this.mode = "*@10==" + mode.trim() + "#Alarm";
 		activeRulesBasedOnMode(this.mode);
 		
 		if (mode.equalsIgnoreCase("UnSet"))

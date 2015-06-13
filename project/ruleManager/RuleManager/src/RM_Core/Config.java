@@ -11,7 +11,7 @@ public class Config {
 
 	private int alarm_config = 300;			// 5m by default
 	private int light_config = 600;			// 10m by default
-	private String filename 	= "IoTMS.config";
+	private String filename 	= "RM_resource/IoTMS.config";
 			
 	private static Config config = new Config(); 
 
