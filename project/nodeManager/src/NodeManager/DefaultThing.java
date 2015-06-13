@@ -1,13 +1,10 @@
-package NodeManager.Things;
+package NodeManager;
 
 import org.json.simple.JSONObject;
 
-import NodeManager.Thing;
-import NodeManager.Type;
+public class DefaultThing extends Thing {
 
-public class Alarm extends Thing {
-
-	public Alarm(Type type, int id) {
+	public DefaultThing(Type type, int id) {
 		mType = type;
 		mId = id;
 	}
@@ -38,10 +35,8 @@ public class Alarm extends Thing {
 
 	@Override
 	public JSONObject GetValue(JSONObject JSONMsg) {
-		if (mValue == 0)
-			JSONMsg.put("Value", "Unset");
-		else
-			JSONMsg.put("Value", "Set");
+		// TODO Auto-generated method stub
+		JSONMsg.put("Value", "Unknown");
 		
 		// add thing id
 		JSONMsg.put("ThingID", Integer.toString(mId));
@@ -60,4 +55,5 @@ public class Alarm extends Thing {
 		// TODO Auto-generated method stub
 		
 	}
+
 }

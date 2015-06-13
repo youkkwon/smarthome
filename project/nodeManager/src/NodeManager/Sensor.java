@@ -1,13 +1,10 @@
-package NodeManager.Things;
+package NodeManager;
 
 import org.json.simple.JSONObject;
 
-import NodeManager.Thing;
-import NodeManager.Type;
+public class Sensor extends Thing {
 
-public class Unknown extends Thing {
-
-	public Unknown(Type type, int id) {
+	public Sensor(Type type, int id) {
 		mType = type;
 		mId = id;
 	}
@@ -38,9 +35,13 @@ public class Unknown extends Thing {
 
 	@Override
 	public JSONObject GetValue(JSONObject JSONMsg) {
-		return null;
 		// TODO Auto-generated method stub
+		JSONMsg.put("Value", "Unknown");
 		
+		// add thing id
+		JSONMsg.put("ThingID", Integer.toString(mId));
+		
+		return JSONMsg;
 	}
 
 	@Override
