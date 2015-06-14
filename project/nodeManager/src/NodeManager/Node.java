@@ -33,10 +33,10 @@ public class Node {
 		return ret; 
 	}
 		
-	public void addThing(SensorType sType, Type type, String name) {
+	public void addThing(SensorType sType, Type type, String id) {
 		Thing thing = thingFactory.create(sType);
 		thing.setType(type);
-		thing.setName(name);
+		thing.setId(id);
 		Things.add(thing);
 	}
 	
@@ -76,23 +76,32 @@ public class Node {
 		return ret;
 	}
 	
-	// To SA Node
-	public JSONObject getThingCommand(String thingName, JSONObject JSONMsg) {
-		JSONObject ret = getThing(thingName).doCommand(JSONMsg);
-		// add macAddress for SA Node
-		// 사실 아래 코드는 붙일 필요가 없음
-		//ret.put("MacAddress", this.macAddress);
+	public JSONObject getThingInfo(int index, JSONObject JSONMsg) {
+		JSONObject ret = Things.get(index).getValue(JSONMsg);
+		// add node id
+		ret.put("NodeID", this.macAddress);
 		
 		return ret;
 	}
 	
-	public Thing getThing(String thingName) {
+	public Thing getThing(String thingId) {
 		int index = 0;
 		for(index=0; index<Things.size(); index++) {
-			if (thingName.equals(Things.get(index)))
+			if (thingId.equals(Things.get(index).getId()))
 					return Things.get(index);
 		}
 		return null;
+	}
+	
+	public int getThingCount() {
+		return Things.size();
+	}
+	
+	// To SA Node
+	public JSONObject getThingCommand(String thingId, JSONObject JSONMsg) {
+		getThing(thingId).doCommand(JSONMsg);
+		
+		return JSONMsg;
 	}
 
 }

@@ -50,37 +50,17 @@ public class NodeManager {
 		String nodeId = (String)JSONMsg.get("NodeID");
 		
 		JSONObject info = new JSONObject();
-		for(int i=0; i<Nodes.size(); i++) {
-			
+		JSONArray thingArray = new JSONArray();
+		
+		for(int i=0; i<getNode(nodeId).getThingCount(); i++) {
+			JSONObject thingInfo = new JSONObject();
+			thingInfo = getNode(nodeId).getThingInfo(i, info);
+			thingArray.add(thingInfo);
 		}
-		
-		
-		/*
-		
-		
-		
+
 		JSONArray targets = new JSONArray();
 		targets.add("UI");
-		sendEvent(info, "UI", "ThingMonitor");
-		
-		
-		
-		
-		String thingId = (String)JSONMsg.get("ThingID");
-		JSONObject info = new JSONObject();
-		if (getNode(nodeId) != null)
-			info = getNode(nodeId).getThingInfo(thingId, info);
-		
-		// address target
-		System.out.println ("[EventBus] ShowThingInfo: " + info);
-		
-		sendEvent(info, "UI", "ThingMonitor");
-		
-		
-		String info = getNode(id).showInfo();
-		//EventBus.push(info);
-
-		 */
+		sendEvent(info, targets, "ThingMonitor");
 	}
 	
 	// from UI
@@ -103,11 +83,12 @@ public class NodeManager {
 	 * RuleManager로부터 낼온 명령을 SA Node로 전달한다.
 	 */
 	public void doCommand(JSONObject JSONMsg) {
-		int nodeId = Integer.parseInt((String)JSONMsg.get("NodeID"));
+		String nodeId = (String)JSONMsg.get("NodeID");
 		String thingId = (String)JSONMsg.get("ThingID");
+		getNode(nodeId).getThingCommand(thingId, JSONMsg);
 		
-		JSONObject action = new JSONObject(); 
-		action = Nodes.get(nodeId).getThingCommand(thingId, action);
+		JSONMsg.remove("Targets");
+		JSONMsg.remove("Job");
 		
 		// To Do Send to SA Node
 		
@@ -127,8 +108,8 @@ public class NodeManager {
 		else
 			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
 		if (thing != null)
-			if (thing.setValue(Integer.parseInt((String)JSONMsg.get("NodeID"))) == false) {
-				// 값의 변경이 없음
+			if (thing.setValue((String)JSONMsg.get("NodeID")) == false) {
+				// 값의 변경이 없음. 삭제
 				
 			}
 		else

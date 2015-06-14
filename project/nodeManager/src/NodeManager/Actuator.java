@@ -19,7 +19,11 @@ public class Actuator extends Thing {
 	@Override
 	public JSONObject getValue(JSONObject JSONMsg) {
 		// TODO Auto-generated method stub
-		return null;
+		JSONMsg.put("Value", this.mValue);
+		JSONMsg.put("ThingID", this.mId);
+		JSONMsg.put("Type", this.mType);
+		
+		return JSONMsg;
 	}
 
 	/*
@@ -28,9 +32,9 @@ public class Actuator extends Thing {
 	 * fasle : 값의 변경이 없음
 	 */
 	@Override
-	public boolean setValue(int value) {
+	public boolean setValue(String value) {
 		// TODO Auto-generated method stub
-		if (value != mValue) {
+		if (!value.equalsIgnoreCase(mValue)) {
 			mValue = value;
 			return true;
 		}
@@ -41,25 +45,21 @@ public class Actuator extends Thing {
 	@Override
 	public JSONObject doCommand(JSONObject JSONMsg) {
 		// TODO Auto-generated method stub
-		JSONMsg.put("Value", "Unknown");
-		
-		
-		// add thing id
-		JSONMsg.put("ThingID", this.mName);
+		this.mValue = (String)JSONMsg.get("Value");
 		
 		return JSONMsg;
 	}
 
 	@Override
-	public String getName() {
+	public String getId() {
 		// TODO Auto-generated method stub
-		return mName;
+		return mId;
 	}
 
 	@Override
-	public void setName(String name) {
+	public void setId(String id) {
 		// TODO Auto-generated method stub
-		this.mName = name;
+		this.mId = id;
 	}
 
 }
