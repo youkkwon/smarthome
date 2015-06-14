@@ -8,6 +8,7 @@ import comm.LinkEventListener;
 import EventBus.*;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
 import org.json.simple.JSONObject;
 
 public class Node implements LinkEventListener {
@@ -141,12 +142,37 @@ public class Node implements LinkEventListener {
 			return;
 		}
 		thing.doCommand(JSONMsg);
+		send(JSONMsg.toString());
 	}
 
+	public void send(String msg)
+	{
+		link.send(msg);
+	}
+
+	public void disconnect()
+	{
+		link.disconnect();
+	}
+	
+	public void updateLink(Link l)
+	{
+		link = l;
+		System.out.println("Update the link (mac: " + getMacAddress() +")");
+		link.addListener(this);
+	}
+	
 	@Override
 	public void onData(LinkEvent event) {
 		// TODO Auto-generated method stub
 		System.out.println("# Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
+		JSONObject thingObj = null;
+		thingObj = (JSONObject) JSONValue.parse(event.getMessage());
+		if (thingObj == null) {
+			System.out.println("JSON Object is null from SA node");
+			return;
+		}
+		updateThingInfo(thingObj);
 	}
 
 	@Override

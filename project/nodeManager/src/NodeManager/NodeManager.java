@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import EventBus.*;
 import comm.Adapter;
@@ -133,14 +134,16 @@ public class NodeManager implements AdapterEventListener {
 
 	
 	// Communicate with SA node
-	public void discoverNode(int duration)
+	public void discoverNode(JSONObject JSONMsg)
 	{
+		int duration = 0;
+		duration = Integer.parseInt((String)JSONMsg.get("Duration"));
 		adapter.discoverNode(duration);
 	}
 
-	public void registerNode(String msg)
+	public void registerNode(JSONObject JSONMsg)
 	{
-		adapter.registerNode(msg);
+		adapter.registerNode(JSONMsg.toString());
 	}
 
 	public void rejectNode(String mac)
@@ -159,8 +162,18 @@ public class NodeManager implements AdapterEventListener {
 	public void onRegistered(AdapterEvent event) {
 		// TODO Auto-generated method stub
 		System.out.println(event.getMessage());
-		// Store DB
 		
+		// Store DB or UI에 던진다.	
+		JSONObject JSONMsg = null;
+		JSONMsg = (JSONObject) JSONValue.parse(event.getMessage());
+		if (JSONMsg == null) {
+			System.out.println("JSON Object is null from SA node");
+			return;
+		}
+		
+		JSONArray targets = new JSONArray();
+		targets.add("UI");
+		sendEvent(JSONMsg, targets, "Registered");
 	}
 
 	@Override

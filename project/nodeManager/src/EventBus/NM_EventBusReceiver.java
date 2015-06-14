@@ -48,6 +48,10 @@ public class NM_EventBusReceiver extends Thread {
 			NodeManager.getInstance().showNodeInfo(JSONMsg);
 		else if (job.equalsIgnoreCase("ActionCtrl"))
 			NodeManager.getInstance().doCommand(JSONMsg);
+		else if (job.equalsIgnoreCase("Register"))
+			NodeManager.getInstance().registerNode(JSONMsg);
+		else if (job.equalsIgnoreCase("DiscoverNode"))
+			NodeManager.getInstance().discoverNode(JSONMsg);
 		else
 		{
 			System.out.println ("Not valid event, ignore it.");
