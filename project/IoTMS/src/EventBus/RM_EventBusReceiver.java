@@ -24,6 +24,8 @@ public class RM_EventBusReceiver { //extends Observable implements Runnable {
 	@Subscribe
 	public void ProcessEvent(JSONObject JSONMsg)
 	{
+//		System.out.println ("=== Event Bus : " + JSONMsg);
+		
 		targets = (JSONArray) JSONMsg.get("Targets");
 		for (int i=0; i < targets.size(); i++)
 		{
