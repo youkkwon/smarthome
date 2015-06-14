@@ -1,6 +1,7 @@
 package NodeManager;
 
 import java.util.ArrayList;
+
 import comm.Link;
 import comm.LinkEvent;
 import comm.LinkEventListener;
@@ -8,13 +9,15 @@ import comm.LinkEventListener;
 import org.json.simple.JSONObject;
 
 public class Node implements LinkEventListener {
-	private String macAddress;
 	private ArrayList<Thing> Things = new ArrayList<Thing>();
 	private Factory thingFactory = new ThingFactory();
+	private Link link;
 	
-	public Node(Link link) {
+	public Node(Link l) {
 		// Creator
-		this.macAddress = link.getMACAddress();
+		link = l;
+		System.out.println("Create a new node (mac: " + getMacAddress() +")");
+		link.addListener(this);
 		
 		// loop for things
 		/*
@@ -44,17 +47,18 @@ public class Node implements LinkEventListener {
 	}
 	
 	public String getMacAddress() {
-		return this.macAddress;
-	}
-	
-	public void setMacAddress(String macAddr) {
-		this.macAddress = macAddr;
+		return link.getMACAddress();
 	}
 	
 	public JSONObject getThingInfo(String thingName, JSONObject JSONMsg) {
-		JSONObject ret = getThing(thingName).getValue(JSONMsg);
+		Thing thing = getThing(thingName);
+		if (thing == null) {
+			System.out.println ("[getThingInfo] Error: Thing is null");
+			return null;
+		}
+		JSONObject ret = thing.getValue(JSONMsg);
 		// add node id
-		ret.put("NodeID", this.macAddress);
+		ret.put("NodeID", getMacAddress());
 		
 		return ret;
 	}
@@ -62,7 +66,7 @@ public class Node implements LinkEventListener {
 	public JSONObject getThingInfo(int index, JSONObject JSONMsg) {
 		JSONObject ret = Things.get(index).getValue(JSONMsg);
 		// add node id
-		ret.put("NodeID", this.macAddress);
+		ret.put("NodeID", getMacAddress());
 		
 		return ret;
 	}
@@ -81,22 +85,26 @@ public class Node implements LinkEventListener {
 	}
 	
 	// To SA Node
-	public JSONObject getThingCommand(String thingId, JSONObject JSONMsg) {
-		getThing(thingId).doCommand(JSONMsg);
-		
-		return JSONMsg;
+	public void doThingCommand(String thingId, JSONObject JSONMsg) {
+		Thing thing = getThing(thingId);
+		if (thing == null) {
+			System.out.println ("[doThingCommand] Error: Thing is null");
+			return;
+		}
+		thing.doCommand(JSONMsg);
 	}
 
 	@Override
 	public void onData(LinkEvent event) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("# Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
 	}
 
 	@Override
 	public void onStatus(LinkEvent event) {
 		// TODO Auto-generated method stub
-		
+		// Disconnect일때 OnStatus가 날라옴
+		System.out.println("# Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
 	}
 
 }

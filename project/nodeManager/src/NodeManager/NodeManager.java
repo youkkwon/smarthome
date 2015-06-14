@@ -39,7 +39,7 @@ public class NodeManager implements AdapterEventListener {
 	private Node getNode(String macAddr) {
 		int index = 0;
 		for(index=0; index<Nodes.size(); index++) {
-			if (macAddr.equals(Nodes.get(index)))
+			if (macAddr.equals(Nodes.get(index).getMacAddress()))
 					return Nodes.get(index);
 		}
 		return null;
@@ -62,9 +62,15 @@ public class NodeManager implements AdapterEventListener {
 		JSONObject info = new JSONObject();
 		JSONArray thingArray = new JSONArray();
 		
-		for(int i=0; i<getNode(nodeId).getThingCount(); i++) {
+		Node node = getNode(nodeId);
+		if (node == null) {
+			System.out.println ("[showNodeInfo] Error: Node is null");
+			return;
+		}
+		
+		for(int i=0; i<node.getThingCount(); i++) {
 			JSONObject thingInfo = new JSONObject();
-			thingInfo = getNode(nodeId).getThingInfo(i, info);
+			thingInfo = node.getThingInfo(i, info);
 			thingArray.add(thingInfo);
 		}
 
@@ -78,8 +84,13 @@ public class NodeManager implements AdapterEventListener {
 		String nodeId = (String)JSONMsg.get("NodeID");
 		String thingId = (String)JSONMsg.get("ThingID");
 		JSONObject info = new JSONObject();
-		if (getNode(nodeId) != null)
-			info = getNode(nodeId).getThingInfo(thingId, info);
+		
+		Node node = getNode(nodeId);
+		if (node == null) {
+			System.out.println ("[showThingInfo] Error: Node is null");
+			return;
+		}
+		info = node.getThingInfo(thingId, info);
 		
 		// address target
 		System.out.println ("[EventBus] ShowThingInfo: " + info);
@@ -95,13 +106,13 @@ public class NodeManager implements AdapterEventListener {
 	public void doCommand(JSONObject JSONMsg) {
 		String nodeId = (String)JSONMsg.get("NodeID");
 		String thingId = (String)JSONMsg.get("ThingID");
-		getNode(nodeId).getThingCommand(thingId, JSONMsg);
+		Node node = getNode(nodeId); 
+		if (node == null) {
+			System.out.println ("[doCommand] Error: Node is null");
+			return;
+		}
 		
-		JSONMsg.remove("Targets");
-		JSONMsg.remove("Job");
-		
-		// To Do Send to SA Node
-		
+		node.doThingCommand(thingId, JSONMsg);	
 	}
 	
 	/* from SA Node
@@ -124,13 +135,15 @@ public class NodeManager implements AdapterEventListener {
 			thingObj = (JSONObject) thingInfos.get(i);
 			String thingID = (String)thingObj.get("ThingID");
 			thing = node.getThing(thingID); 
-			if (thing != null)
+			if (thing != null) {
 				if (thing.setValue((String)thingObj.get("Value")) == false) {
 					// 값의 변경이 없음. 해당 Object 삭제
 					thingInfos.remove(i);
 				}
-			else
+			}
+			else {
 				System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
+			}
 		}
 		
 		// 바뀐 data만 정리해서 보냄
@@ -156,7 +169,7 @@ public class NodeManager implements AdapterEventListener {
 	}
 
 	
-	
+	// Communicate with SA node
 	public void discoverNode(int duration)
 	{
 		adapter.discoverNode(duration);
@@ -169,6 +182,7 @@ public class NodeManager implements AdapterEventListener {
 
 	public void rejectNode(String mac)
 	{
+		// 등록이 안된 Device가 추가되거나 Node의 갯수가 50개를 초과한 경우
 		adapter.disconnectNode(mac);
 	}
 	
@@ -182,6 +196,8 @@ public class NodeManager implements AdapterEventListener {
 	public void onRegistered(AdapterEvent event) {
 		// TODO Auto-generated method stub
 		System.out.println(event.getMessage());
+		// Store DB
+		
 	}
 
 	@Override
@@ -190,6 +206,10 @@ public class NodeManager implements AdapterEventListener {
 		if(event.getType().equals("Add_node"))
 		{
 			// 1. look-up DB
+			// Thing을 DB에서 받아서 Thing을 추가한다.
+			if (Nodes.size() > 50)
+				rejectNode("reject node");
+			
 			
 			// 2. add new node or update the existing node
 			/*
