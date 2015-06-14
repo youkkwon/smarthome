@@ -115,43 +115,6 @@ public class NodeManager implements AdapterEventListener {
 		node.doThingCommand(thingId, JSONMsg);	
 	}
 	
-	/* from SA Node
-	 * SA Node로부터 올라온 Data를 Update한다.
-	*/
-	public void updateThingInfo(JSONObject JSONMsg) { 
-		Node node = null;
-		Thing thing = null;
-		JSONObject thingObj = null;
-		
-		node = getNode((String)JSONMsg.get("MacAddress"));
-		if (node == null) {
-			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
-			return;
-		}
-		
-		JSONArray thingInfos = (JSONArray) JSONMsg.get("ThingsInfo");
-		for (int i=0; i < thingInfos.size(); i++)
-		{
-			thingObj = (JSONObject) thingInfos.get(i);
-			String thingID = (String)thingObj.get("ThingID");
-			thing = node.getThing(thingID); 
-			if (thing != null) {
-				if (thing.setValue((String)thingObj.get("Value")) == false) {
-					// 값의 변경이 없음. 해당 Object 삭제
-					thingInfos.remove(i);
-				}
-			}
-			else {
-				System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
-			}
-		}
-		
-		// 바뀐 data만 정리해서 보냄
-		JSONArray targets = new JSONArray();
-		targets.add("RuleManager");
-		targets.add("UI");
-		sendEvent(JSONMsg, targets, "ThingCtrl");
-	}
 	
 	/* sendEvent
 	 * JSONMsg : 전달할 Object

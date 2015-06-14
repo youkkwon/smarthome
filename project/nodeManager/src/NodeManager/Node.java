@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import comm.Link;
 import comm.LinkEvent;
 import comm.LinkEventListener;
+import EventBus.*;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Node implements LinkEventListener {
 	private ArrayList<Thing> Things = new ArrayList<Thing>();
 	private Factory thingFactory = new ThingFactory();
+	IoTMSEventBus ev_bus = IoTMSEventBus.getInstance();
 	private Link link;
 	
 	public Node(Link l) {
@@ -82,6 +85,52 @@ public class Node implements LinkEventListener {
 	
 	public int getThingCount() {
 		return Things.size();
+	}
+	
+	/* from SA Node
+	 * SA Node로부터 올라온 Data를 Update한다.
+	*/
+	public void updateThingInfo(JSONObject JSONMsg) { 
+		Node node = null;
+		Thing thing = null;
+		JSONObject thingObj = null;
+		
+		String nodeID = (String)JSONMsg.get("NodeID");
+		
+		if (nodeID.equalsIgnoreCase(getMacAddress())) {
+			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
+			return;
+		}
+		
+		JSONArray thingInfos = (JSONArray) JSONMsg.get("Status");
+		for (int i=0; i < thingInfos.size(); i++)
+		{
+			thingObj = (JSONObject) thingInfos.get(i);
+			String thingID = (String)thingObj.get("Id");
+			thing = getThing(thingID); 
+			if (thing != null) {
+				if (thing.setValue((String)thingObj.get("Value")) == false) {
+					// 값의 변경이 없음. 해당 Object 삭제
+					thingInfos.remove(i);
+				}
+			}
+			else {
+				System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
+			}
+		}
+		
+		// 바뀐 data만 정리해서 보냄
+		JSONArray targets = new JSONArray();
+		targets.add("RuleManager");
+		targets.add("UI");
+		
+		JSONMsg.remove("Targets");
+		JSONMsg.remove("Job");
+		
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("Job", "ThingCtrl");
+		
+		ev_bus.postEvent(JSONMsg);
 	}
 	
 	// To SA Node
