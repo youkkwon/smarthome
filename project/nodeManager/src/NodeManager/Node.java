@@ -1,5 +1,6 @@
 package NodeManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
@@ -8,7 +9,7 @@ public class Node {
 	private String macAddress;
 	private String ipAddress;
 	private String hostName;
-	private List<Thing> Things;
+	private ArrayList<Thing> Things = new ArrayList();
 	private Factory thingFactory = new ThingFactory();
 	
 	public Node(String macAddr, String ipAddr, String hName, JSONObject JSONMsg) {

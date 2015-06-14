@@ -1,11 +1,16 @@
 package NodeManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import EventBus.*;
+import comm.Adapter;
+import comm.AdapterEvent;
+import comm.AdapterEventListener;
+import comm.Link;
 
 enum Type {
 	Door, Light, Presense, Temperature, Humidity, DoorSensor, AlarmLamp, MialBox, Unknown
@@ -15,7 +20,7 @@ enum SensorType {
 	Actuator, Sensor, Unknown
 }
 
-public class NodeManager {
+public class NodeManager implements AdapterEventListener {
 	// Singletone
 	private static NodeManager uniqueInstance = new NodeManager();
 	public static NodeManager getInstance() {
@@ -24,7 +29,12 @@ public class NodeManager {
 	
 	NM_EventBusReceiver nm_rcv = NM_EventBusReceiver.getInstance();
 	IoTMSEventBus ev_bus = IoTMSEventBus.getInstance();
-	private List<Node> Nodes;
+	private ArrayList<Node> Nodes = new ArrayList();
+	private Adapter adapter = new Adapter();
+	
+	public NodeManager() {
+		adapter.addListener(this);
+	}
 		
 	private Node getNode(String macAddr) {
 		int index = 0;
@@ -100,20 +110,28 @@ public class NodeManager {
 	public void updateThingInfo(JSONObject JSONMsg) { 
 		Node node = null;
 		Thing thing = null;
+		JSONObject thingObj = null;
 		
-		// Need to loop
 		node = getNode((String)JSONMsg.get("MacAddress"));
-		if (node != null)
-			thing = node.getThing((String)JSONMsg.get("ThingName"));
-		else
+		if (node == null) {
 			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
-		if (thing != null)
-			if (thing.setValue((String)JSONMsg.get("NodeID")) == false) {
-				// 값의 변경이 없음. 삭제
-				
-			}
-		else
-			System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
+			return;
+		}
+		
+		JSONArray thingInfos = (JSONArray) JSONMsg.get("ThingsInfo");
+		for (int i=0; i < thingInfos.size(); i++)
+		{
+			thingObj = (JSONObject) thingInfos.get(i);
+			String thingID = (String)thingObj.get("ThingID");
+			thing = node.getThing(thingID); 
+			if (thing != null)
+				if (thing.setValue((String)thingObj.get("Value")) == false) {
+					// 값의 변경이 없음. 해당 Object 삭제
+					thingInfos.remove(i);
+				}
+			else
+				System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
+		}
 		
 		// 바뀐 data만 정리해서 보냄
 		JSONArray targets = new JSONArray();
@@ -135,5 +153,45 @@ public class NodeManager {
 		JSONMsg.put("Job", job);
 		
 		ev_bus.postEvent(JSONMsg);
+	}
+
+	
+	
+	
+	
+	@Override
+	public void onDiscovered(AdapterEvent event) {
+		// TODO Auto-generated method stub
+		System.out.println(event.getMessage());
+	}
+
+	@Override
+	public void onRegistered(AdapterEvent event) {
+		// TODO Auto-generated method stub
+		System.out.println(event.getMessage());
+	}
+
+	@Override
+	public void onAddNode(AdapterEvent event) {
+		// TODO Auto-generated method stub
+		if(event.getType().equals("Add_node"))
+		{
+			// 1. look-up DB
+			
+			// 2. add new node or update the existing node
+			/*
+			Node node = findNode(((Link)event.getLink()).getMACAddress());
+			if(node == null)
+			{
+				System.out.println("Add new node = " + ((Link)event.getLink()).getMACAddress());
+				nodeList.add(new Node((Link)(event.getLink())));
+			}
+			else
+			{
+				System.out.println("Existing node = " + ((Link)event.getLink()).getMACAddress());
+				node.updateLink((Link)(event.getLink()));
+			}
+			*/
+		}
 	}
 }
