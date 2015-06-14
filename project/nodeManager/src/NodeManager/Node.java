@@ -1,22 +1,20 @@
 package NodeManager;
 
 import java.util.ArrayList;
-import java.util.List;
+import comm.Link;
+import comm.LinkEvent;
+import comm.LinkEventListener;
 
 import org.json.simple.JSONObject;
 
-public class Node {
+public class Node implements LinkEventListener {
 	private String macAddress;
-	private String ipAddress;
-	private String hostName;
-	private ArrayList<Thing> Things = new ArrayList();
+	private ArrayList<Thing> Things = new ArrayList<Thing>();
 	private Factory thingFactory = new ThingFactory();
 	
-	public Node(String macAddr, String ipAddr, String hName, JSONObject JSONMsg) {
+	public Node(Link link) {
 		// Creator
-		this.ipAddress = ipAddr;
-		this.hostName = hName;
-		this.macAddress = macAddr;
+		this.macAddress = link.getMACAddress();
 		
 		// loop for things
 		/*
@@ -45,28 +43,12 @@ public class Node {
 		
 	}
 	
-	public String getIpAddress() {
-		return ipAddress;
-	}
-	
-	public void setIpAddress(String ipAddress) {
-		this.ipAddress = ipAddress;
-	}
-	
 	public String getMacAddress() {
-		return macAddress;
+		return this.macAddress;
 	}
 	
 	public void setMacAddress(String macAddr) {
 		this.macAddress = macAddr;
-	}
-	
-	public String getHostName() {
-		return hostName;
-	}
-	
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
 	}
 	
 	public JSONObject getThingInfo(String thingName, JSONObject JSONMsg) {
@@ -103,6 +85,18 @@ public class Node {
 		getThing(thingId).doCommand(JSONMsg);
 		
 		return JSONMsg;
+	}
+
+	@Override
+	public void onData(LinkEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatus(LinkEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

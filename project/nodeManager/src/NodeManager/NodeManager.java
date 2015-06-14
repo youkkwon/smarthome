@@ -29,7 +29,7 @@ public class NodeManager implements AdapterEventListener {
 	
 	NM_EventBusReceiver nm_rcv = NM_EventBusReceiver.getInstance();
 	IoTMSEventBus ev_bus = IoTMSEventBus.getInstance();
-	private ArrayList<Node> Nodes = new ArrayList();
+	private ArrayList<Node> Nodes = new ArrayList<Node>();
 	private Adapter adapter = new Adapter();
 	
 	public NodeManager() {
@@ -49,9 +49,9 @@ public class NodeManager implements AdapterEventListener {
 		Nodes.remove(id);
 	}
 	
-	// from UI
-	public void addNode(String macAddr, String ipAddr, String hostName, JSONObject JSONMsg) {
-		Node node = new Node(macAddr, ipAddr, hostName, JSONMsg);
+	// from SA Node
+	public void addNode(Link link) {
+		Node node = new Node(link);
 		Nodes.add(node);
 	}
 	
@@ -157,7 +157,20 @@ public class NodeManager implements AdapterEventListener {
 
 	
 	
-	
+	public void discoverNode(int duration)
+	{
+		adapter.discoverNode(duration);
+	}
+
+	public void registerNode(String msg)
+	{
+		adapter.registerNode(msg);
+	}
+
+	public void rejectNode(String mac)
+	{
+		adapter.disconnectNode(mac);
+	}
 	
 	@Override
 	public void onDiscovered(AdapterEvent event) {
