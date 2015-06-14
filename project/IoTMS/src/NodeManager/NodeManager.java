@@ -157,6 +157,15 @@ public class NodeManager implements AdapterEventListener {
 	public void onDiscovered(AdapterEvent event) {
 		// TODO Auto-generated method stub
 		System.out.println(event.getMessage());
+		JSONObject JSONMsg = null;
+		JSONMsg = (JSONObject) JSONValue.parse(event.getMessage());
+		if (JSONMsg == null) {
+			System.out.println("JSON Object is null from SA node");
+			return;
+		}
+		JSONArray targets = new JSONArray();
+		targets.add("UI");
+		sendEvent(JSONMsg, targets, "Discovered");
 	}
 
 	@Override
@@ -189,19 +198,17 @@ public class NodeManager implements AdapterEventListener {
 			
 			
 			// 2. add new node or update the existing node
-			/*
-			Node node = findNode(((Link)event.getLink()).getMACAddress());
+			Node node = getNode(((Link)event.getLink()).getMACAddress());
 			if(node == null)
 			{
 				System.out.println("Add new node = " + ((Link)event.getLink()).getMACAddress());
-				nodeList.add(new Node((Link)(event.getLink())));
+				addNode((Link)(event.getLink()));
 			}
 			else
 			{
 				System.out.println("Existing node = " + ((Link)event.getLink()).getMACAddress());
 				node.updateLink((Link)(event.getLink()));
 			}
-			*/
 		}
 	}
 

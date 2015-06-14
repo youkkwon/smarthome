@@ -156,6 +156,7 @@ public class Node implements LinkEventListener {
 	public void disconnect()
 	{
 		link.disconnect();
+		link = null;
 	}
 	
 	public void updateLink(Link l)
