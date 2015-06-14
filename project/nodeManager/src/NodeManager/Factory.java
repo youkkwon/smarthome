@@ -1,8 +1,8 @@
 package NodeManager;
 
 public abstract class Factory {	
-	public Thing create(Type type, int id) {
-		return createThing(type, id);
+	public Thing create(SensorType type) {
+		return createThing(type);
 	}
-	protected abstract Thing createThing(Type type, int id);
+	protected abstract Thing createThing(SensorType type);
 }

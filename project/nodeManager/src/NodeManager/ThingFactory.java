@@ -3,29 +3,22 @@ package NodeManager;
 public class ThingFactory extends Factory {
  
 	@Override
-	protected Thing createThing(Type type, int id) {
+	protected Thing createThing(SensorType sType) {
 		// TODO Auto-generated method stub
 		// Door, Light, Presense, Temperature, DoorSensor, Alarm, MialBox, Unknown
-		switch(type) {
-		case Door :
-		case Light:
-		case AlarmLamp:
-			Thing actuator = new Actuator(type, id);
+		switch(sType) {
+		case Actuator:
+			Thing actuator = new Actuator();
 			return actuator;
-		case Presense:
-		case Temperature:
-		case Humidity:
-		case DoorSensor:
-		case MialBox:
-			Thing sensor = new Sensor(type, id);
+		case Sensor:
+			Thing sensor = new Sensor();
 			return sensor;
 		case Unknown:
-			Thing defaultThing = new DefaultThing(type, id);
+			Thing defaultThing = new DefaultThing();
 			return defaultThing;
 		default:
 			break;
 		}
 		return null;
 	}
-
 }

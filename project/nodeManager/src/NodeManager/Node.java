@@ -5,49 +5,43 @@ import java.util.List;
 import org.json.simple.JSONObject;
 
 public class Node {
-	private int nodeId;
+	private String macAddress;
 	private String ipAddress;
 	private String hostName;
 	private List<Thing> Things;
 	private Factory thingFactory = new ThingFactory();
 	
-	public Node(int id, String ipAddr, String hName, String things) {
+	public Node(String macAddr, String ipAddr, String hName, JSONObject JSONMsg) {
 		// Creator
-		this.nodeId = id;
 		this.ipAddress = ipAddr;
 		this.hostName = hName;
+		this.macAddress = macAddr;
 		
 		// loop for things
 		/*
 		for () {
-			parse things
-			AddThing(type);
+			parse things about JSONMsg
+			AddThing(type, name);
 		}
 		*/
 	}
 	
-	public String ShowInfo() {
+	public String showInfo() {
 		String ret = "";
 		
 		
 		return ret; 
 	}
 		
-	public void AddThing(Type type) {
-		Thing thing = thingFactory.create(type, Things.size());
+	public void addThing(SensorType sType, Type type, String name) {
+		Thing thing = thingFactory.create(sType);
+		thing.setType(type);
+		thing.setName(name);
 		Things.add(thing);
 	}
 	
-	public void RemoveThing() {
+	public void removeThing() {
 		
-	}
-	
-	public void setNodeID(int id) {
-		this.nodeId = id;
-	}
-	
-	public int getNodeID() {
-		return nodeId;
 	}
 	
 	public String getIpAddress() {
@@ -58,6 +52,14 @@ public class Node {
 		this.ipAddress = ipAddress;
 	}
 	
+	public String getMacAddress() {
+		return macAddress;
+	}
+	
+	public void setMacAddress(String macAddr) {
+		this.macAddress = macAddr;
+	}
+	
 	public String getHostName() {
 		return hostName;
 	}
@@ -66,12 +68,31 @@ public class Node {
 		this.hostName = hostName;
 	}
 	
-	public JSONObject getThingInfo(int thingId, JSONObject JSONMsg) {
-		JSONObject ret = Things.get(thingId).GetValue(JSONMsg);
+	public JSONObject getThingInfo(String thingName, JSONObject JSONMsg) {
+		JSONObject ret = getThing(thingName).getValue(JSONMsg);
 		// add node id
-		ret.put("NodeID", Integer.toString(nodeId));
+		ret.put("NodeID", this.macAddress);
 		
 		return ret;
 	}
 	
+	// To SA Node
+	public JSONObject getThingCommand(String thingName, JSONObject JSONMsg) {
+		JSONObject ret = getThing(thingName).doCommand(JSONMsg);
+		// add macAddress for SA Node
+		// 사실 아래 코드는 붙일 필요가 없음
+		//ret.put("MacAddress", this.macAddress);
+		
+		return ret;
+	}
+	
+	public Thing getThing(String thingName) {
+		int index = 0;
+		for(index=0; index<Things.size(); index++) {
+			if (thingName.equals(Things.get(index)))
+					return Things.get(index);
+		}
+		return null;
+	}
+
 }

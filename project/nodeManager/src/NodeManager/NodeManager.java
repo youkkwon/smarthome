@@ -7,6 +7,14 @@ import org.json.simple.JSONObject;
 
 import EventBus.*;
 
+enum Type {
+	Door, Light, Presense, Temperature, Humidity, DoorSensor, AlarmLamp, MialBox, Unknown
+}
+
+enum SensorType {
+	Actuator, Sensor, Unknown
+}
+
 public class NodeManager {
 	// Singletone
 	private static NodeManager uniqueInstance = new NodeManager();
@@ -17,58 +25,134 @@ public class NodeManager {
 	NM_EventBusReceiver nm_rcv = NM_EventBusReceiver.getInstance();
 	IoTMSEventBus ev_bus = IoTMSEventBus.getInstance();
 	private List<Node> Nodes;
-	
-	// This method is called when command by UI via Event-Bus
-	public void AddNode(int nodeId, String ipAddr, String hostName, String things) {
-		Node node = new Node(nodeId, ipAddr, hostName, things);
-		Nodes.add(node);
-	}
-	
-	public void RemoveNode(int id) {
-		Nodes.remove(id);
-	}
-	
-	public Node GetNode(int id) {
-		if (id <= Nodes.size() && id >= 0)
-			return Nodes.get(id);
+		
+	private Node getNode(String macAddr) {
+		int index = 0;
+		for(index=0; index<Nodes.size(); index++) {
+			if (macAddr.equals(Nodes.get(index)))
+					return Nodes.get(index);
+		}
 		return null;
 	}
 	
-	public void FindNode() {
-		// Invoke Event for discoverNode
+	private void removeNode(int id) {
+		Nodes.remove(id);
 	}
 	
-	public void ShowNodesInfo() { 
-		String info = "{";
-		for(int i=0; i<Nodes.size(); i++) {
-			info += Nodes.get(i).getNodeID();
-			info += ":";
-			info += Nodes.get(i).getHostName();
-			info += ":";
-			info += Nodes.get(i).getIpAddress();
-		}
-		info = "}";
-		//EventBus.push(info);
+	// from UI
+	public void addNode(String macAddr, String ipAddr, String hostName, JSONObject JSONMsg) {
+		Node node = new Node(macAddr, ipAddr, hostName, JSONMsg);
+		Nodes.add(node);
 	}
 	
-	public void ShowThingsInfo(int id) { 
-		String info = Nodes.get(id).ShowInfo();
-		//EventBus.push(info);
-	}
-	
-	public void ShowThingInfo(JSONObject JSONMsg) {
-		int nodeId = Integer.parseInt((String)JSONMsg.get("NodeID"));
-		int thingId = Integer.parseInt((String)JSONMsg.get("ThingID"));
-		JSONObject info = new JSONObject(); 
-		info = Nodes.get(nodeId).getThingInfo(thingId, info);
+	// from UI
+	public void showNodeInfo(JSONObject JSONMsg) {
+		String nodeId = (String)JSONMsg.get("NodeID");
 		
-		// address target
+		JSONObject info = new JSONObject();
+		for(int i=0; i<Nodes.size(); i++) {
+			
+		}
+		
+		
+		/*
+		
+		
+		
 		JSONArray targets = new JSONArray();
 		targets.add("UI");
-		info.put("Targets", targets);
+		sendEvent(info, "UI", "ThingMonitor");
 		
+		
+		
+		
+		String thingId = (String)JSONMsg.get("ThingID");
+		JSONObject info = new JSONObject();
+		if (getNode(nodeId) != null)
+			info = getNode(nodeId).getThingInfo(thingId, info);
+		
+		// address target
 		System.out.println ("[EventBus] ShowThingInfo: " + info);
 		
-		ev_bus.postEvent(info);
+		sendEvent(info, "UI", "ThingMonitor");
+		
+		
+		String info = getNode(id).showInfo();
+		//EventBus.push(info);
+
+		 */
+	}
+	
+	// from UI
+	public void showThingInfo(JSONObject JSONMsg) {
+		String nodeId = (String)JSONMsg.get("NodeID");
+		String thingId = (String)JSONMsg.get("ThingID");
+		JSONObject info = new JSONObject();
+		if (getNode(nodeId) != null)
+			info = getNode(nodeId).getThingInfo(thingId, info);
+		
+		// address target
+		System.out.println ("[EventBus] ShowThingInfo: " + info);
+		
+		JSONArray targets = new JSONArray();
+		targets.add("UI");
+		sendEvent(info, targets, "ThingMonitor");
+	}
+
+	/* from RuleManager
+	 * RuleManager로부터 낼온 명령을 SA Node로 전달한다.
+	 */
+	public void doCommand(JSONObject JSONMsg) {
+		int nodeId = Integer.parseInt((String)JSONMsg.get("NodeID"));
+		String thingId = (String)JSONMsg.get("ThingID");
+		
+		JSONObject action = new JSONObject(); 
+		action = Nodes.get(nodeId).getThingCommand(thingId, action);
+		
+		// To Do Send to SA Node
+		
+	}
+	
+	/* from SA Node
+	 * SA Node로부터 올라온 Data를 Update한다.
+	*/
+	public void updateThingInfo(JSONObject JSONMsg) { 
+		Node node = null;
+		Thing thing = null;
+		
+		// Need to loop
+		node = getNode((String)JSONMsg.get("MacAddress"));
+		if (node != null)
+			thing = node.getThing((String)JSONMsg.get("ThingName"));
+		else
+			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
+		if (thing != null)
+			if (thing.setValue(Integer.parseInt((String)JSONMsg.get("NodeID"))) == false) {
+				// 값의 변경이 없음
+				
+			}
+		else
+			System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
+		
+		// 바뀐 data만 정리해서 보냄
+		JSONArray targets = new JSONArray();
+		targets.add("RuleManager");
+		targets.add("UI");
+		sendEvent(JSONMsg, targets, "ThingCtrl");
+	}
+	
+	/* sendEvent
+	 * JSONMsg : 전달할 Object
+	 * target : 받을 대상
+	 * job : 할 일
+	*/
+	public void sendEvent(JSONObject JSONMsg, JSONArray target, String job) {
+		JSONMsg.remove("Targets");
+		JSONMsg.remove("Job");
+		
+		JSONMsg.put("Targets", target);
+		JSONMsg.put("Job", job);
+		
+		ev_bus.postEvent(JSONMsg);
 	}
 }

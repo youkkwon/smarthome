@@ -4,51 +4,62 @@ import org.json.simple.JSONObject;
 
 public class Actuator extends Thing {
 
-	public Actuator(Type type, int id) {
-		mType = type;
-		mId = id;
-	}
-	
 	@Override
-	public int GetID() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void SetID(int id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Type GetType() {
+	public Type getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void SetType(Type type) {
+	public void setType(Type type) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public JSONObject GetValue(JSONObject JSONMsg) {
+	public JSONObject getValue(JSONObject JSONMsg) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/*
+	 * @see NodeManager.Thing#setValue(int)
+	 * true : 값의 변경이 생김
+	 * fasle : 값의 변경이 없음
+	 */
 	@Override
-	public void SetValue() {
+	public boolean setValue(int value) {
 		// TODO Auto-generated method stub
+		if (value != mValue) {
+			mValue = value;
+			return true;
+		}
 		
+		return false;
 	}
 
 	@Override
-	public void doCommand() {
+	public JSONObject doCommand(JSONObject JSONMsg) {
 		// TODO Auto-generated method stub
+		JSONMsg.put("Value", "Unknown");
 		
+		
+		// add thing id
+		JSONMsg.put("ThingID", this.mName);
+		
+		return JSONMsg;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return mName;
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		this.mName = name;
 	}
 
 }
