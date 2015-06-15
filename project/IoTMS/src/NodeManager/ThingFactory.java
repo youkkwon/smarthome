@@ -5,7 +5,8 @@ public class ThingFactory extends Factory {
 	@Override
 	protected Thing createThing(String sType) {
 		// TODO Auto-generated method stub
-		// Door, Light, Presense, Temperature, DoorSensor, Alarm, MialBox, Unknown
+		// Door, Light, Presense, Temperature, Humidity, DoorSensor, Alarm, MialBox, Unknown
+		
 		switch(sType) {
 		case "Actuator":
 			Thing actuator = new Actuator();
