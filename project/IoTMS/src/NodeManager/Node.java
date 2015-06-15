@@ -130,7 +130,7 @@ public class Node implements LinkEventListener {
 					infoThingObj.put("Id", (String)thingObj.get("Id"));
 					infoThingObj.put("Type", (String)thingObj.get("Type"));
 					infoThingObj.put("Value", (String)thingObj.get("Value"));
-					infoList.add(thing);
+					infoList.add(infoThingObj);
 					changeCount++;
 				}
 			}
