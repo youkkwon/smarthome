@@ -5,15 +5,15 @@ import org.json.simple.JSONObject;
 public class Actuator extends Thing {
 
 	@Override
-	public Type getType() {
+	public String getType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.mType;
 	}
 
 	@Override
-	public void setType(Type type) {
+	public void setType(String type) {
 		// TODO Auto-generated method stub
-		
+		this.mType = type;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -61,6 +61,18 @@ public class Actuator extends Thing {
 	public void setId(String id) {
 		// TODO Auto-generated method stub
 		this.mId = id;
+	}
+
+	@Override
+	public String getSensorType() {
+		// TODO Auto-generated method stub
+		return mSensorType;
+	}
+
+	@Override
+	public void setSensorType(String type) {
+		// TODO Auto-generated method stub
+		mSensorType = type;
 	}
 
 }

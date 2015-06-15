@@ -3,17 +3,17 @@ package NodeManager;
 public class ThingFactory extends Factory {
  
 	@Override
-	protected Thing createThing(SensorType sType) {
+	protected Thing createThing(String sType) {
 		// TODO Auto-generated method stub
 		// Door, Light, Presense, Temperature, DoorSensor, Alarm, MialBox, Unknown
 		switch(sType) {
-		case Actuator:
+		case "Actuator":
 			Thing actuator = new Actuator();
 			return actuator;
-		case Sensor:
+		case "Sensor":
 			Thing sensor = new Sensor();
 			return sensor;
-		case Unknown:
+		case "Unknown":
 			Thing defaultThing = new DefaultThing();
 			return defaultThing;
 		default:

@@ -5,11 +5,14 @@ import org.json.simple.JSONObject;
 public abstract class Thing {
 	protected String mId;
 	protected String mValue;
-	protected int mSensorType = 0; // 0: unknown, 1: actuator, 2: sensor
-	protected Type mType = Type.Unknown;
+	protected String mSensorType = "Unknown"; // 0: unknown, 1: actuator, 2: sensor
+	protected String mType = "Default";
     
-    public abstract Type getType();
-    public abstract void setType(Type type);
+    public abstract String getType();
+    public abstract void setType(String type);
+    
+    public abstract String getSensorType();
+    public abstract void setSensorType(String type);
     
     public abstract JSONObject getValue(JSONObject JSONMsg);
 

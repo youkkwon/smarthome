@@ -12,6 +12,7 @@ import CommManager.AdapterEvent;
 import CommManager.AdapterEventListener;
 import CommManager.Link;
 
+/*
 enum Type {
 	Door, Light, Presense, Temperature, Humidity, DoorSensor, AlarmLamp, MialBox, Unknown
 }
@@ -19,6 +20,7 @@ enum Type {
 enum SensorType {
 	Actuator, Sensor, Unknown
 }
+*/
 
 public class NodeManager implements AdapterEventListener {
 	// Singletone
@@ -48,8 +50,8 @@ public class NodeManager implements AdapterEventListener {
 	}
 	
 	// from SA Node
-	public void addNode(Link link) {
-		Node node = new Node(link);
+	public void addNode(Link link, JSONObject JSONMsg) {
+		Node node = new Node(link, JSONMsg);
 		Nodes.add(node);
 	}
 	
@@ -203,13 +205,16 @@ public class NodeManager implements AdapterEventListener {
 			if (Nodes.size() > 50)
 				rejectNode("reject node");
 			
+			// DB에서 읽은 놈을 JSONObj로 생성한다.
+			String db = "";
+			JSONObject JSONMsg = (JSONObject) JSONValue.parse(db);
 			
 			// 2. add new node or update the existing node
 			Node node = getNode(((Link)event.getLink()).getMACAddress());
 			if(node == null)
 			{
 				System.out.println("Add new node = " + ((Link)event.getLink()).getMACAddress());
-				addNode((Link)(event.getLink()));
+				addNode((Link)(event.getLink()), JSONMsg);
 			}
 			else
 			{

@@ -17,19 +17,25 @@ public class Node implements LinkEventListener {
 	IoTMSEventBus ev_bus = IoTMSEventBus.getInstance();
 	private Link link;
 	
-	public Node(Link l) {
+	public Node(Link l, JSONObject JSONMsg) {
 		// Creator
 		link = l;
 		System.out.println("Create a new node (mac: " + getMacAddress() +")");
 		link.addListener(this);
 		
-		// loop for things
-		/*
-		for () {
-			parse things about JSONMsg
-			AddThing(type, name);
+		Thing thing;
+		JSONObject thingObj;
+		JSONArray thingList = (JSONArray) JSONMsg.get("ThingList");
+		for (int i=0; i < thingList.size(); i++) {
+			thingObj = (JSONObject) thingList.get(i);
+			String thingID = (String)thingObj.get("Id");
+			String Type = (String)thingObj.get("Type");
+			String sType = (String)thingObj.get("SType");
+
+			addThing(sType, Type, thingID);
+			System.out.println ("[CreateNode] Create Thing : " + thingObj);
 		}
-		*/
+		System.out.println ("[CreateNode] Things count : " + Things.size());
 	}
 	
 	public String showInfo() {
@@ -38,8 +44,8 @@ public class Node implements LinkEventListener {
 		
 		return ret; 
 	}
-		
-	public void addThing(SensorType sType, Type type, String id) {
+
+	public void addThing(String sType, String type, String id) {
 		Thing thing = thingFactory.create(sType);
 		thing.setType(type);
 		thing.setId(id);
