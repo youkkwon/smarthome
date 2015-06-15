@@ -104,7 +104,6 @@ public class Node implements LinkEventListener {
 		Thing thing = null;
 		JSONObject thingObj = null;
 		JSONObject infoObj = new JSONObject(); // 보내는 Obj
-		JSONObject infoThingObj = new JSONObject(); // 보내는 Thing의 Object
 		JSONArray infoList = new JSONArray(); // 보내는 Obj
 		
 		String nodeID = (String)JSONMsg.get("NodeID");
@@ -127,6 +126,7 @@ public class Node implements LinkEventListener {
 					// 값의 변경이 없음. 해당 Object 삭제
 					System.out.println ("[UpdateThingInfo] Remove : " + thingInfos);
 				} else {
+					JSONObject infoThingObj = new JSONObject(); 
 					infoThingObj.put("Id", (String)thingObj.get("Id"));
 					infoThingObj.put("Type", (String)thingObj.get("Type"));
 					infoThingObj.put("Value", (String)thingObj.get("Value"));
