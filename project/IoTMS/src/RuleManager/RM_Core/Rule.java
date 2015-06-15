@@ -348,7 +348,7 @@ public class Rule {
 			if (condition.isConditionOn(cond))
 			{
 				active = true;		
-				//System.out.println("[Process] Ruls is activated - " + statement);
+				//System.out.println("[RM - Process] Ruls is activated - " + statement);
 				break;
 			}
 		}
@@ -365,7 +365,7 @@ public class Rule {
 			if (iterator.next().isConditionOn(cond))
 			{
 				active = false;		
-				//System.out.println("[Process] Ruls is de-activated - " + statement);
+				//System.out.println("[RM - Process] Ruls is de-activated - " + statement);
 				break;
 			}
 		}
@@ -382,7 +382,7 @@ public class Rule {
 			if (!condition.isModeCond())
 				break;
 			active = condition.isConditionMatch(mode);
-			//System.out.print("[Process] active[" + active + "] rule - " + statement);
+			//System.out.print("[RM - Process] active[" + active + "] rule - " + statement);
 			//System.out.println(" based on " + mode);
 		}
 	}
