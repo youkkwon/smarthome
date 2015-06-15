@@ -138,7 +138,7 @@ void SendJSONobject(char *key, char *value,bool bEnd)
    if(!bEnd) client.write(',');  
 }
 
-void SendJSONthings(struct sThingsList& thing, bool bEnd)
+void SendJSONthings(const struct sThingsList *thing, bool bEnd)
 {
   
   char id[5];
@@ -149,12 +149,12 @@ void SendJSONthings(struct sThingsList& thing, bool bEnd)
   char VMax[10];
   
   client.write('{');
-    SendJSONobject("Id",thing.id,false);
-    SendJSONobject("Type",thing.Type,false);
-    SendJSONobject("SType",thing.SType,false);
-    SendJSONobject("VType",thing.VType,false);
-    SendJSONobject("VMin",thing.VMin,false);
-    SendJSONobject("VMax",thing.VMax,true);    
+    SendJSONobject("Id",thing->id,false);
+    SendJSONobject("Type",thing->Type,false);
+    SendJSONobject("SType",thing->SType,false);
+    SendJSONobject("VType",thing->VType,false);
+    SendJSONobject("VMin",thing->VMin,false);
+    SendJSONobject("VMax",thing->VMax,true);    
   client.write('}');  
   if(!bEnd) client.write(',');  
 }
@@ -176,14 +176,14 @@ void SendJSONdiscoverRegister(bool bDiscoverRegister)
     }
     client.print("\"ThingList\":[");   
       
-      thing=gThings1; SendJSONthings(thing,false);
-      thing=gThings2; SendJSONthings(thing,false);
-      thing=gThings3; SendJSONthings(thing,false);
-      thing=gThings4; SendJSONthings(thing,false);
-      thing=gThings5; SendJSONthings(thing,false);
-      thing=gThings6; SendJSONthings(thing,false);
-      thing=gThings7; SendJSONthings(thing,false);
-      thing=gThings8; SendJSONthings(thing,true);    
+      SendJSONthings(&gThings1,false);
+      SendJSONthings(&gThings2,false);
+      SendJSONthings(&gThings3,false);
+      SendJSONthings(&gThings4,false);
+      SendJSONthings(&gThings5,false);
+      SendJSONthings(&gThings6,false);
+      SendJSONthings(&gThings7,false);
+      SendJSONthings(&gThings8,true);    
 
     client.write(']');
   client.write('}');
@@ -220,7 +220,7 @@ void loop()
 {
   // Here we attempt connect to the server on the port specified above
   
-  
+ 
   int stringbufIndex = 0;
   Serial.print("\nAttempting to connect to server...");
   
