@@ -14,7 +14,7 @@ public class Discovery implements Runnable {
 	
 	public Discovery(String name)
 	{
-		System.out.println("WiFiDiscovery Start...");
+		System.out.println("[CM - Process] WiFiDiscovery Start...");
 		//listener = l;
 		t = new Thread(this, name);
 		t.start();
@@ -44,11 +44,11 @@ public class Discovery implements Runnable {
 		***********************************************************************************************************/
 
 	   	myIpAddr = GetMyIp();
-	   	System.out.println( "\n\nMy IP Address:: " + myIpAddr );
+	   	System.out.println( "\n\n[CM - Process] My IP Address:: " + myIpAddr );
 
 	   	mySubnetMask = GetSubnetMask();
 	   	mySubnetMask = "255.255.255.255";
-	   	System.out.println( "Subnet Mask:: " + mySubnetMask +"\n\n" );
+	   	System.out.println( "[CM - Process] Subnet Mask:: " + mySubnetMask +"\n\n" );
 
 		/***********************************************************************************************************
 		* Next we get the integer equivalent of each octet. We do this to determine the scan ranges.
@@ -147,7 +147,7 @@ public class Discovery implements Runnable {
 		* Now we start the scan. This algorithm will scan about 2K addresses per minute.
 		***********************************************************************************************************/
 
-		System.out.print( "Scanning from:" + oct1start + "." + oct2start + "." + oct3start + "." + oct4start );
+		System.out.print( "[CM - Process] Scanning from:" + oct1start + "." + oct2start + "." + oct3start + "." + oct4start );
 		System.out.println( " to:" + (oct1finish-1) + "." + (oct2finish-1) + "." + (oct3finish-1) + "." + (oct4finish-1) );
 
 		for ( one = oct1start; one < oct1finish; one++ )						// First octet
@@ -193,13 +193,13 @@ public class Discovery implements Runnable {
 
 		   					} catch ( Exception e ) {
 
-			   					System.out.println( "Error in sleep " + e );
+			   					System.out.println( "[CM - Process] Error in sleep " + e );
 		   					}
 
 		   				} else {
 			   				if ( FirstAddr )
 			   				{
-				   				System.out.println( "Starting Scan..." );
+				   				System.out.println( "[CM - Process] Starting Scan..." );
 				   				FirstAddr = false;
 			   				}
 			   				i++;
@@ -210,7 +210,7 @@ public class Discovery implements Runnable {
 			} // for
 		} // for
 
-		//System.out.println( "\nSearch is complete.\n");
+		//System.out.println( "\n[CM - Process] Search is complete.\n");
 
  	} // Main
 
@@ -260,7 +260,7 @@ public class Discovery implements Runnable {
 
 	            } else {
 
-		            System.out.println( "Local adaptor information not found.");
+		            System.out.println( "[CM - Process] Local adaptor information not found.");
 	            }
             }
 
@@ -280,7 +280,7 @@ public class Discovery implements Runnable {
 	            	}
 	            } else {
 
-		            System.out.println( "Subnet Mask not found.");
+		            System.out.println( "[CM - Process] Subnet Mask not found.");
 	            }
             }
 
@@ -337,7 +337,7 @@ public class Discovery implements Runnable {
 					}
 	            } else {
 
-		            System.out.println( "Local adaptor information not found.");
+		            System.out.println( "[CM - Process] Local adaptor information not found.");
 
 	            }
             }
@@ -360,7 +360,7 @@ public class Discovery implements Runnable {
 
 	            } else {
 
-		            System.out.println( "IP Address not found.");
+		            System.out.println( "[CM - Process] IP Address not found.");
 
 	            }
             }

@@ -12,6 +12,16 @@ import CommManager.AdapterEvent;
 import CommManager.AdapterEventListener;
 import CommManager.Link;
 
+/*
+enum Type {
+	Door, Light, Presense, Temperature, Humidity, DoorSensor, AlarmLamp, MialBox, Unknown
+}
+
+enum SensorType {
+	Actuator, Sensor, Unknown
+}
+*/
+
 public class NodeManager implements AdapterEventListener {
 	// Singletone
 	private static NodeManager uniqueInstance = new NodeManager();
@@ -56,7 +66,7 @@ public class NodeManager implements AdapterEventListener {
 		
 		Node node = getNode(nodeId);
 		if (node == null) {
-			System.out.println ("[showNodeInfo] Error: Node is null");
+			System.out.println ("[NM - Process] [showNodeInfo] Error: Node is null");
 			return;
 		}
 		
@@ -80,13 +90,13 @@ public class NodeManager implements AdapterEventListener {
 		
 		Node node = getNode(nodeId);
 		if (node == null) {
-			System.out.println ("[showThingInfo] Error: Node is null");
+			System.out.println ("[NM - Process] [showThingInfo] Error: Node is null");
 			return;
 		}
 		info = node.getThingInfo(thingId, info);
 		
 		// address target
-		System.out.println ("[EventBus] ShowThingInfo: " + info);
+		System.out.println ("[NM - Process] [EventBus] ShowThingInfo: " + info);
 		
 		JSONArray targets = new JSONArray();
 		targets.add("UI");
@@ -101,7 +111,7 @@ public class NodeManager implements AdapterEventListener {
 		String thingId = (String)JSONMsg.get("ThingID");
 		Node node = getNode(nodeId); 
 		if (node == null) {
-			System.out.println ("[doCommand] Error: Node is null");
+			System.out.println ("[NM - Process] [doCommand] Error: Node is null");
 			return;
 		}
 		
@@ -156,11 +166,11 @@ public class NodeManager implements AdapterEventListener {
 	@Override
 	public void onDiscovered(AdapterEvent event) {
 		// TODO Auto-generated method stub
-		System.out.println(event.getMessage());
+		System.out.println("[NM - Process] " + event.getMessage());
 		JSONObject JSONMsg = null;
 		JSONMsg = (JSONObject) JSONValue.parse(event.getMessage());
 		if (JSONMsg == null) {
-			System.out.println("JSON Object is null from SA node");
+			System.out.println("[NM - Process] JSON Object is null from SA node");
 			return;
 		}
 		JSONArray targets = new JSONArray();
@@ -177,7 +187,7 @@ public class NodeManager implements AdapterEventListener {
 		JSONObject JSONMsg = null;
 		JSONMsg = (JSONObject) JSONValue.parse(event.getMessage());
 		if (JSONMsg == null) {
-			System.out.println("JSON Object is null from SA node");
+			System.out.println("[NM - Process] JSON Object is null from SA node");
 			return;
 		}
 		
@@ -204,12 +214,12 @@ public class NodeManager implements AdapterEventListener {
 			Node node = getNode(((Link)event.getLink()).getMACAddress());
 			if(node == null)
 			{
-				System.out.println("Add new node = " + ((Link)event.getLink()).getMACAddress());
+				System.out.println("[NM - Process] Add new node = " + ((Link)event.getLink()).getMACAddress());
 				addNode((Link)(event.getLink()), JSONMsg);
 			}
 			else
 			{
-				System.out.println("Existing node = " + ((Link)event.getLink()).getMACAddress());
+				System.out.println("[NM - Process] Existing node = " + ((Link)event.getLink()).getMACAddress());
 				node.updateLink((Link)(event.getLink()));
 			}
 		}

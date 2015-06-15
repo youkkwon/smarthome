@@ -20,7 +20,7 @@ public class Node implements LinkEventListener {
 	public Node(Link l, JSONObject JSONMsg) {
 		// Creator
 		link = l;
-		System.out.println("Create a new node (mac: " + getMacAddress() +")");
+		System.out.println("[NM - Process] Create a new node (mac: " + getMacAddress() +")");
 		link.addListener(this);
 		
 		Thing thing;
@@ -33,9 +33,9 @@ public class Node implements LinkEventListener {
 			String sType = (String)thingObj.get("SType");
 
 			addThing(sType, Type, thingID);
-			System.out.println ("[CreateNode] Create Thing : " + thingObj);
+			System.out.println ("[NM - Process] [CreateNode] Create Thing : " + thingObj);
 		}
-		System.out.println ("[CreateNode] Things count : " + Things.size());
+		System.out.println ("[NM - Process] [CreateNode] Things count : " + Things.size());
 	}
 	
 	public String showInfo() {
@@ -64,7 +64,7 @@ public class Node implements LinkEventListener {
 	public JSONObject getThingInfo(String thingName, JSONObject JSONMsg) {
 		Thing thing = getThing(thingName);
 		if (thing == null) {
-			System.out.println ("[getThingInfo] Error: Thing is null");
+			System.out.println ("[NM - Process] [getThingInfo] Error: Thing is null");
 			return null;
 		}
 		JSONObject ret = thing.getValue(JSONMsg);
@@ -108,7 +108,7 @@ public class Node implements LinkEventListener {
 		String nodeID = (String)JSONMsg.get("NodeID");
 		
 		if (!nodeID.equalsIgnoreCase(getMacAddress())) {
-			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
+			System.out.println ("[NM - Process] [UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
 			return;
 		}
 		
@@ -125,7 +125,7 @@ public class Node implements LinkEventListener {
 				}
 			}
 			else {
-				System.out.println ("[UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
+				System.out.println ("[NM - Process] [UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
 			}
 		}
 		
@@ -147,7 +147,7 @@ public class Node implements LinkEventListener {
 	public void doThingCommand(String thingId, JSONObject JSONMsg) {
 		Thing thing = getThing(thingId);
 		if (thing == null) {
-			System.out.println ("[doThingCommand] Error: Thing is null");
+			System.out.println ("[NM - Process] [doThingCommand] Error: Thing is null");
 			return;
 		}
 		thing.doCommand(JSONMsg);
@@ -168,18 +168,18 @@ public class Node implements LinkEventListener {
 	public void updateLink(Link l)
 	{
 		link = l;
-		System.out.println("Update the link (mac: " + getMacAddress() +")");
+		System.out.println("[NM - Process] Update the link (mac: " + getMacAddress() +")");
 		link.addListener(this);
 	}
 	
 	@Override
 	public void onData(LinkEvent event) {
 		// TODO Auto-generated method stub
-		System.out.println("# Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
+		System.out.println("[NM - Process] # Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
 		JSONObject thingObj = null;
 		thingObj = (JSONObject) JSONValue.parse(event.getMessage());
 		if (thingObj == null) {
-			System.out.println("JSON Object is null from SA node");
+			System.out.println("[NM - Process] JSON Object is null from SA node");
 			return;
 		}
 		updateThingInfo(thingObj);
@@ -189,7 +189,7 @@ public class Node implements LinkEventListener {
 	public void onStatus(LinkEvent event) {
 		// TODO Auto-generated method stub
 		// Disconnect일때 OnStatus가 날라옴
-		System.out.println("# Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
+		System.out.println("[NM - Process] # Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
 	}
 
 }

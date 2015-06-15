@@ -33,7 +33,7 @@ public class DiscoveryProbe extends Thread
 		try
 		{
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-			System.out.println(msg);
+			System.out.println("[CM - Process] " + msg);
 			out.write( msg, 0, msg.length() );
 			out.newLine();
 			out.flush();
@@ -50,7 +50,7 @@ public class DiscoveryProbe extends Thread
 		{
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 			String msg = "Disconnect";
-			System.out.println(msg);
+			System.out.println("[CM - Process] " + msg);
 			out.write( msg, 0, msg.length() );
 			out.newLine();
 			out.flush();
@@ -68,7 +68,7 @@ public class DiscoveryProbe extends Thread
 	
 	public void run()
 	{
-		System.out.println("Start to probe...");
+		System.out.println("[CM - Process] Start to probe...");
 		try
    		{
 			/*****************************************************************************
@@ -85,7 +85,7 @@ public class DiscoveryProbe extends Thread
 			*/
 			// new
 			sock = new Socket(ip, CommUtil.getDiscoveryPort());
-			System.out.println( "SERVER FOUND AT:: " + ip + "!!!" );
+			System.out.println( "[CM - Process] SERVER FOUND AT:: " + ip + "!!!" );
 			
 			/*****************************************************************************
 			* If we get here, we are connected. Now we determine if is an Arduino server
@@ -119,7 +119,7 @@ public class DiscoveryProbe extends Thread
 				{
 					if(inputLine.length() > 1)
 					{
-						System.out.println("discoveryProb: " + inputLine);
+						System.out.println("[CM - Process] discoveryProb: " + inputLine);
 						
 						mac = CommUtil.parseMACAddress(inputLine);
 						String job = CommUtil.parseJob(inputLine);
@@ -131,7 +131,7 @@ public class DiscoveryProbe extends Thread
 						else if(job.equals("Registered"))
 						{
 							listener.onRegistered(new AdapterEvent("Registered","found",inputLine));
-							//System.out.println("@@ Request to disconnect...");
+							//System.out.println("[CM - Process] @@ Request to disconnect...");
 							//disconnectNode();
 							break;
 						}
@@ -151,7 +151,7 @@ public class DiscoveryProbe extends Thread
 			//out.close();
 	  		sock.close();
 	  		
-			System.out.println("discoveryProb: Closed");
+			System.out.println("[CM - Process] discoveryProb: Closed");
 
      	} catch (IOException e) {
      		e.printStackTrace();

@@ -13,11 +13,11 @@ public class CommUtil {
 		JSONObject jsonObj;
 		jsonObj = (JSONObject) JSONValue.parse(str);
 		
-		System.out.println("json to be parsed: " + str);
+		System.out.println("[CM - Process] json to be parsed: " + str);
 		
 		String tmp;
 		tmp = (String) jsonObj.get("NodeID");
-		System.out.println("MAC Address : " + tmp);
+		System.out.println("[CM - Process] MAC Address : " + tmp);
 	
 		return tmp;
 	}
@@ -28,11 +28,11 @@ public class CommUtil {
 		JSONObject jsonObj;
 		jsonObj = (JSONObject) JSONValue.parse(str);
 		
-		System.out.println("json to be parsed: " + str);
+		System.out.println("[CM - Process] json to be parsed: " + str);
 		
 		String tmp;
 		tmp = (String) jsonObj.get("Job");
-		System.out.println("Job : " + tmp);
+		System.out.println("[CM - Process] Job : " + tmp);
 	
 		return tmp;
 	}

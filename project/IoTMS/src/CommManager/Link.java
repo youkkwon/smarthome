@@ -16,7 +16,7 @@ public class Link implements Runnable {
 	
 	public Link(String name, Socket socket, LinkEventListener l)
 	{
-		System.out.println("Link Start...");
+		System.out.println("[CM - Process] Link Start...");
 		clientSocket = socket;
 		listener = l;
 		t = new Thread(this, name);
@@ -34,8 +34,8 @@ public class Link implements Runnable {
 	 	* we can read and write.
 	 	*****************************************************************************/
 
-		System.out.println ("Connection successful (" + clientSocket.toString() + ")");
-		System.out.println ("Waiting for input.....");
+		System.out.println ("[CM - Process] Connection successful (" + clientSocket.toString() + ")");
+		System.out.println ("[CM - Process] Waiting for input.....");
 
 		//listener.onLinkEvent(new CommEvent("Status", "Connected", ""));
 			
@@ -56,7 +56,7 @@ public class Link implements Runnable {
  	    			//------------------------------------------------------------
  	    			// need to post message
  	    			//------------------------------------------------------------
-      				System.out.println ("Client Message: " + inputLine);
+      				System.out.println ("[CM - Process] Client Message: " + inputLine);
       				
       				mac = CommUtil.parseMACAddress(inputLine);
       				listener.onData(new LinkEvent("Data", "Data", inputLine, this));
@@ -88,7 +88,7 @@ public class Link implements Runnable {
 	{
 		try
 		{
-			System.out.println ("Send Message (Link) : " + message);
+			System.out.println ("[CM - Process] Send Message (Link) : " + message);
 				
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 	
@@ -110,7 +110,7 @@ public class Link implements Runnable {
 	
 	public void disconnect()
 	{
-		System.out.println ("Disconnect the node (Link)");
+		System.out.println ("[CM - Process] Disconnect the node (Link)");
 		try
 		{
 			clientSocket.close();
@@ -128,8 +128,8 @@ public class Link implements Runnable {
 	
 	public void addListener(LinkEventListener l) {
 		// TODO Auto-generated method stub
-		System.out.println("Start to add link using addListener.");
+		System.out.println("[CM - Process] Start to add link using addListener.");
 		listener = l;
-		System.out.println("End to add link using addListener.");
+		System.out.println("[CM - Process] End to add link using addListener.");
 	}
 }

@@ -14,7 +14,7 @@ public class Adapter implements Runnable, LinkEventListener {
 	
 	public Adapter()
 	{
-		System.out.println("WiFiAdapter Start...");
+		System.out.println("[CM - Process] WiFiAdapter Start...");
 		linkList = new ArrayList<Link>();
 		t = new Thread(this, "wifi");
 		t.start();
@@ -24,7 +24,7 @@ public class Adapter implements Runnable, LinkEventListener {
 	public void run() {
 		// TODO Auto-generated method stub
 
-		System.out.println("Server Socket Thread Start...");
+		System.out.println("[CM - Process] Server Socket Thread Start...");
 		
     	ServerSocket serverSocket = null;							// Server socket object
 		Socket clientSocket = null;									// Client socket object
@@ -37,11 +37,11 @@ public class Adapter implements Runnable, LinkEventListener {
 		try
 		{
     		serverSocket = new ServerSocket(portNum);
-    		System.out.println ( "\n\nWaiting for connection on port " + portNum + "." );
+    		System.out.println ( "\n\n[CM - Process] Waiting for connection on port " + portNum + "." );
     	}
 		catch (IOException e)
     	{
-    		System.err.println( "\n\nCould not instantiate socket on port: " + portNum + " " + e);
+    		System.err.println( "\n\n[CM - Process] Could not instantiate socket on port: " + portNum + " " + e);
     		System.exit(1);
     	}
 		
