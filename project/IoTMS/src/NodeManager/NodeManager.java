@@ -43,9 +43,8 @@ public class NodeManager implements AdapterEventListener {
 		return null;
 	}
 	
-	@SuppressWarnings("unused")
-	private void removeNode(int id) {
-		Nodes.remove(id);
+	private void removeNode(Node node) {
+		Nodes.remove(node);
 	}
 	
 	// from SA Node
@@ -153,6 +152,14 @@ public class NodeManager implements AdapterEventListener {
 		adapter.disconnectNode(mac);
 	}
 	
+	public void removeNode(String mac)
+	{
+		Node node = getNode(mac);
+		if(node != null)
+			node.disconnect();
+		removeNode(node);
+	}
+
 	@Override
 	public void onDiscovered(AdapterEvent event) {
 		// TODO Auto-generated method stub

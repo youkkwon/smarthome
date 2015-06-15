@@ -101,7 +101,7 @@ public class Node implements LinkEventListener {
 		
 		String nodeID = (String)JSONMsg.get("NodeID");
 		
-		if (nodeID.equalsIgnoreCase(getMacAddress())) {
+		if (!nodeID.equalsIgnoreCase(getMacAddress())) {
 			System.out.println ("[UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
 			return;
 		}
