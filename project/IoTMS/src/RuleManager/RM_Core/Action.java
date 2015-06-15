@@ -8,10 +8,11 @@ import EventBus.IoTMSEventBus;
 // {Action} := (!)? {NodeID}@{Thing ID}={Value}(in{value})?{Type}
 public abstract class Action 
 {
-	private String nodeID;
-	private String thingID;
-	protected String type;
-	private String value;
+	private String 		nodeID;
+	private String 		thingID;
+	protected String 	type;
+	private String 		value;
+	private String		desc;
 	
 	private String 			actionID;			// nodeID:thingID
 	protected String 		statement;
@@ -25,6 +26,7 @@ public abstract class Action
 		this.thingID 	= thingID; 
 		this.value		= value;
 		this.type		= type;
+		this.desc		= "N/A";
 		actionID		= this.nodeID + "@" + this.thingID;
 		statement 		= this.nodeID + "@" + this.thingID + "=" + this.value + "#" + this.type; 
 	}
@@ -32,6 +34,11 @@ public abstract class Action
 	public String getStatement()
 	{
 		return statement;
+	}
+	
+	public void setDesc(String desc)
+	{
+		this.desc = desc;
 	}
 	
 	// for cancel action
@@ -79,8 +86,9 @@ public abstract class Action
 			targets.add("Message");
 			JSONMsg.put("Targets", targets);
 			JSONMsg.put("Job", "ReceiveMsg");
-			JSONMsg.put("Type",  type);
-			JSONMsg.put("Value", value);	
+			//JSONMsg.put("Type",  type);					// TODO - does it needed? send kind? (SNS, SMS, Email?.. or Message will decide)
+			JSONMsg.put("Value", value);	 
+			JSONMsg.put("Desc", desc);						// TODO - add some desc. talk with Message
 		}
 		else
 		{	

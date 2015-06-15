@@ -74,6 +74,13 @@ public class ThingEvent {
 		}
 		Iterator<Action> iterator = actions.iterator();
 		while (iterator.hasNext())
-			iterator.next().execute();		
+		{
+			Action action = iterator.next();
+			if (condition.isMinMaxCond())
+			{
+				action.setDesc(condition.getType() + " is malfunction. value - " + condition.getValue());
+			}
+			action.execute();
+		}
 	}
 }

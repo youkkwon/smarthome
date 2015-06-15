@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 
 public class RuleManager extends Thread {
 	
-	private static RuleManager event = new RuleManager(); 
+	private static RuleManager rulemanager = new RuleManager(); 
 	private LinkedBlockingQueue<JSONObject> events;
 	
 	private RuleManager()
@@ -16,7 +16,7 @@ public class RuleManager extends Thread {
 	
 	public static RuleManager getInstance()
 	{
-		return event;		
+		return rulemanager;		
 	}
 	
 	public void pushEvent (JSONObject JSONMsg)
