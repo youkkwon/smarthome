@@ -44,8 +44,9 @@ char c;                           // Character read from server
 int status = WL_IDLE_STATUS;      // Network connection status
 // IPAddress server(192,168,1,124);  // The server's IP address
 //IPAddress server(192,168,1,139);  // The server's IP address
-IPAddress server(192,168,10,106);  // The server's IP address
+IPAddress server(192,168,10,107);  // The server's IP address
 //IPAddress server(10,253,225,74);  // The server's IP address
+//IPAddress server(192,168,10,109);  // The server's IP address
 WiFiClient client;                // The client (our) socket
 IPAddress ip;                     // The IP address of the shield
 IPAddress subnet;                 // The IP address of the shield
@@ -92,37 +93,34 @@ char gNodeID[] = "78:C4:E:2:5C:A3";
 //JSON thing list
 struct sThingsList
 {
-  char id[5];
-  char Type[15];
-  char SType[20];
-  char VType[10];
-  char VMin[10];
-  char VMax[10];
-};
-struct sThingsList gThingsList[]=
-{
-  {"0001","Door"       ,"Actuator","String","Open"  ,"Close"},
-  {"0002","Light"      ,"Actuator","String","On"    ,"Off"  },
-  {"0003","Presence"   ,"Sensor"  ,"String","AtHome","Away" },
-  {"0004","Temperature","Sensor"  ,"Number","-50"   ,"50"   },
-  {"0005","Humidity"   ,"Sensor"  ,"Number","0"     ,"100"  },
-  {"0006","DoorSensor" ,"Sensor"  ,"String","Open"  ,"Close"},
-  {"0007","MailBox"    ,"Sensor"  ,"String","Empty" ,"Mail" },
-  {"0008","Alarm"      ,"Actuator","String","Set"   ,"Unset"}  
+  char *id;
+  char *Type;
+  char *SType;
+  char *VType;
+  char *VMin;
+  char *VMax;
 };
 
+const struct sThingsList gThings1 = {"0001","Door"       ,"Actuator","String","Open"  ,"Close"};
+const struct sThingsList gThings2 = {"0002","Light"      ,"Actuator","String","On"    ,"Off"  };
+const struct sThingsList gThings3 = {"0003","Presence"   ,"Sensor"  ,"String","AtHome","Away" };
+const struct sThingsList gThings4 = {"0004","Temperature","Sensor"  ,"Number","-50"   ,"50"   };
+const struct sThingsList gThings5 = {"0005","Humidity"   ,"Sensor"  ,"Number","0"     ,"100"  };
+const struct sThingsList gThings6 = {"0006","DoorSensor" ,"Sensor"  ,"String","Open"  ,"Close"};
+const struct sThingsList gThings7 = {"0007","MailBox"    ,"Sensor"  ,"String","Empty" ,"Mail" };
+const struct sThingsList gThings8 = {"0008","Alarm"      ,"Actuator","String","Set"   ,"Unset"};  
 
 
 //JSON event
 struct sThingEvent
 {
-  char id[5];
-  char Type[15];
-  char Value[20];
+  char *id;
+  char *Type;
+  char Value[10];
 };
 struct sThingEvent gThingEvent[] = {
   {"0003","Presence"   , "AtHome"},
-  {"0004","Temperature", "-999"    },
+  {"0004","Temperature", "-999"  },
   {"0005","Humidity"   , "100"   },
   {"0006","DoorSensor" , "Close" },
   {"0007","MailBox"    , "Mail"  }
@@ -163,6 +161,7 @@ void SendJSONthings(struct sThingsList& thing, bool bEnd)
 
 void SendJSONdiscoverRegister(bool bDiscoverRegister)
 {
+  struct sThingsList thing; 
   client.write('{');    
     if(bDiscoverRegister)
     {
@@ -175,16 +174,17 @@ void SendJSONdiscoverRegister(bool bDiscoverRegister)
       SendJSONobject("NodeID",gNodeID,false); 
       SendJSONobject("Result","Authorized",false); 
     }
-    client.print("\"ThingList\":[");    
-      SendJSONthings(gThingsList[0],false);
-      SendJSONthings(gThingsList[1],false);
-      SendJSONthings(gThingsList[2],false);      
-      SendJSONthings(gThingsList[3],false);
-      SendJSONthings(gThingsList[4],false);
-      SendJSONthings(gThingsList[5],false);
-      SendJSONthings(gThingsList[6],false);
-      SendJSONthings(gThingsList[7],false);
-      SendJSONthings(gThingsList[8],true);
+    client.print("\"ThingList\":[");   
+      
+      thing=gThings1; SendJSONthings(thing,false);
+      thing=gThings2; SendJSONthings(thing,false);
+      thing=gThings3; SendJSONthings(thing,false);
+      thing=gThings4; SendJSONthings(thing,false);
+      thing=gThings5; SendJSONthings(thing,false);
+      thing=gThings6; SendJSONthings(thing,false);
+      thing=gThings7; SendJSONthings(thing,false);
+      thing=gThings8; SendJSONthings(thing,true);    
+
     client.write(']');
   client.write('}');
 }
@@ -248,7 +248,6 @@ void loop()
       }       
 */
 
- //     client.println(); 
      while(1)
      {
        SendJSONdiscoverRegister(true);
@@ -259,7 +258,6 @@ void loop()
        client.println(); 
        delay(3000);      
      }
-      delay(2000);
  
       // That's it. We wait a second, then do it all again.
       client.stop();
