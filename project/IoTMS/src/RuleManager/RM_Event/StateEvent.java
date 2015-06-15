@@ -19,7 +19,7 @@ public class StateEvent {
 	
 	public void execute(JSONObject JSONMsg)
 	{
-		System.out.println("[Process] Handle StateEvent : " + JSONMsg);
+		System.out.println("[RM - Process] Handle StateEvent : " + JSONMsg);
 		
 		String value = (String) JSONMsg.get("Value");
 		try {

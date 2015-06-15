@@ -7,6 +7,13 @@ import EventBus.IoTMSEventBus;
 
 public class RM_Tester {
 	
+	private String nodeID;
+	
+	public RM_Tester(String nodeID)
+	{
+		this.nodeID = nodeID;		
+	}
+	
 	/*
 	 * Thing ID				Action
 	 * Door			1		Open/Close
@@ -189,25 +196,25 @@ public class RM_Tester {
 		testRuleEvent("Search", null, null);
 	
 		// Thing Test (Node ID : + Thing ID)
-		testActionEvent ("0", "1", "Door", "Open");			// Door open on Alarm mode
+		testActionEvent (nodeID, "1", "Door", "Open");			// Door open on Alarm mode
 		
 		// State Test (Normal mode)
 		testStateEvent ("UnSet");	
 			
 		// Thing Test (Node ID + Thing ID)
-		testActionEvent ("0", "1", "Door", "Open");			// Door open on Normal mode
+		testActionEvent (nodeID, "1", "Door", "Open");			// Door open on Normal mode
 			
 		// Thing Test (Node ID + Thing ID)
-		testThingEvent ("0", "2", "Light", "On");			// Test no rule event
+		testThingEvent (nodeID, "2", "Light", "On");			// Test no rule event
 		
-		testThingEvent ("0", "3", "Presence", "Away");		// Test schedule event
+		testThingEvent (nodeID, "3", "Presence", "Away");		// Test schedule event
 		testStateEvent ("UnSet");							// Test cancel scheduled event
 
 		testConfigEvent("Alarm", "3");						// Test config 
 		testConfigEvent("Light", "9");
 		//testRuleEvent ("Search", null, null);
 	
-		testThingEvent ("0", "3", "Presence", "Away");		// Check schedule job on changed value		
+		testThingEvent (nodeID, "3", "Presence", "Away");		// Check schedule job on changed value		
 		
 		String[] IDs = new String[3];
 		String[] types = new String[3];
@@ -215,6 +222,6 @@ public class RM_Tester {
 		IDs[0] = "5";	types[0] = "DoorSensor";		values[0] = "Open";
 		IDs[1] = "3";	types[1] = "Presense";			values[1] = "Away";
 		IDs[2] = "4";	types[2] = "Temperature";		values[2] = "32";		
-		testThingBulkEvent("0", IDs, types, values);
+		testThingBulkEvent(nodeID, IDs, types, values);
 	}
 }

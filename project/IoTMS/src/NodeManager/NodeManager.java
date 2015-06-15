@@ -45,6 +45,7 @@ public class NodeManager implements AdapterEventListener {
 		return null;
 	}
 	
+	@SuppressWarnings("unused")
 	private void removeNode(Node node) {
 		Nodes.remove(node);
 	}

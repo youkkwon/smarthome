@@ -25,7 +25,7 @@ public class RuleEvent {
 	@SuppressWarnings("unchecked")
 	public void execute(JSONObject JSONMsg)
 	{
-		System.out.println("[Process] Handle RuleEvent : " + JSONMsg);
+		System.out.println("[RM - Process] Handle RuleEvent : " + JSONMsg);
 		RuleSet ruleset = RuleSet.getInstance();
 		String type = (String) JSONMsg.get("Type");
 		
@@ -54,16 +54,14 @@ public class RuleEvent {
 			while (iterator.hasNext())
 			{
 				Rule rule  = iterator.next();
-				System.out.println("[Process] Rules [" + rule.isActive() + "] - " + rule.getStatement());
 				rules.add(rule.getStatement());
-				//rules.add(iterator.next().getStatement());
 			}
 			
 			JSONOutMsg.put("Targets", targets);
 			JSONOutMsg.put("Job", "RuleSearch");			
 			JSONOutMsg.put("Rules", rules);
 					
-			System.out.println("[Process] SearchRule : " + JSONOutMsg);
+			//System.out.println("[RM - Process] SearchRule : " + JSONOutMsg);
 			
 			// post event.
 			IoTMSEventBus.getInstance().postEvent(JSONOutMsg);
@@ -82,16 +80,14 @@ public class RuleEvent {
 			while (iterator.hasNext())
 			{
 				Rule rule  = iterator.next();
-				System.out.println("[Process] Rules [" + rule.isActive() + "] - " + rule.getStatement());
 				rules.add(rule.getStatement());
-				//rules.add(iterator.next().getStatement());
 			}
 			
 			JSONOutMsg.put("Targets", targets);
 			JSONOutMsg.put("Job", "RuleSearch");			
 			JSONOutMsg.put("Rules", rules);
 			
-			System.out.println("[Process] SearchRule : " + JSONOutMsg);
+			//System.out.println("[RM - Process] SearchRule : " + JSONOutMsg);
 					
 			// post event.
 			IoTMSEventBus.getInstance().postEvent(JSONOutMsg);

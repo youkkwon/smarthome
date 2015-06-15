@@ -1,6 +1,7 @@
 package Main;
 
 import EventBus.*;
+import NodeManager.NodeManager;
 import RuleManager.RM_Event.RuleManager;
 import RuleManager.RM_Core.Scheduler;
 
@@ -8,6 +9,7 @@ import Tester.Tester;
 
 public class Main {
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 				
 		// Event bus for IoTMS
@@ -23,6 +25,9 @@ public class Main {
 		rulemanager.start();							
 		rm_scheduler.start();
 	
+		// NodeManager
+		NodeManager 				nodemanager	= NodeManager.getInstance();	
+		
 		Tester tester	= new Tester();
 		tester.test();
 	}

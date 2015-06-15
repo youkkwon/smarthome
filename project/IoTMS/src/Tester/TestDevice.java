@@ -8,6 +8,13 @@ import CommManager.CommUtil;
 
 public class TestDevice {
 
+	private String nodeID;
+	
+	public TestDevice (String nodeID)
+	{
+		this.nodeID = nodeID;
+	}
+	
 	public void test(int mode)
  	{		
   		String inputLine;															// String from the server
@@ -22,7 +29,7 @@ public class TestDevice {
     	if(mode == 0)
     	{
     	
-		System.out.println("Server Socket Thread Start... (001)");
+		System.out.println("[Tester - Device] Server Socket Thread Start... (001)");
 		
     	ServerSocket serverSocket = null;							// Client socket object
     	int	discPortNum = CommUtil.getDiscoveryPort();											// Port number for server socket
@@ -34,11 +41,11 @@ public class TestDevice {
 		try
 		{
     		serverSocket = new ServerSocket(discPortNum);
-    		System.out.println ( "\n\nWaiting for connection on port " + discPortNum + "." );
+    		System.out.println ( "\n\n[Tester - Device] Waiting for connection on port " + discPortNum + "." );
     	}
 		catch (IOException e)
     	{
-    		System.err.println( "\n\nCould not instantiate socket on port: " + discPortNum + " " + e);
+    		System.err.println( "\n\n[Tester - Device] Could not instantiate socket on port: " + discPortNum + " " + e);
     		System.exit(1);
     	}
 		
@@ -56,7 +63,7 @@ public class TestDevice {
         	}
     		catch (Exception e)
         	{
-        		System.err.println("Accept failed.");
+        		System.err.println("[Tester - Device] Accept failed.");
         		System.exit(1);
         	}
 
@@ -65,8 +72,8 @@ public class TestDevice {
     	 	* we can read and write.
 		 	*****************************************************************************/
 
-    		System.out.println ("Connection successful");
-    		System.out.println ("Waiting for input.....");
+    		System.out.println ("[Tester - Device] Connection successful");
+    		System.out.println ("[Tester - Device] Waiting for input.....");
 
  	    	try
  	    	{ 	   	
@@ -81,7 +88,8 @@ public class TestDevice {
 		    	{
 	 	    		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\",\"Sensor\":[\"DoorSensor\":[\"Open\",\"Close\"],\"Temperater\":\"Numeric\"]}\n";
 	 	    		String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
-	 				System.out.println( "Sending message to client...." );
+	 	    		disc_resp_msg.replaceAll("12:23:34:45:56:67", nodeID);
+	 				System.out.println( "[Tester - Device] Sending message to client...." );
 	   				out.write( disc_resp_msg, 0, disc_resp_msg.length() );
 	   				out.newLine();
 					out.flush();
@@ -95,7 +103,7 @@ public class TestDevice {
 		    	{
 		    		if ((inputLine = in.readLine()) != null)
 		    		{
-	  	  				System.out.println("FROM SERVER: " + inputLine);
+	  	  				System.out.println("[Tester - Device] FROM SERVER: " + inputLine);
 		   				
 	  	  				/*if(inputLine.equals("Disconnect") == true)
 		   				{
@@ -105,7 +113,8 @@ public class TestDevice {
 		   				else*/
 		   				{
 		   	 	    		String reg_resp_msg = "{\"Job\":\"Registered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
-		   	 				System.out.println( "Sending message to client.... " + reg_resp_msg );
+		   	 	    		reg_resp_msg.replaceAll("12:23:34:45:56:67", nodeID);
+		   	 				System.out.println( "[Tester - Device] Sending message to client.... " + reg_resp_msg );
 		   	   				out.write( reg_resp_msg, 0, reg_resp_msg.length() );
 		   	   				out.newLine();
 		   					out.flush();
@@ -125,7 +134,7 @@ public class TestDevice {
 	   		 	clientSocket.close();
 		    	serverSocket.close();
 	
-				System.out.println ( "\ndiscovery done...............\n" );
+				System.out.println ( "\n[Tester - Device] discovery done...............\n" );
 			
 
 			} catch (Exception e) {
@@ -152,7 +161,7 @@ public class TestDevice {
       		  			System.out.println ( "\nPlease specify an IP address on the command line.\n" );
        		 			System.exit(1);
    		 			} else*/ {
-      		  			System.out.println ( "\n\nTrying to connect to " + "127.0.0.1" + " on port " + portNum + ".\n" );
+      		  			System.out.println ( "\n\n[Tester - Device] Trying to connect to " + "127.0.0.1" + " on port " + portNum + ".\n" );
       		  			//clientSocket = new Socket(argv[0], portNum);
       		  			clientSocket = new Socket("127.0.0.1", portNum);
        		 			done = true;
@@ -178,7 +187,8 @@ public class TestDevice {
 		    		for(int i = 0; i < 3; i++)
 		    		{
 		    			String json_string = "{\"Job\":\"event\",\"NodeID\":\"12:23:34:45:56:67\",\"type\":\"event\",\"Temperature\":\"28\",\"DoorSensor\":\"Open\"}\n";
-			    		System.out.println(json_string);
+		    			json_string.replaceAll("12:23:34:45:56:67", nodeID);
+		    			System.out.println("[Tester - Device] - " + json_string);
 						out.write( json_string, 0, json_string.length() );
 						out.flush();
 						Thread.sleep(3000);
@@ -195,7 +205,7 @@ public class TestDevice {
 			    	{
 			    		if ((inputLine = in.readLine()) != null)
 			    		{
-		  	  				System.out.println("FROM SERVER: " + inputLine);
+		  	  				System.out.println("[Tester - Device] FROM SERVER: " + inputLine);
 		  	  				msgCnt++;
 			  			}
 						if (msgCnt > 1) done = true;
@@ -216,7 +226,7 @@ public class TestDevice {
     			catch (Exception e)
         		{
              		e.printStackTrace();
-        			System.err.println( "Could not connect to " + mode + " on port: " + portNum + "\n");
+        			System.err.println( "[Tester - Device] Could not connect to " + mode + " on port: " + portNum + "\n");
         		}
 
 

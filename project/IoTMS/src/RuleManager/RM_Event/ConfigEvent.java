@@ -18,7 +18,7 @@ public class ConfigEvent {
 	
 	public void execute(JSONObject JSONMsg)
 	{
-		System.out.println("[Process] Handle ConfigEvent : " + JSONMsg);
+		System.out.println("[RM - Process] Handle ConfigEvent : " + JSONMsg);
 		
 		String type = (String) JSONMsg.get("Type");
 		String value = (String) JSONMsg.get("Value");
