@@ -23,7 +23,7 @@ public class ActionEvent {
 	
 	public void execute(JSONObject JSONMsg)
 	{
-		System.out.println("[Process] Handle ActionEvent : " + JSONMsg);
+		System.out.println("[RM - Process] Handle ActionEvent : " + JSONMsg);
 		
 		boolean allow = false;
 		String nodeID = (String) JSONMsg.get("NodeID");
@@ -41,6 +41,6 @@ public class ActionEvent {
 		if (allow)
 			action.execute();
 		else
-			System.out.println ("Action is not allowed : " + JSONMsg);
+			System.out.println ("[RM - Process] Action is not allowed : " + JSONMsg);
 	}
 }

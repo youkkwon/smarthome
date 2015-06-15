@@ -42,7 +42,7 @@ public class RuleManager extends Thread {
 		else if (job.equalsIgnoreCase("ConfigCtrl"))
 			ConfigEvent.getInstance().execute(JSONMsg);
 		else
-			System.out.println ("Not valid event, ignore it.");
+			System.out.println ("[RM  - Process] Not valid event, ignore it.");
 		
 		return;
 	}

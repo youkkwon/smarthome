@@ -7,6 +7,13 @@ import EventBus.IoTMSEventBus;
 
 public class NM_Tester {
 	
+	private String nodeID;
+	
+	public NM_Tester (String nodeID)
+	{
+		this.nodeID = nodeID;
+	}
+	
 	/*
 	 * Thing ID				Action
 	 * Door			1		Open/Close
@@ -107,7 +114,7 @@ public class NM_Tester {
 		values[3] = "Open";
 		testThingBulkEvent("0", IDs, types, values);*/
 		
-		testUINodeEvent("0");
-		testUIThingEvent("0", "1");
+		testUINodeEvent(nodeID);
+		testUIThingEvent(nodeID, "1");
 	}
 }
