@@ -1,8 +1,8 @@
 package node;
 
-import comm.Link;
-import comm.LinkEvent;
-import comm.LinkEventListener;
+import comm.core.LinkEvent;
+import comm.core.LinkEventListener;
+import comm.core.Link;
 
 public class Node implements LinkEventListener {
 

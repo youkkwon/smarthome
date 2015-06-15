@@ -10,6 +10,7 @@ public class TestServer {
 		// discover node
 		System.out.println("\n# 1. Create Node Manager.");
 		NodeManager nm = new NodeManager();
+		
 		System.out.println("\n# 2. Discover Node.");
 		nm.discoverNode(10);
 

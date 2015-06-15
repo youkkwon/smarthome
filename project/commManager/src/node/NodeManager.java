@@ -2,15 +2,16 @@ package node;
 
 import java.util.ArrayList;
 
-import comm.Adapter;
-import comm.AdapterEvent;
-import comm.AdapterEventListener;
-import comm.Link;
+import comm.core.AdapterEvent;
+import comm.core.AdapterEventListener;
+import comm.core.Link;
+import comm.manager.CommManager;
 
 public class NodeManager implements AdapterEventListener {
 	
-	Adapter wifiAdapter;
 	ArrayList<Node> nodeList;
+	
+	CommManager cm;
 	
 	public NodeManager()
 	{
@@ -19,24 +20,24 @@ public class NodeManager implements AdapterEventListener {
 	
 	public void initialize()
 	{
-		wifiAdapter = new Adapter();
-		wifiAdapter.addListener(this);
+		cm = CommManager.getInstance();
+		cm.addListener(this);
 		nodeList = new ArrayList<Node>();
 	}
-
+	
 	public void discoverNode(int duration)
 	{
-		wifiAdapter.discoverNode(duration);
+		cm.discoverNode(duration);
 	}
 
 	public void registerNode(String msg)
 	{
-		wifiAdapter.registerNode(msg);
+		cm.registerNode(msg);
 	}
 
 	public void rejectNode(String mac)
 	{
-		wifiAdapter.disconnectNode(mac);
+		cm.rejectNode(mac);
 	}
 	
 	private Node findNode(String mac)

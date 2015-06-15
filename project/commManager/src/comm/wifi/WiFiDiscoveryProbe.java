@@ -1,12 +1,13 @@
-package comm;
+package comm.wifi;
 
 import java.net.*;
 import java.io.*;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import comm.core.AdapterEvent;
+import comm.core.AdapterEventListener;
+import comm.util.CommUtil;
 
-public class DiscoveryProbe extends Thread
+public class WiFiDiscoveryProbe extends Thread
 {
 	String ip;	// IP address and port to try to connect to.
 	int port;
@@ -19,12 +20,13 @@ public class DiscoveryProbe extends Thread
 
 	// Here we set up the thread and local parameters
 
-	public DiscoveryProbe ( String ip, int port, int index, AdapterEventListener l )
+	public WiFiDiscoveryProbe ( String ip, int port, int index, AdapterEventListener l )
 	{
 		this.ip = ip;
 		this.port = port;
 		this.index = index;
 		listener = l;
+		System.out.println("WiFiDiscoveryProbe-addListener");
 		setDaemon(false);
 
 	} // constructor

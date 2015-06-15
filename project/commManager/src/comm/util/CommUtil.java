@@ -1,4 +1,4 @@
-package comm;
+package comm.util;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -13,8 +13,6 @@ public class CommUtil {
 		JSONObject jsonObj;
 		jsonObj = (JSONObject) JSONValue.parse(str);
 		
-		System.out.println("json to be parsed: " + str);
-		
 		String tmp;
 		tmp = (String) jsonObj.get("NodeID");
 		System.out.println("MAC Address : " + tmp);
@@ -27,8 +25,6 @@ public class CommUtil {
 	{
 		JSONObject jsonObj;
 		jsonObj = (JSONObject) JSONValue.parse(str);
-		
-		System.out.println("json to be parsed: " + str);
 		
 		String tmp;
 		tmp = (String) jsonObj.get("Job");

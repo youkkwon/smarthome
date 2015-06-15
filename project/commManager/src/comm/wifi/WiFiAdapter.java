@@ -1,23 +1,28 @@
-package comm;
+package comm.wifi;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import node.Node;
+import comm.core.Adapter;
+import comm.core.AdapterEvent;
+import comm.core.AdapterEventListener;
+import comm.core.LinkEvent;
+import comm.core.LinkEventListener;
+import comm.util.CommUtil;
 
-public class Adapter implements Runnable, LinkEventListener {
+public class WiFiAdapter extends Adapter implements Runnable, LinkEventListener {
 
 	private Thread t;
 	private AdapterEventListener adapterListener;
-	private Discovery wifiDiscovery;
-	private ArrayList<Link> linkList;
+	private WiFiDiscovery wifiDiscovery;
+	private ArrayList<WiFiLink> linkList;
 	
-	public Adapter()
+	public WiFiAdapter()
 	{
 		System.out.println("WiFiAdapter Start...");
-		linkList = new ArrayList<Link>();
+		linkList = new ArrayList<WiFiLink>();
 		t = new Thread(this, "wifi");
 		t.start();
 	}
@@ -71,7 +76,7 @@ public class Adapter implements Runnable, LinkEventListener {
 		 	*****************************************************************************/
 
 	    	//linkList.add(new Link("Link", clientSocket, this));
-	    	linkList.add(new Link("Link", clientSocket, this));
+	    	linkList.add(new WiFiLink("Link", clientSocket, this));
 	    	
 	    	//adapterListener.onAdapterEvent(new CommEvent("Add_node", "Connect", (new Integer(clientSocketList.indexOf(clientSocket))).toString()));
 			
@@ -85,21 +90,24 @@ public class Adapter implements Runnable, LinkEventListener {
 	{
 		adapterListener = l;
 	}
-	
+
+	@Override
 	public void discoverNode(int duration)
 	{
-		wifiDiscovery = new Discovery("WiFiDiscovery");
+		wifiDiscovery = new WiFiDiscovery("WiFiDiscovery");
 		wifiDiscovery.addListener(adapterListener);
 	}
 
+	@Override
 	public void registerNode(String msg)
 	{
 		wifiDiscovery.registerNode(msg);
 	}
-	
+
+	@Override
 	public void disconnectNode(String mac)
 	{
-		for(Link link : linkList)
+		for(WiFiLink link : linkList)
 		{
 			if(link.getMACAddress().equals(mac))
 			{

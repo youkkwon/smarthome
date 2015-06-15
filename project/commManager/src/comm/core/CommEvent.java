@@ -1,4 +1,4 @@
-package comm;
+package comm.core;
 
 public class CommEvent {
 	

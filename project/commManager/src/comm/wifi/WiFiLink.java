@@ -1,4 +1,4 @@
-package comm;
+package comm.wifi;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -7,14 +7,19 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
 
-public class Link implements Runnable {
+import comm.core.Link;
+import comm.core.LinkEvent;
+import comm.core.LinkEventListener;
+import comm.util.CommUtil;
+
+public class WiFiLink extends Link implements Runnable {
 
 	private Thread t;
 	private Socket clientSocket = null;	
 	private LinkEventListener listener;
 	private String mac = "00:00:00:00:00:00";
 	
-	public Link(String name, Socket socket, LinkEventListener l)
+	public WiFiLink(String name, Socket socket, LinkEventListener l)
 	{
 		System.out.println("Link Start...");
 		clientSocket = socket;

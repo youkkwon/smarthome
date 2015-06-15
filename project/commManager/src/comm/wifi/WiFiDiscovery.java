@@ -1,19 +1,23 @@
-package comm;
+package comm.wifi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
-public class Discovery implements Runnable {
+import comm.core.AdapterEventListener;
+import comm.core.Discovery;
+import comm.util.CommUtil;
+
+public class WiFiDiscovery extends Discovery implements Runnable {
 	
 	private Thread t;
 	private AdapterEventListener listener;
 	
 	int searchSize = 2048;							// The number of IP address to scan at the same time.
-   	DiscoveryProbe tcList[] = new DiscoveryProbe[searchSize];	// The list of threads that actually does the scan
+   	WiFiDiscoveryProbe tcList[] = new WiFiDiscoveryProbe[searchSize];	// The list of threads that actually does the scan
 	
-	public Discovery(String name)
+	public WiFiDiscovery(String name)
 	{
 		System.out.println("WiFiDiscovery Start...");
 		//listener = l;
@@ -173,7 +177,7 @@ public class Discovery implements Runnable {
 		***********************************************************************************************************/
 
 
-			   			tcList[i] = new DiscoveryProbe(searchIpAddr, portNum, i, listener);
+			   			tcList[i] = new WiFiDiscoveryProbe(searchIpAddr, portNum, i, listener);
 			   			tcList[i].start();
 			   			
 			   			if(i > 0) System.exit(0);

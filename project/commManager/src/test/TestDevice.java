@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import comm.CommUtil;
+import comm.util.CommUtil;
 
 public class TestDevice {
 
@@ -16,6 +16,10 @@ public class TestDevice {
     	int msgCnt;																	// Number for message displayed
     	int	portNum = CommUtil.getServerPort();															// Port number for server socket
 
+    	String json_discovered = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\",\"ThingList\":[{\"Id\":\"0001\",\"Type\":\"Door\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0002\",\"Type\":\"Light\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"On\"\"VMax\":\"Off\"},{\"Id\":\"0003\",\"Type\":\"Presence\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"AtHome\"\"VMax\":\"Away\"},{\"Id\":\"0004\",\"Type\":\"Temperature\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"-50\"\"VMax\":\"50\"},{\"Id\":\"0005\",\"Type\":\"Humidity\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"0\"\"VMax\":\"100\"},{\"Id\":\"0006\",\"Type\":\"DoorSensor\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0007\",\"Type\":\"MailBox\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Empty\"\"VMax\":\"Mail\"},{\"Id\":\"0008\",\"Type\":\"Alarm\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Set\"\"VMax\":\"Unset\"}]}\n";
+    	String json_registered = "{\"Job\":\"Registered\",\"NodeID\":\"12:23:34:45:56:67\",\"ThingList\":[{\"Id\":\"0001\",\"Type\":\"Door\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0002\",\"Type\":\"Light\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"On\"\"VMax\":\"Off\"},{\"Id\":\"0003\",\"Type\":\"Presence\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"AtHome\"\"VMax\":\"Away\"},{\"Id\":\"0004\",\"Type\":\"Temperature\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"-50\"\"VMax\":\"50\"},{\"Id\":\"0005\",\"Type\":\"Humidity\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"0\"\"VMax\":\"100\"},{\"Id\":\"0006\",\"Type\":\"DoorSensor\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0007\",\"Type\":\"MailBox\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Empty\"\"VMax\":\"Mail\"},{\"Id\":\"0008\",\"Type\":\"Alarm\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Set\"\"VMax\":\"Unset\"}]}\n";
+    	String json_event = "{\"Job\":\"Event\",\"NodeID\":\"12:23:34:45:56:67\",\"Status\":[{\"Id\":\"0003\",\"Type\":\"Presence\",\"Value\":\"AtHome\"},{\"Id\":\"0004\",\"Type\":\"Temperature\",\"Value\":\"50\"},{\"Id\":\"0005\",\"Type\":\"Humidity\",\"Value\":\"100\"},{\"Id\":\"0006\",\"Type\":\"DoorSensor\",\"Value\":\"Close\"},{\"Id\":\"0007\",\"Type\":\"MailBox\",\"Value\":\"Mail\"}]}\n";
+    	
     	// args[0] == 0 // factory reset mode
     	// args[0] == 1 // registered mode
     	
@@ -82,8 +86,9 @@ public class TestDevice {
 			 	 *****************************************************************************/
 		    	{
 	 	    		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\",\"Sensor\":[\"DoorSensor\":[\"Open\",\"Close\"],\"Temperater\":\"Numeric\"]}\n";
-	 	    		String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
-	 				System.out.println( "Sending message to client...." );
+	 	    		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
+	 	    		String disc_resp_msg = json_discovered;
+	 				System.out.println( "Sending message to client.... " + disc_resp_msg);
 	   				out.write( disc_resp_msg, 0, disc_resp_msg.length() );
 	   				out.newLine();
 					out.flush();
@@ -106,7 +111,8 @@ public class TestDevice {
 		   				}
 		   				else*/
 		   				{
-		   	 	    		String reg_resp_msg = "{\"Job\":\"Registered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
+		   	 	    		//String reg_resp_msg = "{\"Job\":\"Registered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
+		   	 	    		String reg_resp_msg = json_registered;
 		   	 				System.out.println( "Sending message to client.... " + reg_resp_msg );
 		   	   				out.write( reg_resp_msg, 0, reg_resp_msg.length() );
 		   	   				out.newLine();
@@ -179,8 +185,15 @@ public class TestDevice {
 		    		
 		    		for(int i = 0; i < 3; i++)
 		    		{
-		    			String json_string = "{\"Job\":\"event\",\"NodeID\":\"12:23:34:45:56:67\",\"type\":\"event\",\"Temperature\":\"28\",\"DoorSensor\":\"Open\"}\n";
-			    		System.out.println(json_string);
+		    			String json_string;
+		    			if(mode == 2)
+		    				json_string = "{\"Job\":\"Event\",\"NodeID\":\"12:12:12:12:12:12\",\"Status\":[{\"Id\":\"0003\",\"Type\":\"Presence\",\"Value\":\"AtHome\"}]}\n";
+		    			else
+		    				json_string = "{\"Job\":\"Event\",\"NodeID\":\"12:23:34:45:56:67\",\"type\":\"event\",\"Temperature\":\"28\",\"DoorSensor\":\"Open\"}\n";
+		    			
+		    			json_string = json_event;
+		    			
+		    			System.out.println(json_string);
 						out.write( json_string, 0, json_string.length() );
 						out.flush();
 						Thread.sleep(3000);
