@@ -12,16 +12,6 @@ import CommManager.AdapterEvent;
 import CommManager.AdapterEventListener;
 import CommManager.Link;
 
-/*
-enum Type {
-	Door, Light, Presense, Temperature, Humidity, DoorSensor, AlarmLamp, MialBox, Unknown
-}
-
-enum SensorType {
-	Actuator, Sensor, Unknown
-}
-*/
-
 public class NodeManager implements AdapterEventListener {
 	// Singletone
 	private static NodeManager uniqueInstance = new NodeManager();
