@@ -203,12 +203,19 @@ public class NodeManager implements AdapterEventListener {
 		{
 			// 1. look-up DB
 			// Thing을 DB에서 받아서 Thing을 추가한다.
-			if (Nodes.size() > 50)
+			if (Nodes.size() > 50) {
+				System.out.println("Node is more 50. reject to add new node!!!");
 				rejectNode("reject node");
+			}
 			
 			// DB에서 읽은 놈을 JSONObj로 생성한다.
 			String db = "";
 			JSONObject JSONMsg = (JSONObject) JSONValue.parse(db);
+			
+			if (JSONMsg == null) {
+				System.out.println("DB is null. reject to add new node!!!");
+				rejectNode("reject node");
+			}
 			
 			// 2. add new node or update the existing node
 			Node node = getNode(((Link)event.getLink()).getMACAddress());

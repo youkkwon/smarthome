@@ -3,8 +3,8 @@ package NodeManager;
 import org.json.simple.JSONObject;
 
 public abstract class Thing {
-	protected String mId;
-	protected String mValue;
+	protected String mId = "";
+	protected String mValue = "";
 	protected String mSensorType = "Unknown"; // 0: unknown, 1: actuator, 2: sensor
 	protected String mType = "Default";
     

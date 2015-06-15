@@ -52,8 +52,8 @@ public class Node implements LinkEventListener {
 		Things.add(thing);
 	}
 	
-	public void removeThing() {
-		
+	public void removeThing(Thing thing) {
+		Things.remove(thing);
 	}
 	
 	public String getMacAddress() {
@@ -99,13 +99,17 @@ public class Node implements LinkEventListener {
 	/* from SA Node
 	 * SA Node로부터 올라온 Data를 Update한다.
 	*/
-	@SuppressWarnings("unchecked")
-	public void updateThingInfo(JSONObject JSONMsg) { 
-		Node node = null;
+	public void updateThingInfo(JSONObject JSONMsg) {
+		int changeCount = 0;
 		Thing thing = null;
 		JSONObject thingObj = null;
+		JSONObject infoObj = new JSONObject(); // 보내는 Obj
+		JSONObject infoThingObj = new JSONObject(); // 보내는 Thing의 Object
+		JSONArray infoList = new JSONArray(); // 보내는 Obj
 		
 		String nodeID = (String)JSONMsg.get("NodeID");
+		
+		infoObj.put("NodeID", nodeID);
 		
 		if (!nodeID.equalsIgnoreCase(getMacAddress())) {
 			System.out.println ("[NM - Process] [UpdateThingInfo] Error: cannot find Node...ignore it : " + JSONMsg);
@@ -121,26 +125,34 @@ public class Node implements LinkEventListener {
 			if (thing != null) {
 				if (thing.setValue((String)thingObj.get("Value")) == false) {
 					// 값의 변경이 없음. 해당 Object 삭제
-					thingInfos.remove(i);
+					System.out.println ("[UpdateThingInfo] Remove : " + thingInfos);
+				} else {
+					infoThingObj.put("Id", (String)thingObj.get("Id"));
+					infoThingObj.put("Type", (String)thingObj.get("Type"));
+					infoThingObj.put("Value", (String)thingObj.get("Value"));
+					infoList.add(thing);
+					changeCount++;
 				}
 			}
 			else {
 				System.out.println ("[NM - Process] [UpdateThingInfo] Error: cannot find Thing...ignore it : " + JSONMsg);
 			}
 		}
-		
-		// 바뀐 data만 정리해서 보냄
-		JSONArray targets = new JSONArray();
-		targets.add("RuleManager");
-		targets.add("UI");
-		
-		JSONMsg.remove("Targets");
-		JSONMsg.remove("Job");
-		
-		JSONMsg.put("Targets", targets);
-		JSONMsg.put("Job", "ThingCtrl");
-		
-		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+		if (changeCount > 0) {
+			infoObj.put("Status", infoList);
+			
+			// 바뀐 data만 정리해서 보냄
+			JSONArray targets = new JSONArray();
+			targets.add("RuleManager");
+			targets.add("UI");
+			
+			infoObj.put("Targets", targets);
+			infoObj.put("Job", "ThingCtrl");
+			
+			IoTMSEventBus.getInstance().postEvent(infoObj);
+		} else {
+			System.out.println ("[UpdateThingInfo] no changed!!! node will eat event!!!");
+		}
 	}
 	
 	// To SA Node
