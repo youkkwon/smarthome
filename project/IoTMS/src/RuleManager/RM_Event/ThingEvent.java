@@ -22,7 +22,7 @@ public class ThingEvent {
 		return thingEvent;
 	}
 	
-	public void execute_single(JSONObject JSONMsg)
+	/*public void execute_single(JSONObject JSONMsg)
 	{
 		System.out.println("[RM - Process] Handle ThingEvent : " + JSONMsg);
 		
@@ -42,19 +42,19 @@ public class ThingEvent {
 		Iterator<Action> iterator = actions.iterator();
 		while (iterator.hasNext())
 			iterator.next().execute();		
-	}
+	}*/
 	
 	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[RM - Process] Handle ThingEvent : " + JSONMsg);
 		
 		String nodeID = (String) JSONMsg.get("NodeID");
-		JSONArray thingsInfo = (JSONArray) JSONMsg.get("ThingsInfo");
+		JSONArray thingsInfo = (JSONArray) JSONMsg.get("Status");
 		
 		for (int i=0; i < thingsInfo.size(); i++)
 		{
 			JSONObject thing = (JSONObject) thingsInfo.get(i);
-			String thingID = (String) thing.get("ThingID");
+			String thingID = (String) thing.get("Id");
 			String value = (String) thing.get("Value");
 			String type = (String) thing.get("Type");
 			
@@ -69,7 +69,7 @@ public class ThingEvent {
 		LinkedList<Action> actions = RuleSet.getInstance().getActions(condition.getStatement());
 		if (actions == null || actions.isEmpty())
 		{
-			System.out.println("[RM - Process] No rule for this condition.");
+			System.out.println("[RM - Process] No rule for this condition." + condition.getStatement());
 			return;
 		}
 		Iterator<Action> iterator = actions.iterator();

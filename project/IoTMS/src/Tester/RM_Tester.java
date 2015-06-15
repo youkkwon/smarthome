@@ -18,7 +18,7 @@ public class RM_Tester {
 	 * Thing ID				Action
 	 * Door			1		Open/Close
 	 * Light		2		On/Off
-	 * Presense		3		AtHome/Away
+	 * Presence		3		AtHome/Away
 	 * Temperature	4		number
 	 * Humidity		5		number
 	 * DoorSensor	6		Open/Close
@@ -121,11 +121,11 @@ public class RM_Tester {
 
 		JSONArray	things	= new JSONArray();
 		JSONObject thing = new JSONObject();
-		thing.put ("ThingID", thingID);
+		thing.put ("Id", thingID);
 		thing.put ("Type", type);
 		thing.put ("Value", value);
 		things.add(thing);
-		JSONMsg.put("ThingsInfo", things);
+		JSONMsg.put("Status", things);
 		
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}

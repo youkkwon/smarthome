@@ -1,5 +1,5 @@
-if *@10==Set#Alarm 							then !0@1=Open#Door, 0@1=Close#Door, 0@7=On#AlarmLamp
-if *@10==UnSet#Alarm 						then 0@7=Off#AlarmLamp
-if 0@3==Away#Presence 						then 0@11=Confirm#Message, *@10=Set#AlarmDelay, 0@2=Off#LightDelay
-if *@10==Set#Alarm, 0@3==AtHome#Presense 	then 0@11=Emergency#Message
-if *@10==Set#Alarm, 0@1==Open#Door 			then 0@11=Emergency#Message
+if *@0010==Set#Alarm 											then !12:23:34:45:56:67@0001=Open#Door, 12:23:34:45:56:67@0001=Close#Door, 12:23:34:45:56:67@0007=On#AlarmLamp
+if *@0010==UnSet#Alarm 											then 12:23:34:45:56:67@0007=Off#AlarmLamp
+if 12:23:34:45:56:67@0003==Away#Presence 						then 12:23:34:45:56:67@0011=Confirm#Message, *@0010=Set#AlarmDelay, 12:23:34:45:56:67@0002=Off#LightDelay
+if *@0010==Set#Alarm, 12:23:34:45:56:67@0003==AtHome#Presense 	then 12:23:34:45:56:67@0011=Emergency#Message
+if *@0010==Set#Alarm, 12:23:34:45:56:67@0001==Open#Door 		then 12:23:34:45:56:67@0011=Emergency#Message

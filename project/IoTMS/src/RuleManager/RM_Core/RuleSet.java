@@ -161,7 +161,7 @@ public class RuleSet {
 			RuleSetFileStorage.getInstance().storeRuleSet(rules);			
 		}
 		else
-			System.out.println ("There is no such a rule");
+			System.out.println ("[RM - Process] There is no such a rule");
 		
 		return delete;
 	}
