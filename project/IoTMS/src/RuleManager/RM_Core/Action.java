@@ -67,7 +67,14 @@ public abstract class Action
 		JSONArray 	targets = new JSONArray();
 		
 		targets.add("Logger");
-		if (type.equalsIgnoreCase("Message"))
+		if (type.equalsIgnoreCase("Alarm"))
+		{
+			targets.add("RuleManager");
+			JSONMsg.put("Targets", targets);
+			JSONMsg.put("Job", "Alarm");
+			JSONMsg.put("Value", value);
+		}
+		else if (type.equalsIgnoreCase("Message"))
 		{
 			targets.add("Message");
 			JSONMsg.put("Targets", targets);
