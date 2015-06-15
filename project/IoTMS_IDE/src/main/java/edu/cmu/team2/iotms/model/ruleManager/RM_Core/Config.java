@@ -1,19 +1,11 @@
 package edu.cmu.team2.iotms.model.ruleManager.RM_Core;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import edu.cmu.team2.iotms.model.ruleManager.RM_Storage.RuleSetDBStorage;
+import edu.cmu.team2.iotms.model.ruleManager.RM_Storage.RuleManagerDBStorage;
 
 public class Config {
 
 	private int alarm_config = 300;			// 5m by default
 	private int light_config = 600;			// 10m by default
-	private String filename 	= "RM_resource/IoTMS.config";
 			
 	private static Config config = new Config(); 
 
@@ -48,48 +40,14 @@ public class Config {
 	}
 	
 	private void loadConfig () {
-/*		
-		int 	idx = 0;
-		String 	input = new String();
-				
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(filename));		
-			while ( (input=br.readLine()) != null )
-			{
-				idx = input.indexOf(":");
-				if (input.startsWith("Alarm"))
-					alarm_config = Integer.parseInt(input.substring(idx+1));
-				else if (input.startsWith("Light"))
-					light_config = Integer.parseInt(input.substring(idx+1));
-					
-			} 
-			br.close();
-		} catch (FileNotFoundException e) {
-			storeConfig();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-*/
-		alarm_config = RuleSetDBStorage.getInstance().loadRuleAlarmConfig();
-		light_config = RuleSetDBStorage.getInstance().loadRuleLightOffConfig();
+		alarm_config = RuleManagerDBStorage.getInstance().loadRuleAlarmConfig();
+		light_config = RuleManagerDBStorage.getInstance().loadRuleLightOffConfig();
 	}
 	
 	
 	public void storeConfig() {
-/*		
-		try {
-			BufferedWriter output =  new BufferedWriter(new FileWriter(filename));			
-			output.write("Alarm:" + Integer.toString(alarm_config) + "\n");
-			output.write("Light:" + Integer.toString(light_config) + "\n");
-			output.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-*/		
-		RuleSetDBStorage.getInstance().storeRuleAlarmConfig(alarm_config);
-		RuleSetDBStorage.getInstance().storeRuleLightOffConfig(light_config);
+		RuleManagerDBStorage.getInstance().storeRuleAlarmConfig(alarm_config);
+		RuleManagerDBStorage.getInstance().storeRuleLightOffConfig(light_config);
 	}
 
 }

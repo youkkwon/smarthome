@@ -3,7 +3,7 @@ package edu.cmu.team2.iotms.model.ruleManager.RM_Core;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import edu.cmu.team2.iotms.model.ruleManager.RM_Storage.RuleSetDBStorage;
+import edu.cmu.team2.iotms.model.ruleManager.RM_Storage.RuleManagerDBStorage;
 import edu.cmu.team2.iotms.model.utility.InvalidRuleException;
 
 // Singleton
@@ -36,8 +36,7 @@ public class RuleSet {
 	
 	private boolean loadRuleSet()
 	{
-		//ListIterator<String> raw_rules = RuleSetFileStorage.getInstance().loadRuleSet();
-		ListIterator<String> raw_rules = RuleSetDBStorage.getInstance().loadRuleSet();
+		ListIterator<String> raw_rules = RuleManagerDBStorage.getInstance().loadRuleSet();
 		
 		while (raw_rules.hasNext())
 		{
@@ -48,9 +47,8 @@ public class RuleSet {
 			try {
 				Rule rule = new Rule(conditions, actions);
 				rules.add(rule);
-			} catch (InvalidRuleException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (InvalidRuleException e) {
+				System.out.println(e.getExceptionMsg());
 			}
 		}
 		return false;
@@ -125,8 +123,7 @@ public class RuleSet {
 				Rule rule = new Rule(condStr, actStr);
 				rules.add(rule);
 			
-				//RuleSetFileStorage.getInstance().storeRuleSet(rules);
-				RuleSetDBStorage.getInstance().storeRuleSet(rules);
+				RuleManagerDBStorage.getInstance().insertRule(rule);
 			}
 		} catch (InvalidRuleException e) {
 			System.out.println(e.getExceptionMsg());
@@ -146,12 +143,14 @@ public class RuleSet {
 				{
 					rules.remove(rule);
 					delete = true;
+					//System.out.println ("[RM - Process] deleteRule - SameRule " + rules.size());
 					break;
 				}
 				else if (rule.isSameCondition(condStr))
 				{
 					rule.deleteActions(actStr);
 					delete = true;
+					//System.out.println ("[RM - Process] deleteRule - SameCondition " + rules.size());
 					break;
 				}
 			}
@@ -159,10 +158,8 @@ public class RuleSet {
 			System.out.println(e.getExceptionMsg());
 		}
 		
-		if (delete) {
-			//RuleSetFileStorage.getInstance().storeRuleSet(rules);			
-			RuleSetDBStorage.getInstance().storeRuleSet(rules);
-		}
+		if (delete) 
+			RuleManagerDBStorage.getInstance().storeRuleSet(rules);
 		else
 			System.out.println ("[RM - Process] There is no such a rule");
 		

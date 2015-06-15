@@ -6,13 +6,13 @@ import java.util.ListIterator;
 import Database.RuleSetDao;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Rule;
 
-public class RuleSetDBStorage extends RuleSetStroage {
-	private static RuleSetDBStorage storage = new RuleSetDBStorage(); 
+public class RuleManagerDBStorage extends RuleManagerStroage {
+	private static RuleManagerDBStorage storage = new RuleManagerDBStorage(); 
 	
-	private RuleSetDBStorage() {
+	private RuleManagerDBStorage() {
 	}
 
-	public static RuleSetDBStorage getInstance() {
+	public static RuleManagerDBStorage getInstance() {
 		return storage;		
 	}
 	

@@ -47,7 +47,7 @@ public class Rule {
 			actStatement = actStatement + ", " + actString[i];
 		
 		String statement = "if " + condStatement + " then " + actStatement;
-		
+				
 		return this.statement.startsWith(statement);
 	}
 	
@@ -90,13 +90,13 @@ public class Rule {
 		if (act_iterator.hasNext()) 
 		{
 			if ( actStatement == null)
-				actStatement = " not " + act_iterator.next().getStatement();
+				actStatement = " !" + act_iterator.next().getStatement();
 			else
-				actStatement = actStatement + ", " + " not " + act_iterator.next().getStatement();
+				actStatement = actStatement + ", !" + act_iterator.next().getStatement();
 		}
 		while (act_iterator.hasNext())
 		{
-			actStatement = actStatement + ", not " + act_iterator.next().getStatement();
+			actStatement = actStatement + ", !" + act_iterator.next().getStatement();
 		}
 		
 		statement = "if " + condStatement + " then " + actStatement;
