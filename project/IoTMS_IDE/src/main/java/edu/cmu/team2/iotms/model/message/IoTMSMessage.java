@@ -27,6 +27,28 @@ public abstract class IoTMSMessage {
 	}
 	
 	private void ProcessMessage(JSONObject msgJSON) {
+		String  value= (String) msgJSON.get("Value");
+
+ 			switch(value.toUpperCase()) {
+ 			case CONFIRM :
+ 				sendConfirmMessage();
+ 				break;
+ 			case EMERGENCY :
+ 				sendEmergencyMessage();
+ 				break;
+ 			case MALFUNCTION :
+ 				sendMalFunctionMessage();
+ 				break;
+ 			case POST :
+ 				sendPostMessage();
+ 				break;
+ 			default:
+ 				break;
+ 			}	 			
+ 	}
+
+	/*
+	 * private void ProcessMessage(JSONObject msgJSON) {
 		JSONArray  value= (JSONArray) msgJSON.get("value");
 		for(int i = 0; i < value.size(); i++) {
  			switch(value.get(i).toString().toUpperCase()) {
@@ -48,6 +70,7 @@ public abstract class IoTMSMessage {
  		}
 	}
 
+	 */
 	protected abstract void sendConfirmMessage();
 	protected abstract void sendEmergencyMessage();
 	protected abstract void sendMalFunctionMessage();

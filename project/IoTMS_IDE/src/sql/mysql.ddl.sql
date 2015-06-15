@@ -112,6 +112,4 @@ insert into iotmsdb.ruleset_info(ruleset) value ("if *@10==UnSet#Alarm 						the
 insert into iotmsdb.ruleset_info(ruleset) value ("if 0@3==Away#Presense 						then 0@11=Confirm#Message, *@10=Set#AlarmDelay, 0@2=Off#LightDelay");
 insert into iotmsdb.ruleset_info(ruleset) value ("if *@10==Set#Alarm, 0@3==AtHome#Presense 	then 0@11=Emergency#Message");
 insert into iotmsdb.ruleset_info(ruleset) value ("if *@10==Set#Alarm, 0@1==Open#Door 			then 0@11=Emergency#Message");
-
-insert into iotmsdb.ruleset_info(ruleset) value ("test rule");
-
+insert into iotmsdb.ruleset_info(ruleset) value ("if 12:23:34:45:56:67@0010==Over100#Humidity						then 12:23:34:45:56:67@0011=Alarm#Message");

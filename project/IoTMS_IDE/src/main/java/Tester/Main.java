@@ -1,9 +1,12 @@
 package Tester;
 
+import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 import edu.cmu.team2.iotms.model.eventBus.Logger_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.Message_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.NM_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.RM_EventBusReceiver;
+import edu.cmu.team2.iotms.model.message.MailMessage;
+import edu.cmu.team2.iotms.model.message.TwitterMessage;
 import edu.cmu.team2.iotms.model.nodeManager.NodeManager;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Scheduler;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Event.RuleManager;
@@ -29,7 +32,12 @@ public class Main {
 		// NodeManager
 		NodeManager 				nodemanager	= NodeManager.getInstance();	
 		
+		IoTMSEventBus.getInstance().register(new MailMessage());
+		IoTMSEventBus.getInstance().register(new TwitterMessage());
+		
+		/*
 		Tester tester	= new Tester();
 		tester.test();
+		*/
 	}
 }
