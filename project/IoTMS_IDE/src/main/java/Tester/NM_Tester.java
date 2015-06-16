@@ -61,6 +61,20 @@ public class NM_Tester {
 	
 	
 	@SuppressWarnings("unchecked")
+	public void testUINodeEvent1(String nodeID)
+	{
+		JSONObject	JSONMsg = new JSONObject();
+		JSONArray 	targets = new JSONArray();
+		
+		targets.add("NodeManager");
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("Job", "NodeMonitor");
+		JSONMsg.put("NodeID", nodeID);
+
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public void testUINodeEvent(String nodeID)
 	{
 		JSONObject	JSONMsg = new JSONObject();
@@ -75,17 +89,16 @@ public class NM_Tester {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testUIThingEvent(String nodeID, String thingID)
+	public void testUIDiscoverEvent()
 	{
 		JSONObject	JSONMsg = new JSONObject();
 		JSONArray 	targets = new JSONArray();
 		
 		targets.add("NodeManager");
 		JSONMsg.put("Targets", targets);
-		JSONMsg.put("Job", "ThingMonitor");
-		JSONMsg.put("NodeID", nodeID);
-		JSONMsg.put("ThingID", thingID);
-		
+		JSONMsg.put("Job", "Discover");
+		JSONMsg.put("Duration", "20");
+				
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}
 	
@@ -112,9 +125,12 @@ public class NM_Tester {
 		values[1] = "38";
 		values[2] = "12";
 		values[3] = "Open";
-		testThingBulkEvent("0", IDs, types, values);*/
+		testThingBulkEvent("0", IDs, types, values);
 		
 		testUINodeEvent(nodeID);
 		testUIThingEvent(nodeID, "1");
+		*/
+		
+		testUIDiscoverEvent();
 	}
 }

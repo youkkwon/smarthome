@@ -7,11 +7,11 @@ create table iotmsdb.ruleset_info (
 	PRIMARY KEY (`ruleset_id`)
 ) engine=InnoDB character set = utf8;
 
-insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm 															then !12:23:34:45:56:67@0001=Open#Door, 12:23:34:45:56:67@0001=Close#Door, 12:23:34:45:56:67@0007=On#AlarmLamp");
-insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==UnSet#Alarm 														then 12:23:34:45:56:67@0007=Off#AlarmLamp");
-insert into iotmsdb.ruleset_info(ruleset) value ("if 12:23:34:45:56:67@0003==Away#Presence 								then 12:23:34:45:56:67@0011=Confirm#Message, *@0010=Set#AlarmDelay, 12:23:34:45:56:67@0002=Off#LightDelay");
-insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm, 12:23:34:45:56:67@0003==AtHome#Presense 	then 12:23:34:45:56:67@0011=Emergency#Message");
-insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm, 12:23:34:45:56:67@0001==Open#Door 			then 12:23:34:45:56:67@0011=Emergency#Message");
-insert into iotmsdb.ruleset_info(ruleset) value ("if 12:23:34:45:56:67@0010==Over100#Humidity							then 12:23:34:45:56:67@0011=Malfunction#Message");
-insert into iotmsdb.ruleset_info(ruleset) value ("if 12:23:34:45:56:67@0010==Over100#Temperature						then 12:23:34:45:56:67@0011=Malfunction#Message");
-insert into iotmsdb.ruleset_info(ruleset) value ("if 12:23:34:45:56:67@0010==Under0#Temperature							then 12:23:34:45:56:67@0011=Malfunction#Message");
+insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm 														then !78:c4:e:1:7f:f9@0001=Open#Door, 78:c4:e:1:7f:f9@0001=Close#Door, 78:c4:e:1:7f:f9@0007=On#AlarmLamp");
+insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==UnSet#Alarm 													then 78:c4:e:1:7f:f9@0007=Off#AlarmLamp");
+insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0003==Away#Presence 								then 78:c4:e:1:7f:f9@0011=Confirm#Message, *@0010=Set#AlarmDelay, 78:c4:e:1:7f:f9@0002=Off#LightDelay");
+insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm, 78:c4:e:1:7f:f9@0003==AtHome#Presense 	then 78:c4:e:1:7f:f9@0011=Emergency#Message");
+insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm, 78:c4:e:1:7f:f9@0001==Open#Door 			then 78:c4:e:1:7f:f9@0011=Emergency#Message");
+insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0010==Over100#Humidity							then 78:c4:e:1:7f:f9@0011=Malfunction#Message");
+insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0010==Over100#Temperature						then 78:c4:e:1:7f:f9@0011=Malfunction#Message");
+insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0010==Under0#Temperature						then 78:c4:e:1:7f:f9@0011=Malfunction#Message");

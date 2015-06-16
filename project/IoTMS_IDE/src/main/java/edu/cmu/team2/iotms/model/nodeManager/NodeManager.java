@@ -140,7 +140,9 @@ public class NodeManager implements AdapterEventListener {
 	public void discoverNode(JSONObject JSONMsg)
 	{
 		int duration = 0;
-		duration = Integer.parseInt((String)JSONMsg.get("Duration"));
+		String strDuration = (String)JSONMsg.get("Duration");
+		if (strDuration != null)
+			duration = Integer.parseInt(strDuration);
 		adapter.discoverNode(duration);
 	}
 

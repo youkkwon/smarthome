@@ -23,14 +23,13 @@ public class RM_EventBusReceiver { //extends Observable implements Runnable {
 
 	@Subscribe
 	public void ProcessEvent(JSONObject JSONMsg)
-	{
-		System.out.println ("[EventBus] Process RuleManager Event : " + JSONMsg);
-		
+	{		
 		targets = (JSONArray) JSONMsg.get("Targets");
 		for (int i=0; i < targets.size(); i++)
 		{
 			if (targets.get(i).equals(ID))
 			{
+				System.out.println ("[EventBus] Process RuleManager Event : " + JSONMsg);
 				RuleManager.getInstance().pushEvent(JSONMsg);				
 			}
 		}
