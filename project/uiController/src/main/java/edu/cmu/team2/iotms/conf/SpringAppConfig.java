@@ -21,6 +21,8 @@ import edu.cmu.team2.iotms.application.EventHistoryService;
 import edu.cmu.team2.iotms.application.EventHistoryServiceImpl;
 import edu.cmu.team2.iotms.application.MessageService;
 import edu.cmu.team2.iotms.application.MessageServiceImpl;
+import edu.cmu.team2.iotms.application.NodeService;
+import edu.cmu.team2.iotms.application.NodeServiceImpl;
 import edu.cmu.team2.iotms.application.RuleService;
 import edu.cmu.team2.iotms.application.RuleServiceImpl;
 import edu.cmu.team2.iotms.application.SettingService;
@@ -93,6 +95,12 @@ public class SpringAppConfig {
 	@Bean
 	public RuleService ruleService() {
 		RuleServiceImpl service = new RuleServiceImpl(dataSource());
+		return service;
+	}
+	
+	@Bean
+	public NodeService nodeService() {
+		NodeServiceImpl service = new NodeServiceImpl(dataSource());
 		return service;
 	}
 }

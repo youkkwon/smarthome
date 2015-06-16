@@ -6,9 +6,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import EventBus.IoTMSEventBus;
 import edu.cmu.team2.iotms.domain.Setting;
 
 public class SettingServiceImpl implements SettingService {
@@ -44,7 +47,26 @@ public class SettingServiceImpl implements SettingService {
 					+",lightoff_settime="+settings.getLightoffSettime()
 					+",logging_duration="+settings.getLoggingDuration();
 		System.out.println("setSettings sql : "+sql);
+
+		ConfigEvent("Alarm", settings.getSecuritySettime());
+		ConfigEvent("Light", settings.getLightoffSettime());
+				
 		jdbcTemplate.execute(sql);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void ConfigEvent(String type, String value)
+	{
+		JSONObject	JSONMsg = new JSONObject();
+		JSONArray 	targets = new JSONArray();
+		
+		targets.add("RuleManager");
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("Job", "ConfigCtrl");
+		JSONMsg.put("Type",  type);
+		JSONMsg.put("Value", value);
+
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}
 
 }

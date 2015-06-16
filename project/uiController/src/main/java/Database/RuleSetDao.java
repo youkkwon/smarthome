@@ -129,7 +129,7 @@ public class RuleSetDao {
 		ResultSet rs = null;
 		
 		try {
-			pstmt = conn.prepareStatement("select security_settime from ruleset_info");
+			pstmt = conn.prepareStatement("select security_settime from setting");
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
 				do {
@@ -157,7 +157,7 @@ public class RuleSetDao {
 		ResultSet rs = null;
 		
 		try {
-			pstmt = conn.prepareStatement("select lightoff_settime from ruleset_info");
+			pstmt = conn.prepareStatement("select lightoff_settime from setting");
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
 				do {

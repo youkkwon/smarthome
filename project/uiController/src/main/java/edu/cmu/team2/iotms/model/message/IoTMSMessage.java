@@ -13,7 +13,7 @@ public abstract class IoTMSMessage {
 	protected final static String POST = "POST";
 	
 	@Subscribe
-	public void SubscribeMessage(JSONObject msgJSON) {
+	public void SubscribeMessage(final JSONObject msgJSON) {
 		JSONArray target= (JSONArray) msgJSON.get("Targets");
 		for(int i = 0; i < target.size(); i++) {				
  			if( mID.equals( target.get(i).toString().toUpperCase() ) ){
