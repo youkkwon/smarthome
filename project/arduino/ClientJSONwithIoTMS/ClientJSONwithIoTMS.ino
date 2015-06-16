@@ -187,15 +187,15 @@ void SendJSONstatusEvent(void)
       int i;
       char ch=0;
       for(i = 0 ; i < strlen(JSONstatus1) ; i++) client.write(pgm_read_byte_near(JSONstatus1 + i));       
-      client.print(gThingStatusValue[0]);client.print("\"," );
+      client.print(gThingStatusValue[0]);client.print("\"}," );
       for(i = 0 ; i < strlen(JSONstatus2) ; i++) client.write(pgm_read_byte_near(JSONstatus2 + i)); 
-      client.print(gThingStatusValue[1]);client.print("\"," );
+      client.print(gThingStatusValue[1]);client.print("\"}," );
       for(i = 0 ; i < strlen(JSONstatus3) ; i++) client.write(pgm_read_byte_near(JSONstatus3 + i)); 
-      client.print(gThingStatusValue[2]);client.print("\"," );
+      client.print(gThingStatusValue[2]);client.print("\"}," );
       for(i = 0 ; i < strlen(JSONstatus4) ; i++) client.write(pgm_read_byte_near(JSONstatus4 + i)); 
-      client.print(gThingStatusValue[3]);client.print("\"," );
+      client.print(gThingStatusValue[3]);client.print("\"}," );
       for(i = 0 ; i < strlen(JSONstatus5) ; i++) client.write(pgm_read_byte_near(JSONstatus5 + i)); 
-      client.print(gThingStatusValue[4]);client.print("\"" );
+      client.print(gThingStatusValue[4]);client.print("\"}" );
     }
     client.write(']');
   client.write('}');
