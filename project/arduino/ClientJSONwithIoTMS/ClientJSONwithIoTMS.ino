@@ -32,6 +32,8 @@
 
 
 #define PORTID  550               // IP socket port ID
+//#define PORTID  5503               // IP socket port ID
+
 #define MAX_TARGET_NUM 5
 #define MAX_WIFI_STRING_LENGTH 50
 //char ssid[] = "LGTeam2";             // The network SSID 
@@ -88,43 +90,47 @@ char stringbuf[256]={0};
 
 }
 
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+//
+//  JSON message
+//
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+/************************************************************************************************/
+
 //NodeID
-char gNodeID[] = "78:C4:E:2:5C:A3";
+char gNodeID[] = "12:23:34:45:56:67";
+#include <avr/pgmspace.h>
 //JSON thing list
-struct sThingsList
-{
-  char *id;
-  char *Type;
-  char *SType;
-  char *VType;
-  char *VMin;
-  char *VMax;
+const char gJSONthings1[] PROGMEM ="{\"Id\":\"0001\",\"Type\":\"Door\"       ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"Open\"  ,\"VMax\" : \"Close\"},";
+const char gJSONthings2[] PROGMEM ="{\"Id\":\"0002\",\"Type\":\"Light\"      ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"On\"    ,\"VMax\" : \"Off\"  },";
+const char gJSONthings3[] PROGMEM ="{\"Id\":\"0003\",\"Type\":\"Presence\"   ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"AtHome\",\"VMax\" : \"Away\" },";
+const char gJSONthings4[] PROGMEM ="{\"Id\":\"0004\",\"Type\":\"Temperature\",\"SType\":\"Sensor\"  ,\"VType\": \"Number\",\"VMin\" : \"-50\"   ,\"VMax\" : \"50\"   },";
+const char gJSONthings5[] PROGMEM ="{\"Id\":\"0005\",\"Type\":\"Humidity\"   ,\"SType\":\"Sensor\"  ,\"VType\": \"Number\",\"VMin\" : \"0\"     ,\"VMax\" : \"100\"\ },";
+const char gJSONthings6[] PROGMEM ="{\"Id\":\"0006\",\"Type\":\"DoorSensor\" ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Open\"  ,\"VMax\" : \"Close\"},";
+const char gJSONthings7[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"    ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Empty\" ,\"VMax\" : \"Mail\" },";
+const char gJSONthings8[] PROGMEM ="{\"Id\":\"0008\",\"Type\":\"Alarm\"      ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"Set\"   ,\"VMax\" : \"Unset\"}";
+
+#define MAX_SENSOR_NUM 5
+char gThingStatusValue[MAX_SENSOR_NUM][10] = {
+  {"Away"},
+  {"-999"},
+  {"100"},
+  {"Close"},
+  {"Mail"}
 };
 
-const struct sThingsList gThings1 = {"0001","Door"       ,"Actuator","String","Open"  ,"Close"};
-const struct sThingsList gThings2 = {"0002","Light"      ,"Actuator","String","On"    ,"Off"  };
-const struct sThingsList gThings3 = {"0003","Presence"   ,"Sensor"  ,"String","AtHome","Away" };
-const struct sThingsList gThings4 = {"0004","Temperature","Sensor"  ,"Number","-50"   ,"50"   };
-const struct sThingsList gThings5 = {"0005","Humidity"   ,"Sensor"  ,"Number","0"     ,"100"  };
-const struct sThingsList gThings6 = {"0006","DoorSensor" ,"Sensor"  ,"String","Open"  ,"Close"};
-const struct sThingsList gThings7 = {"0007","MailBox"    ,"Sensor"  ,"String","Empty" ,"Mail" };
-const struct sThingsList gThings8 = {"0008","Alarm"      ,"Actuator","String","Set"   ,"Unset"};  
+const char JSONstatus1[] PROGMEM ="{\"Id\":\"0003\",\"Type\":\"Presence\"   ,\"Value\":\"";
+const char JSONstatus2[] PROGMEM ="{\"Id\":\"0004\",\"Type\":\"Temperature\",\"Value\":\"";
+const char JSONstatus3[] PROGMEM ="{\"Id\":\"0005\",\"Type\":\"Humidity\"   ,\"Value\":\"";
+const char JSONstatus4[] PROGMEM ="{\"Id\":\"0006\",\"Type\":\"DoorSensor\" ,\"Value\":\"";
+const char JSONstatus5[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"    ,\"Value\":\"";
 
-
-//JSON event
-struct sThingEvent
-{
-  char *id;
-  char *Type;
-  char Value[10];
-};
-struct sThingEvent gThingEvent[] = {
-  {"0003","Presence"   , "AtHome"},
-  {"0004","Temperature", "-999"  },
-  {"0005","Humidity"   , "100"   },
-  {"0006","DoorSensor" , "Close" },
-  {"0007","MailBox"    , "Mail"  }
-};
 
 void SendJSONobject(char *key, char *value,bool bEnd)
 {
@@ -138,30 +144,9 @@ void SendJSONobject(char *key, char *value,bool bEnd)
    if(!bEnd) client.write(',');  
 }
 
-void SendJSONthings(const struct sThingsList *thing, bool bEnd)
-{
-  
-  char id[5];
-  char Type[15];
-  char SType[20];
-  char VType[10];
-  char VMin[10];
-  char VMax[10];
-  
-  client.write('{');
-    SendJSONobject("Id",thing->id,false);
-    SendJSONobject("Type",thing->Type,false);
-    SendJSONobject("SType",thing->SType,false);
-    SendJSONobject("VType",thing->VType,false);
-    SendJSONobject("VMin",thing->VMin,false);
-    SendJSONobject("VMax",thing->VMax,true);    
-  client.write('}');  
-  if(!bEnd) client.write(',');  
-}
-
 void SendJSONdiscoverRegister(bool bDiscoverRegister)
 {
-  struct sThingsList thing; 
+  //struct sThingsList thing; 
   client.write('{');    
     if(bDiscoverRegister)
     {
@@ -174,31 +159,22 @@ void SendJSONdiscoverRegister(bool bDiscoverRegister)
       SendJSONobject("NodeID",gNodeID,false); 
       SendJSONobject("Result","Authorized",false); 
     }
+    
     client.print("\"ThingList\":[");   
-      
-      SendJSONthings(&gThings1,false);
-      SendJSONthings(&gThings2,false);
-      SendJSONthings(&gThings3,false);
-      SendJSONthings(&gThings4,false);
-      SendJSONthings(&gThings5,false);
-      SendJSONthings(&gThings6,false);
-      SendJSONthings(&gThings7,false);
-      SendJSONthings(&gThings8,true);    
-
+    {
+      int i;
+      char ch=0;
+      for(i = 0 ; i < strlen(gJSONthings1) ; i++) client.write(pgm_read_byte_near(gJSONthings1 + i));
+      for(i = 0 ; i < strlen(gJSONthings2) ; i++) client.write(pgm_read_byte_near(gJSONthings2 + i));
+      for(i = 0 ; i < strlen(gJSONthings3) ; i++) client.write(pgm_read_byte_near(gJSONthings3 + i));
+      for(i = 0 ; i < strlen(gJSONthings4) ; i++) client.write(pgm_read_byte_near(gJSONthings4 + i));
+      for(i = 0 ; i < strlen(gJSONthings5) ; i++) client.write(pgm_read_byte_near(gJSONthings5 + i));
+      for(i = 0 ; i < strlen(gJSONthings6) ; i++) client.write(pgm_read_byte_near(gJSONthings6 + i));
+      for(i = 0 ; i < strlen(gJSONthings7) ; i++) client.write(pgm_read_byte_near(gJSONthings7 + i));
+      for(i = 0 ; i < strlen(gJSONthings8) ; i++) client.write(pgm_read_byte_near(gJSONthings8 + i));
+    }
     client.write(']');
   client.write('}');
-}
-
-
-
-void SendJSONthingStatus(struct sThingEvent& thing, bool bEnd)
-{
-  client.write('{');
-    SendJSONobject("Id",thing.id,false);
-    SendJSONobject("Type",thing.Type,false);
-    SendJSONobject("Value",thing.Value,true);
-  client.write('}');  
-  if(!bEnd) client.write(',');  
 }
 
 void SendJSONstatusEvent(void)
@@ -207,11 +183,20 @@ void SendJSONstatusEvent(void)
     SendJSONobject("Job","Event",false);
     SendJSONobject("NodeID",gNodeID,false); 
     client.print("\"Status\":[");    
-      SendJSONthingStatus(gThingEvent[0],false);
-      SendJSONthingStatus(gThingEvent[1],false);
-      SendJSONthingStatus(gThingEvent[2],false);
-      SendJSONthingStatus(gThingEvent[3],false);
-      SendJSONthingStatus(gThingEvent[4],true);
+    {
+      int i;
+      char ch=0;
+      for(i = 0 ; i < strlen(JSONstatus1) ; i++) client.write(pgm_read_byte_near(JSONstatus1 + i));       
+      client.print(gThingStatusValue[0]);client.print("\"," );
+      for(i = 0 ; i < strlen(JSONstatus2) ; i++) client.write(pgm_read_byte_near(JSONstatus2 + i)); 
+      client.print(gThingStatusValue[1]);client.print("\"," );
+      for(i = 0 ; i < strlen(JSONstatus3) ; i++) client.write(pgm_read_byte_near(JSONstatus3 + i)); 
+      client.print(gThingStatusValue[2]);client.print("\"," );
+      for(i = 0 ; i < strlen(JSONstatus4) ; i++) client.write(pgm_read_byte_near(JSONstatus4 + i)); 
+      client.print(gThingStatusValue[3]);client.print("\"," );
+      for(i = 0 ; i < strlen(JSONstatus5) ; i++) client.write(pgm_read_byte_near(JSONstatus5 + i)); 
+      client.print(gThingStatusValue[4]);client.print("\"" );
+    }
     client.write(']');
   client.write('}');
 }
@@ -229,7 +214,8 @@ void loop()
       Serial.println("connected");
 
       // We write a couple of messages to the server
-      Serial.print("Server Message: ");
+      Serial.print("Server Message: ");    
+
 /*
       char c = ' ';      
       stringbufIndex = 0;
@@ -246,9 +232,17 @@ void loop()
           stringbuf[stringbufIndex++] = c;
         }
       }       
+      {
+        Serial.println(stringbuf);
+        Serial.println();
+        StaticJsonBuffer<200> jsonBuffer;  
+        JsonObject& msg = jsonBuffer.parseObject(stringbuf);
+        msg.prettyPrintTo(Serial);   
+        Serial.println();
+      }
 */
-
-     while(1)
+    Serial.println("start Message: "); 
+     for(int i = 0 ; i <= 5 ; i++)
      {
        SendJSONdiscoverRegister(true);
        client.println();  
@@ -258,7 +252,7 @@ void loop()
        client.println(); 
        delay(3000);      
      }
- 
+    Serial.println("end Message: "); 
       // That's it. We wait a second, then do it all again.
       client.stop();
       Serial.println();
