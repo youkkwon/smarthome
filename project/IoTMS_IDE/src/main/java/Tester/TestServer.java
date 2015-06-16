@@ -32,18 +32,18 @@ public class TestServer {
 		
 		// register node
 		System.out.println("\n[Tester - Server] # 3. Register the Node.");
-		String msg = "{\"job\":\"Register\",\"NodeID\":\"12:23:34:45:56:67\",\"ip\":\"127.0.0.1\",\"port\":\"5503\"}";
+		String msg = "{\"job\":\"Register\",\"NodeID\":\"78:c4:e:1:7f:f9\",\"ip\":\"127.0.0.1\",\"port\":\"5503\"}";
 		nm.registerNode((JSONObject) JSONValue.parse(msg));
 		
 
 		Thread.sleep(15000);
 		System.out.println("\n[Tester - Server] # 4. Send data to the Node.");
-		msg = "{\"job\":\"Request\",\"NodeID\":\"12:23:34:45:56:67\",\"Door\":\"OpenDoor\"}";
+		msg = "{\"job\":\"Request\",\"NodeID\":\"78:c4:e:1:7f:f9\",\"Door\":\"OpenDoor\"}";
 		//nm.send("12:23:34:45:56:67", msg);
 
 		Thread.sleep(5000);
 		System.out.println("\n[Tester - Server] # 5. Disconnect the Node.");
-		msg = "{\"job\":\"Request\",\"NodeID\":\"12:23:34:45:56:67\",\"Door\":\"OpenDoor\"}";
+		msg = "{\"job\":\"Request\",\"NodeID\":\"78:c4:e:1:7f:f9\",\"Door\":\"OpenDoor\"}";
 		//nm.disconnect("12:23:34:45:56:67");
 	}
 

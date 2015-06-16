@@ -3,6 +3,7 @@ package Tester;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import edu.cmu.team2.iotms.model.commManager.CommUtil;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 
 public class NM_Tester {
@@ -102,6 +103,23 @@ public class NM_Tester {
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void testUIRegisterEvent()
+	{
+		JSONObject	JSONMsg = new JSONObject();
+		JSONArray 	targets = new JSONArray();
+		
+		targets.add("NodeManager");
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("Job", "Register");
+		JSONMsg.put("NodeID", "78:c4:e:1:7f:f9");
+		JSONMsg.put("URL", "192.168.1.143");
+		JSONMsg.put("Port", (new Integer(CommUtil.getServerPort())).toString());
+		JSONMsg.put("SerialNumber", "12345678");
+		
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+	}
+	
 	public void test() 
 	{
 		/*String[] IDs = new String[4];
@@ -132,5 +150,12 @@ public class NM_Tester {
 		*/
 		
 		testUIDiscoverEvent();
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		testUIRegisterEvent();
 	}
 }

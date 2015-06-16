@@ -2,6 +2,7 @@ package edu.cmu.team2.iotms.model.commManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Discovery implements Runnable {
@@ -10,8 +11,10 @@ public class Discovery implements Runnable {
 	private AdapterEventListener listener;
 	
 	int searchSize = 2048;							// The number of IP address to scan at the same time.
-   	DiscoveryProbe tcList[] = new DiscoveryProbe[searchSize];	// The list of threads that actually does the scan
+   	//DiscoveryProbe tcList[] = new DiscoveryProbe[searchSize];	// The list of threads that actually does the scan
 	
+   	ArrayList<DiscoveryProbe> tclist = new ArrayList<DiscoveryProbe>();
+   	
 	public Discovery(String name)
 	{
 		System.out.println("[CM - Process] WiFiDiscovery Start...");
@@ -47,7 +50,7 @@ public class Discovery implements Runnable {
 	   	System.out.println( "\n\n[CM - Process] My IP Address:: " + myIpAddr );
 
 	   	mySubnetMask = GetSubnetMask();
-	   	mySubnetMask = "255.255.255.255";
+	   	mySubnetMask = "255.255.255.255"; // TODO - comment out this for test
 	   	System.out.println( "[CM - Process] Subnet Mask:: " + mySubnetMask +"\n\n" );
 
 		/***********************************************************************************************************
@@ -170,12 +173,14 @@ public class Discovery implements Runnable {
 		* Here we instantiate a TryConnect thread for each IP address. The scans happen simultaniously. We can do
 		* upto searchSize at a time.
 		***********************************************************************************************************/
-
-
-			   			tcList[i] = new DiscoveryProbe(searchIpAddr, portNum, i, listener);
-			   			tcList[i].start();
 			   			
-			   			if(i > 0) System.exit(0);
+			   			//System.out.println("[CM - Process] Send probe: " + searchIpAddr + ":" + portNum + "(size of list = " + tclist.size() + ")");
+
+			   			DiscoveryProbe probe = new DiscoveryProbe(searchIpAddr, portNum, i, listener);
+			   			tclist.add(probe);
+			   			probe.start();
+			   			
+			   			//if(i > 0) System.exit(0);
 
 		/***********************************************************************************************************
 		* What we are checking for here is to see if the tcList thread pool is full. If so, we wait about 3 seconds
@@ -429,14 +434,35 @@ public class Discovery implements Runnable {
 	
 	public void registerNode(String msg)
 	{
+		int cnt = 0;
+
+		for(int i=0; i< tclist.size(); i++)
+		{
+			DiscoveryProbe probe = tclist.get(i);
+			String mac = probe.getMACAddress();
+			if (mac == null)
+				continue;
+			if(mac.equalsIgnoreCase(CommUtil.parseMACAddress(msg)))
+			{
+				System.out.println("[CM - Process] Register request: Match found");
+				probe.registerNode(msg);
+				return;
+			}
+		}
+		
+		/*
 		for(int i = 0; i < searchSize; i++)
 		{
 			if(tcList[i] != null)
-				if(tcList[i].getMACAddress().equals(CommUtil.parseMACAddress(msg)))
+			{
+				System.out.println("[CM - Process] tclist mac : " + tcList[i].getMACAddress() + ":" + i);
+				if(tcList[i].getMACAddress().equalsIgnoreCase(CommUtil.parseMACAddress(msg)))
 				{
+					System.out.println("[CM - Process] Register request: Match found");
 					tcList[i].registerNode(msg);
 					return;
 				}
-		}
+			}
+		}*/
 	}
 }

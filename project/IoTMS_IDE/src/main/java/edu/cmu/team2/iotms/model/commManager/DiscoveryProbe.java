@@ -9,7 +9,7 @@ public class DiscoveryProbe extends Thread
 	int port;
 	int index;
 	Socket sock;
-	String mac;
+	private String macAddress;
 	//BufferedWriter out;
 	
 	private AdapterEventListener listener;
@@ -22,7 +22,7 @@ public class DiscoveryProbe extends Thread
 		this.port = port;
 		this.index = index;
 		listener = l;
-		setDaemon(false);
+		//setDaemon(false);
 
 	} // constructor
 
@@ -63,7 +63,12 @@ public class DiscoveryProbe extends Thread
 	
 	public String getMACAddress()
 	{
-		return mac;
+		return this.macAddress;
+	}
+
+	public void setMACAddress(String mac)
+	{
+		this.macAddress = mac;
 	}
 	
 	public void run()
@@ -81,12 +86,17 @@ public class DiscoveryProbe extends Thread
 			/*
 			SocketAddress sockaddr = new InetSocketAddress(ip, port);
 			Socket sock = new Socket();
-			sock.connect(sockaddr, CommUtil.getDiscoveryPort());
+			sock.connect(sockaddr, port); //CommUtil.getDiscoveryPort());
 			*/
-			// new
-			sock = new Socket(ip, CommUtil.getDiscoveryPort());
+
+			sock = new Socket(ip, port);
 			System.out.println( "[CM - Process] SERVER FOUND AT:: " + ip + "!!!" );
 			
+			// new
+			/*
+			sock = new Socket(ip, CommUtil.getDiscoveryPort());
+			System.out.println( "[CM - Process] SERVER FOUND AT:: " + ip + "!!!" );
+			*/
 			/*****************************************************************************
 			* If we get here, we are connected. Now we determine if is an Arduino server
 			* running the CommandServer application. So wecreate the input and output
@@ -121,11 +131,12 @@ public class DiscoveryProbe extends Thread
 					{
 						System.out.println("[CM - Process] discoveryProb: " + inputLine);
 						
-						mac = CommUtil.parseMACAddress(inputLine);
 						String job = CommUtil.parseJob(inputLine);
 						
 						if(job.equals("Discovered"))
 						{
+							setMACAddress(CommUtil.parseMACAddress(inputLine));
+							System.out.println("[CM - Process] register discoveryProb mac: " + getMACAddress());
 							listener.onDiscovered(new AdapterEvent("Discovered","found",inputLine));
 						}
 						else if(job.equals("Registered"))
@@ -154,7 +165,7 @@ public class DiscoveryProbe extends Thread
 			System.out.println("[CM - Process] discoveryProb: Closed");
 
      	} catch (IOException e) {
-     		e.printStackTrace();
+     		//e.printStackTrace();
     	}
 
 	} // main

@@ -17,9 +17,9 @@ public class TestJSON {
 	
 	public void test() {
 		// TODO Auto-generated method stub
-		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\",\"list\":[{\"id\":\"0001\",\"type\":\"Door\",\"stype\":\"Actuator\"},{\"id\":\"0002\",\"type\":\"DoorSensor\",\"stype\":\"Sensor\"}]}";
-		String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\",\"list\":[{\"id\":\"0001\",\"type\":\"Door\",\"stype\":\"Actuator\"},{\"id\":\"0002\",\"type\":\"DoorSensor\",\"stype\":\"Sensor\"}]}";
- 		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"12:23:34:45:56:67\"}\n";
+		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"78:c4:e:1:7f:f9\",\"list\":[{\"id\":\"0001\",\"type\":\"Door\",\"stype\":\"Actuator\"},{\"id\":\"0002\",\"type\":\"DoorSensor\",\"stype\":\"Sensor\"}]}";
+		String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"78:c4:e:1:7f:f9\",\"list\":[{\"id\":\"0001\",\"type\":\"Door\",\"stype\":\"Actuator\"},{\"id\":\"0002\",\"type\":\"DoorSensor\",\"stype\":\"Sensor\"}]}";
+ 		//String disc_resp_msg = "{\"Job\":\"Discovered\",\"NodeID\":\"78:c4:e:1:7f:f9\"}\n";
  		
 		disc_resp_msg.replaceAll("12:23:34:45:56:67", nodeID);
 		

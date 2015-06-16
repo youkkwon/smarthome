@@ -6,7 +6,7 @@ import org.json.simple.JSONValue;
 public class CommUtil {
 
 	private static int discoveryPort = 3251;
-	private static int serverPort = 5503;
+	private static int serverPort = 3250;
 	
 	public static String parseMACAddress(String str)
 	{

@@ -146,13 +146,13 @@ public class RM_Tester {
 			for (int i=0; i < thingID.length; i++)
 			{
 				JSONObject thing = new JSONObject();
-				thing.put ("ThingID", thingID[i]);
+				thing.put ("Id", thingID[i]);
 				thing.put ("Type", type[i]);
 				thing.put ("Value", value[i]);
 				things.add(thing);
 			}
 		}
-		JSONMsg.put("ThingsInfo", things);
+		JSONMsg.put("Status", things);
 
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}

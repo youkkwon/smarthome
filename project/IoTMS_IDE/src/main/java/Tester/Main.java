@@ -35,9 +35,9 @@ public class Main {
 		IoTMSEventBus.getInstance().register(new MailMessage());
 		IoTMSEventBus.getInstance().register(new TwitterMessage());
 		
-		/*
+		
 		Tester tester	= new Tester();
 		tester.test();
-		*/
+		
 	}
 }
