@@ -61,7 +61,15 @@ public class Condition {
 			String type = cond.substring(endIndex+1);
 			if (type.equalsIgnoreCase("Humidity") || type.equalsIgnoreCase("Temperature")) 
 			{
-				int realValue = Integer.parseInt(cond.substring(startIndex, endIndex));
+				String condStr = cond.substring(startIndex, endIndex);			
+				
+				float realValue = 0;
+				if (condStr.indexOf(".") != -1)
+				{
+					realValue = Float.parseFloat(condStr);	//	cond.substring(startIndex, endIndex));
+				}
+				else
+					realValue = Integer.parseInt(condStr);	//	cond.substring(startIndex, endIndex));
 					
 				startIndex = value.indexOf("Over");
 				if (startIndex != -1)

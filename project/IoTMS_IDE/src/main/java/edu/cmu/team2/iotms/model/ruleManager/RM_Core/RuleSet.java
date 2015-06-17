@@ -188,13 +188,13 @@ public class RuleSet {
 		return rules;
 	}
 	
-	public void setMode (String mode) throws InvalidRuleException
+	public void setMode (String value) throws InvalidRuleException
 	{
 		// TODO - hard card value
-		this.mode = "*@0010==" + mode.trim() + "#Alarm";
-		activeRulesBasedOnMode(this.mode);
+		mode = "*@0010==" + value.trim() + "#Alarm";
+		activeRulesBasedOnMode(mode);
 				
-		// cancle all mode related action. 
+		// cancel all mode related action. 
 		Scheduler.getInstance().cancelStateAction("*@0010");
 		if (value.trim().equalsIgnoreCase("Set"))
 		{

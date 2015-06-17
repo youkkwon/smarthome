@@ -229,5 +229,6 @@ public class RM_Tester {
 		IDs[1] = "0003";	types[1] = "Presense";			values[1] = "Away";
 		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32";		
 		testThingBulkEvent(nodeID, IDs, types, values);
+		testThingEvent (nodeID, "0003", "Temperature", "32.00");		// Check schedule job on changed value	
 	}
 }
