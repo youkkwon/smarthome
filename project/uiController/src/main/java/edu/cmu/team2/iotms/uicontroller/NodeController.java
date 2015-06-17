@@ -31,6 +31,26 @@ public class NodeController {
 		return model;
 	}
 	
+	@RequestMapping("/newnode")
+	public String newNode(ModelAndView model) throws IOException{
+		nodeService.discoverNodes();
+		return "newnode";
+	}
+	
+	@RequestMapping("/node/discover")
+	public String discoverNodes(ModelAndView model) throws IOException{
+		nodeService.discoverNodes();
+		return "newnode";
+	}
+	
+	@RequestMapping("/node/register")
+	public String registerNode(@RequestParam("nodeid") String nodeid
+			,@RequestParam("serial") String serial
+			,ModelAndView model) throws IOException{
+		nodeService.registerNode(nodeid, serial);
+		return "newnode";
+	}
+
 	@RequestMapping("/thing/control")
 	public String controlThing(@RequestParam("nodeid") String nodeid
 			,@RequestParam("thingid") String thingid

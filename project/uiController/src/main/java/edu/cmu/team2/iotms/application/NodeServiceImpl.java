@@ -1,5 +1,7 @@
 package edu.cmu.team2.iotms.application;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -96,5 +98,43 @@ public class NodeServiceImpl implements NodeService {
 			IoTMSEventBus.getInstance().postEvent(msgJSON);
 		}
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void discoverNodes() {
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		target.add("NodeManager");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "Discover");
+		msgJSON.put("Duration", "30000");
+		
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void registerNode(String nodeid, String serial) {
+		String localIP="";
+		try {
+			localIP = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("localIP :"+localIP);
+		
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		target.add("NodeManager");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "Register");
+		msgJSON.put("NodeID", nodeid);
+		msgJSON.put("URL", localIP);
+		msgJSON.put("Port", "550");
+		msgJSON.put("SerialNumber", serial);
+		
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}
 }
