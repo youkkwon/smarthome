@@ -89,6 +89,8 @@ WiFiServer server(SERVER_PORT);	// The WIFI status,.. we are using port 500
 WiFiClient ServerClient;
 WiFiClient Client;
 IPAddress IoTMSIp(192, 168, 1, 143);           // 
+//String IoTmsIp;		// Ip address from Registered message 
+//int IoTmsPort;		// Port numbr from Registered message
 IPAddress ip;                 // The IP address of the shield
 //IPAddress subnet;            // The subnet we are connected to
 //long rssi;                   // The WIFI shield signal strength
@@ -206,6 +208,8 @@ void CheckRegisterServer(void)
 {    
 	#ifndef CHECK_REGISTER_IOTMS
 	MainLoopState = MLS_STANDBY_DISCOVERY;
+	server.begin();
+	Serial.println("======= Stand by IoTMS Discovery connection");
 	#else
 	CheckRegisterServerForTest();
 	#endif
@@ -276,7 +280,7 @@ void StandbyIoTMSConnection(void)
 			// message : SA Node information
 			SendJSONdiscoverRegister(ServerClient, true);    // Send Discovery message 
 			MainLoopState = MLS_REGISTER_NODE_TO_IOTMS;
-			Serial.println("SA Node wait IoTMS Register message...");
+			Serial.println("Wait IoTMS Register msg");
 		}
 	}
 }
@@ -320,7 +324,7 @@ void RegisterNodeToIoTMS(void)
 				SendJSONdiscoverRegister(ServerClient, false);	// Send Discovery message 
 				ServerClient.stop();
 				MainLoopState = MLS_CONNECTING_SERVER;
-				Serial.println("=== ConnectToIoTMS function ===");
+				Serial.println("Connect To IoTMS function");
 			}
 		}
 	}
@@ -344,10 +348,11 @@ int RegisterNodeCommandCtl(void)
 	else
 	{
 		String PasingMsg;
-		PasingMsg = iotmsMsg["Jop"];
+		PasingMsg = iotmsMsg["Job"];
 		if(!PasingMsg.equals("Register"))
 		{
 			// invalid Jop, send NotAuthorized message
+			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
 
@@ -355,6 +360,7 @@ int RegisterNodeCommandCtl(void)
 		if(!PasingMsg.equals(MacAddressString))
 		{
 			// invalid Node ID, send NotAuthorized message
+			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
 
@@ -368,6 +374,7 @@ int RegisterNodeCommandCtl(void)
 		if(!PasingMsg.equals("12345678"))
 		{
 			// invalid Serial Number, send NotAuthorized message
+			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
 
@@ -408,6 +415,7 @@ void SendSAnodeStateCtl(void)
 {
 	if(SendStateTimer.CheckPassTime(3000, 0) == 1)
 	{
+		Serial.println("======= Send sensing data to IoTMS");
 		SendJSONstatusEvent(Client);
 	}
 }
@@ -484,7 +492,7 @@ int IoTMSCommandParsing(void)
 	else
 	{
 		String PasingMsg;
-		PasingMsg = iotmsCommand["Jop"];
+		PasingMsg = iotmsCommand["Job"];
 		if(!PasingMsg.equals("ActionCtrl"))
 		{
 			// invalid Jop
@@ -683,7 +691,7 @@ void SendJSONobject(WiFiClient localclient, char *key, char *value, bool bEnd)
 		localclient.print(value);
 	localclient.write('"');   
 
-	if(!bEnd) localclient.write(',');  
+	if(!bEnd) localclient.write(','); 
 }
 
 void SendJSONdiscoverRegister(WiFiClient localclient , bool bDiscoverRegister)
@@ -712,7 +720,7 @@ void SendJSONdiscoverRegister(WiFiClient localclient , bool bDiscoverRegister)
 			for(i = 0 ; i < strlen(gJSONthings4) ; i++) localclient.write(pgm_read_byte_near(gJSONthings4 + i));
 			for(i = 0 ; i < strlen(gJSONthings5) ; i++) localclient.write(pgm_read_byte_near(gJSONthings5 + i));
 			for(i = 0 ; i < strlen(gJSONthings6) ; i++) localclient.write(pgm_read_byte_near(gJSONthings6 + i));
-			for(i = 0 ; i < strlen(gJSONthings7) ; i++) localclient.write(pgm_read_byte_near(gJSONthings7 + i));
+			//for(i = 0 ; i < strlen(gJSONthings7) ; i++) localclient.write(pgm_read_byte_near(gJSONthings7 + i));
 			for(i = 0 ; i < strlen(gJSONthings8) ; i++) localclient.write(pgm_read_byte_near(gJSONthings8 + i));
 		}
 		localclient.write(']');
