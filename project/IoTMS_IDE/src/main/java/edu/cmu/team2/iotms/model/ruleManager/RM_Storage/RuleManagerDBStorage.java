@@ -61,4 +61,15 @@ public class RuleManagerDBStorage extends RuleManagerStroage {
 	public boolean storeRuleLightOffConfig(int config) {
 		return RuleSetDao.getInstance().storeRuleLightOffConfig(config);
 	}
+
+   	 // TODO 
+    public int loadRuleMalFuncConfig() {
+		//return RuleSetDao.getInstance().loadRuleMalFuncCConfig();
+        return 10;
+	}
+
+    public boolean storeRuleMalFuncConfig(int config) {
+		//return RuleSetDao.getInstance().storeRuleMalFuncConfig(config);
+        return true;
+	}
 }

@@ -1,5 +1,6 @@
 package edu.cmu.team2.iotms.model.ruleManager.RM_Event;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Action;
@@ -21,6 +22,7 @@ public class ActionEvent {
 		return actEvent;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[RM - Process] Handle ActionEvent : " + JSONMsg);
@@ -41,6 +43,19 @@ public class ActionEvent {
 		if (allow)
 			action.execute();
 		else
+		{
 			System.out.println ("[RM - Process] Action is not allowed : " + JSONMsg);
+			
+			JSONArray 	targets 	= new JSONArray();
+			
+			JSONMsg.remove("Targets");
+			targets.add("UI");
+			JSONMsg.put("Targets", targets);
+			JSONMsg.put("Job", "ActionCtrl");
+			JSONMsg.put("NodeID",  nodeID);
+			JSONMsg.put("ThingID", thingID);
+			JSONMsg.put("Type",  type);
+			JSONMsg.put("Value", "Rejected by RuleManager");			
+		}
 	}
 }

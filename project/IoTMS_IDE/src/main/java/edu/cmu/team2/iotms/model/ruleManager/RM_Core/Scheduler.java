@@ -46,28 +46,45 @@ public class Scheduler extends Thread {
 		{
 			Action action = iterator.next();
 			if (cancle_action.isConflict(action))
-			{
-				System.out.println("delete action : " + action.getStatement());
-				actions.remove(action);
+			{	
+				boolean deleted = actions.remove(action);
+				if (deleted)
+					System.out.println("delete action : " + action.getStatement());
 			}
 		}
 	}
 	
-	public void cancelStateAction ()
+	public void cancelStateAction (String state)
 	{
 		Iterator<DelayAction>	iterator = actions.iterator();
 		while (iterator.hasNext())
 		{
 			Action action = iterator.next();
-			if (action.isActionOn("*@8"))
+			if (action.isActionOn(state))
 			{
-				System.out.println("cancel action due to state change: " + action.getStatement());
-				actions.remove(action);
+				boolean deleted = actions.remove(action);
+				if (deleted)
+					System.out.println("cancel action due to state change: " + action.getStatement());
 			}
 		}
 	}
 	
-	
+    public void cancelMalFuncAction (String actStr)
+	{
+		Iterator<DelayAction>	iterator = actions.iterator();
+		while (iterator.hasNext())
+		{
+			Action action = iterator.next();
+            // f9@0011=Malfunction#Message
+			if (action.isActionMatch(actStr))
+			{
+				boolean deleted = actions.remove(action);
+				if (deleted)
+					System.out.println("cancel action due to state change: " + action.getStatement());				
+			}
+		}
+	}
+
 	// 가장 손쉽게는 thread 로 돌려서 period 마다 꺠서 확인하기. ㅎㅎㅎ  나중에 폼나게 바꿉시다요. 
 	// TODO expire 처리. 
 	public void run()

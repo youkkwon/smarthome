@@ -17,6 +17,7 @@ import edu.cmu.team2.iotms.model.eventBus.Logger_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.Message_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.NM_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.RM_EventBusReceiver;
+import edu.cmu.team2.iotms.model.nodeManager.NodeManager;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Scheduler;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Event.RuleManager;
 
@@ -38,6 +39,9 @@ public class RuleServiceImpl implements RuleService {
 		
 		rulemanager.start();							
 		rm_scheduler.start();
+		
+		// NodeManager
+		NodeManager 				nodemanager	= NodeManager.getInstance();	
 		
 		JSONObject msgJSON = new JSONObject();
 		JSONArray target = new JSONArray();

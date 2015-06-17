@@ -11,7 +11,7 @@ public abstract class Action
 	private String 		nodeID;
 	private String 		thingID;
 	protected String 	type;
-	private String 		value;
+	protected String 	value;
 	private String		desc;
 	
 	private String 			actionID;			// nodeID:thingID
@@ -99,7 +99,7 @@ public abstract class Action
 			JSONMsg.put("ThingID", thingID);
 			JSONMsg.put("Type",  type);
 			JSONMsg.put("Value", value);			
-		}			
+		}		
 	}
 	
 	protected void postEvent() {				

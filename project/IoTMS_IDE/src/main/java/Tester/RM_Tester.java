@@ -189,39 +189,45 @@ public class RM_Tester {
 		testRuleEvent("Search", null, null);
 		testRuleEvent("Delete", null, input);
 		*/
-		testRuleEvent("Search", null, null);
+		
+        testConfigEvent("Alarm", "0300");							// Test config 
+		testConfigEvent("Light", "0600");
+
+		// State Test (Alarm mode)
+		testStateEvent ("Setting");		
+
+		Thread.sleep(3000);
+		// Thing Test (Node ID + Thing ID)
+		testThingEvent (nodeID, "0006", "DoorSensor", "Close");	    // Test no rule event
+			
+		Thread.sleep(3000);
+		// Thing Test (Node ID : + Thing ID)
+		testActionEvent (nodeID, "0001", "Door", "Open");			// Door open on Alarm mode
 		
 		// State Test (Alarm mode)
-		testStateEvent ("Set");		
-		testRuleEvent("Search", null, null);
-	
-		// Thing Test (Node ID : + Thing ID)
-		testActionEvent (nodeID, "1", "Door", "Open");			// Door open on Alarm mode
+		testStateEvent ("Setting");	
 		
-		// State Test (Normal mode)
-		testStateEvent ("UnSet");	
+		Thread.sleep(12000);                                        // Alarm setting will fail.
+        // Thing Test (Node ID + Thing ID)
+		testActionEvent (nodeID, "0001", "Door", "Open");			// Door open on Normal mode
 			
 		// Thing Test (Node ID + Thing ID)
-		testActionEvent (nodeID, "1", "Door", "Open");			// Door open on Normal mode
-			
-		// Thing Test (Node ID + Thing ID)
-		testThingEvent (nodeID, "2", "Light", "On");			// Test no rule event
+		testThingEvent (nodeID, "0002", "Light", "On");			    // Test no rule event
 		
-		testThingEvent (nodeID, "3", "Presence", "Away");		// Test schedule event
-		testStateEvent ("UnSet");							// Test cancel scheduled event
+		testThingEvent (nodeID, "0003", "Presence", "Away");		// Test schedule event
+		testStateEvent ("UnSet");								    // Test cancel scheduled event
 
-		testConfigEvent("Alarm", "3");						// Test config 
-		testConfigEvent("Light", "9");
-		//testRuleEvent ("Search", null, null);
+		testConfigEvent("Alarm", "0003");							// Test config 
+		testConfigEvent("Light", "0009");
 	
-		testThingEvent (nodeID, "3", "Presence", "Away");		// Check schedule job on changed value		
+		testThingEvent (nodeID, "0003", "Presence", "Away");		// Check schedule job on changed value	
 		
-		String[] IDs = new String[3];
+        String[] IDs = new String[3];
 		String[] types = new String[3];
 		String[] values = new String[3];
-		IDs[0] = "5";	types[0] = "DoorSensor";		values[0] = "Open";
-		IDs[1] = "3";	types[1] = "Presense";			values[1] = "Away";
-		IDs[2] = "4";	types[2] = "Temperature";		values[2] = "32";		
+		IDs[0] = "0005";	types[0] = "DoorSensor";		values[0] = "Open";
+		IDs[1] = "0003";	types[1] = "Presense";			values[1] = "Away";
+		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32";		
 		testThingBulkEvent(nodeID, IDs, types, values);
 	}
 }

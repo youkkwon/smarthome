@@ -33,11 +33,9 @@ public class Main {
 		NodeManager 				nodemanager	= NodeManager.getInstance();	
 		
 		IoTMSEventBus.getInstance().register(new MailMessage());
-		IoTMSEventBus.getInstance().register(new TwitterMessage());
-		
+		IoTMSEventBus.getInstance().register(new TwitterMessage());		
 		
 		Tester tester	= new Tester();
-		tester.test();
-		
+		tester.test();		
 	}
 }
