@@ -161,6 +161,82 @@ public class NodeDao {
 		
 		return things;
 	}
+	
+	public String getJsonOfNode(String node_id) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String result=null;
+		
+		try {
+			pstmt = conn.prepareStatement("select json "
+					+"from node_info "
+					+"where node_id='"+node_id+"'");
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				do {
+					result = rs.getString("json");
+				} while(rs.next());
+			}
+				
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	public boolean setJsonOfNode(String node_id, String json) {
+		boolean ret = false;
+		boolean update = false;
+		PreparedStatement pstmt = null;
+
+		try {
+			String query = "insert into node_info(node_id, json) value('"+node_id+"','"+json+"')";
+			System.out.println("NodeDao(setJsonOfNode-insert) sql: "+query);
+			pstmt = conn.prepareStatement(query);
+			ret = pstmt.execute();
+		} catch (SQLException e) {
+			update = true;
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) {
+					pstmt.close();
+					pstmt = null;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(update) {
+			try {
+				String query = "update node_info set json='"+json+"' where node_id='"+node_id+"'";
+				System.out.println("NodeDao(setJsonOfNode-update) sql: "+query);
+				pstmt = conn.prepareStatement(query);
+				ret = pstmt.execute();
+			} catch (SQLException e) {
+				update = true;
+				e.printStackTrace();
+			} finally {
+				try {
+					if(pstmt != null) {
+						pstmt.close();
+						pstmt = null;
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return ret;
+	}
 
 	public boolean insertThing(String thing_id) {
 		boolean ret = false;

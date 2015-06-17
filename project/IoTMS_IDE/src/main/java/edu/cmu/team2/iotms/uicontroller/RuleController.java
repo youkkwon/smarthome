@@ -34,7 +34,7 @@ public class RuleController {
 		
 		ruleService.createRuleSet(ruleInfo);
 
-		return "rulelist";
+		return "redirect:/rulelist";
 	}
 	@RequestMapping(value = "/rule/remove", method = RequestMethod.POST)
 	public String removeUser(
