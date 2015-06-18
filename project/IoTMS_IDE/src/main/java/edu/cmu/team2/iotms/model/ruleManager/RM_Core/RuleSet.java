@@ -1,5 +1,6 @@
 package edu.cmu.team2.iotms.model.ruleManager.RM_Core;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -187,14 +188,32 @@ public class RuleSet {
 		return rules;
 	}
 	
-	public void setMode (String mode) throws InvalidRuleException
+	public void setMode (String value) throws InvalidRuleException
 	{
 		// TODO - hard card value
-		this.mode = "*@0010==" + mode.trim() + "#Alarm";
-		activeRulesBasedOnMode(this.mode);
+		mode = "*@0010==" + value.trim() + "#Alarm";
+		activeRulesBasedOnMode(mode);
+				
+		// cancel all mode related action. 
+		Scheduler.getInstance().cancelStateAction("*@0010");
+		if (value.trim().equalsIgnoreCase("Set"))
+		{
+			Scheduler.getInstance().cancelMalFuncAction("*@0011=Malfunction#Message");
+		}
 		
-		if (mode.equalsIgnoreCase("UnSet"))
-			Scheduler.getInstance().cancelStateAction();
+		// run actions on mode setting.
+		LinkedList<Action> actions = RuleSet.getInstance().getActions(mode);
+		if (actions == null || actions.isEmpty())
+		{
+			System.out.println("[RM - Process] No rule for this condition." + mode);
+			return;
+		}
+		Iterator<Action> iterator = actions.iterator();
+		while (iterator.hasNext())
+		{
+			Action action = iterator.next();
+			action.execute();
+		}		
 	}
 	
 	public String getMode ()
@@ -242,7 +261,9 @@ public class RuleSet {
 		
 		while (iterator.hasNext()) 
 		{
-			iterator.next().activeRuleBasedOnMode(mode);
+			Rule rule = iterator.next();
+			rule.activeRuleBasedOnMode(mode);
+	//		System.out.println("[RM - Process] active[" + rule.isActive() + "] rule - " + rule.getStatement());
 		}
 	}
 	

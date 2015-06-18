@@ -379,11 +379,15 @@ public class Rule {
 		while (iterator.hasNext())
 		{
 			Condition condition = iterator.next();
-			if (!condition.isModeCond())
-				break;
-			active = condition.isConditionMatch(mode);
-			//System.out.print("[RM - Process] active[" + active + "] rule - " + statement);
-			//System.out.println(" based on " + mode);
+			if (condition.isModeCond())
+			{
+				active = false;
+				if (condition.isConditionMatch(mode))
+				{
+					active = true;
+					break;
+				}
+			}			
 		}
 	}
 	

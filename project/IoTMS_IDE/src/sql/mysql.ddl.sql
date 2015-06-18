@@ -74,27 +74,40 @@ insert into iotmsdb.user_authority value ("hanbell","USER");
 
 CREATE TABLE iotmsdb.node_info (
 	`node_id` VARCHAR(50) NOT NULL,
+	`node_name` VARCHAR(50) NOT NULL,
 	`url` VARCHAR(50) NULL DEFAULT NULL,
 	`port` VARCHAR(50) NULL DEFAULT NULL,
 	`serialnumber` VARCHAR(50) NULL DEFAULT NULL,
+	`json` VARCHAR(512) NULL DEFAULT NULL,
 	PRIMARY KEY (`node_id`)
 ) engine=InnoDB character set = utf8;
 
 CREATE TABLE iotmsdb.thing_info (
 	`node_id` VARCHAR(50) NOT NULL,
 	`thing_id` VARCHAR(50) NOT NULL,
+	`thing_name` VARCHAR(50) NOT NULL,
 	`type` VARCHAR(50) NULL DEFAULT NULL,
 	`stype` VARCHAR(50) NULL DEFAULT NULL,
 	`vtype` VARCHAR(50) NULL DEFAULT NULL,
 	`vmin` VARCHAR(50) NULL DEFAULT NULL,
 	`vmax` VARCHAR(50) NULL DEFAULT NULL,
 	`value` VARCHAR(50) NULL DEFAULT NULL,
+	`json` VARCHAR(512) NULL DEFAULT NULL,
 	PRIMARY KEY (`node_id`, `thing_id`),
 	CONSTRAINT `FK_thing_info_node_info` FOREIGN KEY (`node_id`) REFERENCES `node_info` (`node_id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) engine=InnoDB character set = utf8;
 
+insert into iotmsdb.node_info(node_id,node_name,serialnumber) value("00:11:22:33:44:55:66:77","node1","01234567");
+insert into iotmsdb.node_info(node_id,node_name,serialnumber) value("01:12:23:34:45:56:67:78","node2","76543210");
 
+insert into iotmsdb.thing_info(node_id,thing_id,thing_name,`type`,`stype`,`vtype`,`vmin`,`vmax`,`value`)
+	value("00:11:22:33:44:55:66:77","1","Door","Door","ACTUATOR","STRING","Close","Open","Open");
+insert into iotmsdb.thing_info(node_id,thing_id,thing_name,`type`,`stype`,`vtype`,`vmin`,`vmax`,`value`)
+	value("00:11:22:33:44:55:66:77","2","Door","Door","ACTUATOR","STRING","Close","Open","Close");
 
+	
+insert into iotmsdb.thing_info(node_id,thing_id,thing_name,`type`,`stype`,`vtype`,`vmin`,`vmax`,`value`)
+	value("01:12:23:34:45:56:67:78","1","MailBox","Mailbox","SENSOR","STRING","EMPTY","EXIST","EMPTY");
 
 
 

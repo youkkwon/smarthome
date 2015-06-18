@@ -32,7 +32,12 @@ import org.json.simple.JSONObject;
 
 import java.net.*;
 import java.io.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.net.*;
+import java.io.*;
+import org.json.simple.JSONValue;
 public class TestServerJSONtoArduino
 {
  	public static void main(String[] args) throws IOException
@@ -137,8 +142,11 @@ public class TestServerJSONtoArduino
  	    	{
  	    		while ((inputLine = in.readLine()) != null)
     			{
-      				System.out.println ("Client Message: " + inputLine);
-
+ 	    			JSONObject msg;
+ 	    			msg = (JSONObject)JSONValue.parse(inputLine);
+      				System.out.println ("Client Message1: " + inputLine);
+      				System.out.println ("Client Message2: " + msg);
+      				
 	   				if (inputLine.equals("Bye."))
     	    		 	break;
    				} // while

@@ -73,7 +73,7 @@ public class DiscoveryProbe extends Thread
 	
 	public void run()
 	{
-		System.out.println("[CM - Process] Start to probe...");
+		System.out.println("[CM - Process] Start to probe..." + ip + ":" + port  + "!!!");
 		try
    		{
 			/*****************************************************************************

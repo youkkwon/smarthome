@@ -89,6 +89,8 @@ WiFiServer server(SERVER_PORT);	// The WIFI status,.. we are using port 500
 WiFiClient ServerClient;
 WiFiClient Client;
 IPAddress IoTMSIp(192, 168, 1, 143);           // 
+//String IoTmsIp;		// Ip address from Registered message 
+//int IoTmsPort;		// Port numbr from Registered message
 IPAddress ip;                 // The IP address of the shield
 //IPAddress subnet;            // The subnet we are connected to
 //long rssi;                   // The WIFI shield signal strength
@@ -98,7 +100,7 @@ boolean IoTMSMagReadComplete;                  // Loop flag
 String IoTMSCommand;
 
 // Jason message variable
-StaticJsonBuffer<128> jsonBuffer;  
+//StaticJsonBuffer<128> jsonBuffer;  
 String MacAddressString;
 
 int SendDiscoveredMessage(void);
@@ -129,7 +131,7 @@ void SendJSONstatusEvent(WiFiClient);
 void SendJSONnotAuthorizedEvent(WiFiClient);
 
 void setup() {
-	Serial.begin(9600);		// Set up a debug window
+	Serial.begin(115200);		// Set up a debug window
 	HomeNode.DoorServoAttach();	
 	SensingTimer.SetBaseTimer();
 	MainLoopState = MLS_WIFI_CONNECTTION;
@@ -206,6 +208,8 @@ void CheckRegisterServer(void)
 {    
 	#ifndef CHECK_REGISTER_IOTMS
 	MainLoopState = MLS_STANDBY_DISCOVERY;
+	server.begin();
+	Serial.println("======= Stand by IoTMS Discovery connection");
 	#else
 	CheckRegisterServerForTest();
 	#endif
@@ -276,7 +280,7 @@ void StandbyIoTMSConnection(void)
 			// message : SA Node information
 			SendJSONdiscoverRegister(ServerClient, true);    // Send Discovery message 
 			MainLoopState = MLS_REGISTER_NODE_TO_IOTMS;
-			Serial.println("SA Node wait IoTMS Register message...");
+			Serial.println("Wait IoTMS Register msg");
 		}
 	}
 }
@@ -317,10 +321,11 @@ void RegisterNodeToIoTMS(void)
 			}
 			else
 			{	
+				Serial.println("Send register message");
 				SendJSONdiscoverRegister(ServerClient, false);	// Send Discovery message 
-				ServerClient.stop();
+				//ServerClient.stop();
 				MainLoopState = MLS_CONNECTING_SERVER;
-				Serial.println("=== ConnectToIoTMS function ===");
+				Serial.println("Connect To IoTMS function");
 			}
 		}
 	}
@@ -328,6 +333,8 @@ void RegisterNodeToIoTMS(void)
 
 int RegisterNodeCommandCtl(void)
 {
+	StaticJsonBuffer<128> jsonBuffer;  
+	
 	Serial.print("IoTMS Message : ");
 	Serial.println(IoTMSCommand);		// for debugging
 
@@ -340,14 +347,16 @@ int RegisterNodeCommandCtl(void)
 	{
 		Serial.println("parseObject() failed");
 		return -1;
+		//return 1;
 	}
 	else
 	{
 		String PasingMsg;
-		PasingMsg = iotmsMsg["Jop"];
+		PasingMsg = iotmsMsg["Job"];
 		if(!PasingMsg.equals("Register"))
 		{
 			// invalid Jop, send NotAuthorized message
+			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
 
@@ -355,6 +364,7 @@ int RegisterNodeCommandCtl(void)
 		if(!PasingMsg.equals(MacAddressString))
 		{
 			// invalid Node ID, send NotAuthorized message
+			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
 
@@ -368,6 +378,7 @@ int RegisterNodeCommandCtl(void)
 		if(!PasingMsg.equals("12345678"))
 		{
 			// invalid Serial Number, send NotAuthorized message
+			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
 
@@ -408,20 +419,18 @@ void SendSAnodeStateCtl(void)
 {
 	if(SendStateTimer.CheckPassTime(3000, 0) == 1)
 	{
-		SendJSONstatusEvent(Client);
+		if(Client.connected())
+		{
+			Serial.println("=== Send sensing data to IoTMS");
+			SendJSONstatusEvent(Client);
+		}
+		else
+		{
+			Serial.println("=== Soket disconnected");
+		}
 	}
 }
 
-/*
-enum {
-	DOOR_OPEN = 0,
-	DOOR_CLOSE,
-	LIGHT_ON,
-	LIGHT_OFF,
-	ALARM_SET,
-	ALARM_UNSET,
-};
-*/
 int IoTMSCommandCtl(void)
 {
 	int result = 0;
@@ -468,6 +477,8 @@ int IoTMSCommandCtl(void)
 */
 int IoTMSCommandParsing(void)
 {
+	StaticJsonBuffer<128> jsonBuffer;  
+	
 	Serial.print("IoTMS Command : ");
 	Serial.println(IoTMSCommand);		// for debugging
 
@@ -484,7 +495,7 @@ int IoTMSCommandParsing(void)
 	else
 	{
 		String PasingMsg;
-		PasingMsg = iotmsCommand["Jop"];
+		PasingMsg = iotmsCommand["Job"];
 		if(!PasingMsg.equals("ActionCtrl"))
 		{
 			// invalid Jop
@@ -672,109 +683,235 @@ const char JSONstatus3[] PROGMEM ="{\"Id\":\"0005\",\"Type\":\"Humidity\"	 ,\"Va
 const char JSONstatus4[] PROGMEM ="{\"Id\":\"0006\",\"Type\":\"DoorSensor\" ,\"Value\":\"";
 const char JSONstatus5[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"	 ,\"Value\":\"";
 
+#define MAX_WIFI_STRING_LENGTH 70
+String gsBufferWiFi;
 
 void SendJSONobject(WiFiClient localclient, char *key, char *value, bool bEnd)
 {
-	localclient.write('"');
-		localclient.print(key);
-	localclient.write('"');   
-	localclient.write(':');   
-	localclient.write('"');
-		localclient.print(value);
-	localclient.write('"');   
+	gsBufferWiFi+='"';
+		gsBufferWiFi+=key;
+	gsBufferWiFi+='"';   
+	gsBufferWiFi+=':';   
+	gsBufferWiFi+='"';
+		gsBufferWiFi+=value;
+	gsBufferWiFi+='"';   
 
-	if(!bEnd) localclient.write(',');  
+	if(!bEnd) gsBufferWiFi+=',';	  
 }
 
 void SendJSONdiscoverRegister(WiFiClient localclient , bool bDiscoverRegister)
 {
-	//struct sThingsList thing; 
-	localclient.write('{');	  
-		if(bDiscoverRegister)
-		{
-			SendJSONobject(localclient, "Job", "Discovered", false);
-			SendJSONobject(localclient, "NodeID", (char *)MacAddressString.c_str(), false); 
-		}
-		else
-		{
-			SendJSONobject(localclient, "Job", "Registered", false);
-			SendJSONobject(localclient, "NodeID",(char *)MacAddressString.c_str(), false); 
-			SendJSONobject(localclient, "Result", "Authorized", false); 
-		}
+	gsBufferWiFi="";
+	gsBufferWiFi+='{';
+	if(bDiscoverRegister)
+	{
+		SendJSONobject(localclient, "Job", "Discovered", false);
+		SendJSONobject(localclient, "NodeID", (char *)MacAddressString.c_str(), false); 
+	}
+	else
+	{
+		SendJSONobject(localclient, "Job", "Registered", false);
+		SendJSONobject(localclient, "NodeID",(char *)MacAddressString.c_str(), false); 
+		SendJSONobject(localclient, "Result", "Authorized", false); 
+	}
+	gsBufferWiFi+="\"ThingList\":[";
+	localclient.print(gsBufferWiFi.c_str());
 
-		localclient.print("\"ThingList\":[");	 
+	// nested thing message
+	{
+		int i;
+		//thing1
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings1) ; i++) 
 		{
-			int i;
-			char ch=0;
-			for(i = 0 ; i < strlen(gJSONthings1) ; i++) localclient.write(pgm_read_byte_near(gJSONthings1 + i));
-			for(i = 0 ; i < strlen(gJSONthings2) ; i++) localclient.write(pgm_read_byte_near(gJSONthings2 + i));
-			for(i = 0 ; i < strlen(gJSONthings3) ; i++) localclient.write(pgm_read_byte_near(gJSONthings3 + i));
-			for(i = 0 ; i < strlen(gJSONthings4) ; i++) localclient.write(pgm_read_byte_near(gJSONthings4 + i));
-			for(i = 0 ; i < strlen(gJSONthings5) ; i++) localclient.write(pgm_read_byte_near(gJSONthings5 + i));
-			for(i = 0 ; i < strlen(gJSONthings6) ; i++) localclient.write(pgm_read_byte_near(gJSONthings6 + i));
-			for(i = 0 ; i < strlen(gJSONthings7) ; i++) localclient.write(pgm_read_byte_near(gJSONthings7 + i));
-			for(i = 0 ; i < strlen(gJSONthings8) ; i++) localclient.write(pgm_read_byte_near(gJSONthings8 + i));
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings1 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
 		}
-		localclient.write(']');
-	localclient.write('}');
-	localclient.write('\n');
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing2
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings2) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings2 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing3
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings3) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings3 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing4
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings4) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings4 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing5
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings5) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings5 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing6
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings6) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings6 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing7
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings7) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings7 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//thing8
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(gJSONthings8) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(gJSONthings8 + i);
+			if(i>MAX_WIFI_STRING_LENGTH)
+			{
+				localclient.print(gsBufferWiFi.c_str());
+				gsBufferWiFi="";
+			}
+		}
+		localclient.print(gsBufferWiFi.c_str());
+	}
+	
+	localclient.print("]}\n");
 }
 
 
 void SendJSONstatusEvent(WiFiClient localclient)
 {
-	localclient.write('{');	  
-		SendJSONobject(localclient, "Job", "Event", false);
-		SendJSONobject(localclient, "NodeID", (char *)MacAddressString.c_str(), false); 
-		localclient.print("\"Status\":[");    
+	Serial.print(millis());
+	
+	gsBufferWiFi="";
+	gsBufferWiFi+='{';  
+	SendJSONobject(localclient, "Job", "Event", false);
+	SendJSONobject(localclient, "NodeID", (char *)MacAddressString.c_str(), false);  
+	gsBufferWiFi+="\"Status\":[";
+	localclient.print(gsBufferWiFi.c_str());	  
+
+	{
+		int i;
+		//JSONstatus1  // Presence
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(JSONstatus1) ; i++) 
 		{
-			int i;
-			char ch=0;
-
-			// ToDo :  Thing status value 값은 감지된 값으로 변경 필요.
-			// Presence
-			for(i = 0 ; i < strlen(JSONstatus1) ; i++) localclient.write(pgm_read_byte_near(JSONstatus1 + i));		
-			if(HomeNode.proximity <= 50)		// door open
-			{	localclient.print("AtHome");
-			}
-			else
-			{	localclient.print("Away");
-			}
-			localclient.print("\"}," );
-
-			// Temperature
-			for(i = 0 ; i < strlen(JSONstatus2) ; i++) localclient.write(pgm_read_byte_near(JSONstatus2 + i)); 
-			localclient.print(HomeNode.temperature);
-			localclient.print("\"}," );
-
-			// Humidity
-			for(i = 0 ; i < strlen(JSONstatus3) ; i++) localclient.write(pgm_read_byte_near(JSONstatus3 + i)); 
-			localclient.print(HomeNode.humidity);
-			localclient.print("\"}," );
-
-			// DoorSensor
-			for(i = 0 ; i < strlen(JSONstatus4) ; i++) localclient.write(pgm_read_byte_near(JSONstatus4 + i)); 
-			if(HomeNode.doorstate == 0)		// door open
-			{	localclient.print("Open");
-			}
-			else
-			{	localclient.print("Close");
-			}
-			localclient.print("\"}," );
+			gsBufferWiFi+=(char)pgm_read_byte_near(JSONstatus1 + i);
 		}
-		localclient.write(']');
-	localclient.write('}');	
-	localclient.write('\n');
+		if(HomeNode.proximity <= 50)	// door open
+		{ 
+			gsBufferWiFi+="AtHome";
+		}
+		else
+		{ 
+			gsBufferWiFi+="Away"; 	 
+		}
+		gsBufferWiFi+="\"},";
+		localclient.print(gsBufferWiFi.c_str());
+		
+		//JSONstatus2 temperature
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(JSONstatus2) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(JSONstatus2 + i);
+		}
+		gsBufferWiFi+=HomeNode.temperature;
+		gsBufferWiFi+="\"},";
+		localclient.print(gsBufferWiFi.c_str());
+
+		//JSONstatus3 humidity
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(JSONstatus3) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(JSONstatus3 + i);
+		}
+		gsBufferWiFi+=HomeNode.humidity;
+		gsBufferWiFi+="\"},";
+		localclient.print(gsBufferWiFi.c_str());
+
+		//JSONstatus4  DoorSensor
+		gsBufferWiFi="";
+		for(i = 0 ; i < strlen(JSONstatus4) ; i++) 
+		{
+			gsBufferWiFi+=(char)pgm_read_byte_near(JSONstatus4 + i);
+		}
+		if(HomeNode.doorstate == 0)   // door open
+		{ 
+			gsBufferWiFi+="Open";
+		}
+		else
+		{ 
+			gsBufferWiFi+="Close";
+		}
+		gsBufferWiFi+="\"}";
+		localclient.print(gsBufferWiFi.c_str());
+	}
+	localclient.print("]}\n");
+
+	Serial.print(" : ");
+	Serial.println(millis());
 }
 
 void SendJSONnotAuthorizedEvent(WiFiClient localclient)
 {
-	localclient.write('{');	  
-		SendJSONobject(localclient, "Job", "Event", false);
-		SendJSONobject(localclient, "NodeID", (char *)MacAddressString.c_str(), false); 
-		SendJSONobject(localclient, "Result", "NotAuthorized", false);
-	localclient.write('}');
-	localclient.write('\n');
+	gsBufferWiFi="";
+	//localclient.write('{');	
+	gsBufferWiFi+='{';
+	SendJSONobject(localclient, "Job", "Event", false);
+	SendJSONobject(localclient, "NodeID", (char *)MacAddressString.c_str(), false); 
+	SendJSONobject(localclient, "Result", "NotAuthorized", false);
+	gsBufferWiFi+="}\n";
+	localclient.print(gsBufferWiFi.c_str());
 }
 
 

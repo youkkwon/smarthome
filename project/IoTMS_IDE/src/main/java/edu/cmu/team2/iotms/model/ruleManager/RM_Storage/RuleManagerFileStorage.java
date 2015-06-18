@@ -15,6 +15,7 @@ public class RuleManagerFileStorage extends RuleManagerStroage {
 
 	private int alarm_config = 300;			// 5m by default
 	private int light_config = 600;			// 10m by default
+	private int malfunc_config = 10;			// 10s by default
 	
 	private String				rule_filename;
 	private String				config_filename;
@@ -46,6 +47,8 @@ public class RuleManagerFileStorage extends RuleManagerStroage {
 					alarm_config = Integer.parseInt(input.substring(idx+1));
 				else if (input.startsWith("Light"))
 					light_config = Integer.parseInt(input.substring(idx+1));		
+               	else if (input.startsWith("MalFunc"))
+					malfunc_config = Integer.parseInt(input.substring(idx+1));		
 			} 
 			br.close();
 		} catch (FileNotFoundException e) {
@@ -61,6 +64,7 @@ public class RuleManagerFileStorage extends RuleManagerStroage {
 			BufferedWriter output =  new BufferedWriter(new FileWriter(config_filename));			
 			output.write("Alarm:" + Integer.toString(alarm_config) + "\n");
 			output.write("Light:" + Integer.toString(light_config) + "\n");
+			output.write("MalFunc:" + Integer.toString(malfunc_config) + "\n");
 			output.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

@@ -257,8 +257,8 @@ public class Discovery implements Runnable {
 
 		            if ( ( line.indexOf( "Ethernet adapter Local Area Connection:" ) >= 0 ) ||
 		               ( line.indexOf( "Wireless LAN adapter Wireless Network Connection:" ) >= 0 )||
-		               ( line.indexOf( "이더넷 어댑터 로컬 영역 연결:" ) >= 0 )||
-		               ( line.indexOf( "무선 LAN 어댑터 무선 네트워크 연결:" ) >= 0 ) )
+		               ( line.indexOf( "??? ??? ?? ?? ??:" ) >= 0 )||
+		               ( line.indexOf( "?? LAN ??? ?? ???? ??:" ) >= 0 ) )
 		            {
 		              found = true;
 					}
@@ -335,8 +335,8 @@ public class Discovery implements Runnable {
 	            {
 		            if ( ( line.indexOf( "Ethernet adapter Local Area Connection:" ) >= 0 ) ||
 		               ( line.indexOf( "Wireless LAN adapter Wireless Network Connection:" ) >= 0 )||
-		               ( line.indexOf( "이더넷 어댑터 로컬 영역 연결:" ) >= 0 )||
-		               ( line.indexOf( "무선 LAN 어댑터 무선 네트워크 연결:" ) >= 0 ) )
+		               ( line.indexOf( "??? ??? ?? ?? ??:" ) >= 0 )||
+		               ( line.indexOf( "?? LAN ??? ?? ???? ??:" ) >= 0 ) )
 		            {
 		              found = true;
 					}
@@ -357,7 +357,7 @@ public class Discovery implements Runnable {
 	            if (line != null)
 	            {
 		            if (( line.indexOf( "IP Address" ) >= 0 ) || ( line.indexOf( "IPv4 Address" ) >= 0 ) ||
-		            		( line.indexOf( "IP 주소" ) >= 0 ) || ( line.indexOf( "IPv4 주소" ) >= 0 ))
+		            		( line.indexOf( "IP ??" ) >= 0 ) || ( line.indexOf( "IPv4 ??" ) >= 0 ))
 		            {
 		            	ipAddr = (line.substring(line.indexOf( ":" )+1 )).trim();
 						found = true;

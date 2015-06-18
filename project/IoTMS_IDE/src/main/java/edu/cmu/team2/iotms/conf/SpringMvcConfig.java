@@ -10,6 +10,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import edu.cmu.team2.iotms.uicontroller.EventHistoryController;
 import edu.cmu.team2.iotms.uicontroller.MessageController;
+import edu.cmu.team2.iotms.uicontroller.NodeController;
 import edu.cmu.team2.iotms.uicontroller.RuleController;
 import edu.cmu.team2.iotms.uicontroller.SettingController;
 import edu.cmu.team2.iotms.uicontroller.UserController;
@@ -59,6 +60,12 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public RuleController ruleController() {
 		RuleController controller = new RuleController();
+		return controller;
+	}
+	
+	@Bean
+	public NodeController nodeController() {
+		NodeController controller = new NodeController();
 		return controller;
 	}
 }

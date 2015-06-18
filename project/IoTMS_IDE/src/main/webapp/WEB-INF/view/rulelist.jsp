@@ -15,6 +15,31 @@
   </script>
 </head>
 <script type="text/javascript">
+function CreateRule()
+{
+	var ruleset = document.getElementById("newrule").value;
+	
+	document.getElementById("ruleSet_ID").value = "0";
+	document.getElementById("ruleSet").value = ruleset;
+	
+	document.getElementById("myform").action = "/iotms/rule/create";
+	$( "#dialog-confirm" ).dialog({
+		resizable: false,
+		height:230,
+		width:320,
+		modal: true,
+		buttons: {
+			"Create RuleSet": function() {
+			     	// Do this after Confirm
+			     	document.getElementById("myform").submit();
+			$( this ).dialog( "close" );
+			     },
+			     Cancel: function() {
+			$( this ).dialog( "close" );
+			     }
+		}
+	});
+}
 function DeleteRule(ruleid)
 {
 	var ruleset = document.getElementById (ruleid).value;
@@ -56,6 +81,8 @@ function DeleteRule(ruleid)
       	</tr>
 	</c:forEach>
 </table>
+<p><button onClick="CreateRule()" >Add Rule</button><input id="newrule" type="text" value=""></p>
+
 <div style="display:none;">
 	<form id="myform" method="POST" action="">
 		<input id="ruleSet_ID" name="ruleSet_ID" value="" />

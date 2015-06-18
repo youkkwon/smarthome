@@ -13,7 +13,14 @@ public class DelayAction extends Action {
 		String timeStr = statement; 
 		
 		if (type.equalsIgnoreCase("Alarm"))
-			timeStr = timeStr + " in " + Config.getInstance().getAlarmConfig() + " seconds";
+		{
+			if (value.equalsIgnoreCase("UnSet"))
+				timeStr = timeStr + " in " + Config.getInstance().getMalFuncConfig() + " seconds";
+			else
+				timeStr = timeStr + " in " + Config.getInstance().getAlarmConfig() + " seconds";
+		}
+        else if (type.equalsIgnoreCase("Message"))
+            timeStr = timeStr + " in " + Config.getInstance().getMalFuncConfig() + " seconds";
 		else 
 			timeStr = timeStr + " in " + Config.getInstance().getLightConfig() + " seconds";
 		
@@ -44,7 +51,14 @@ public class DelayAction extends Action {
 	public void execute() {
 		
 		if (type.equalsIgnoreCase("Alarm"))
-			remainTime = Integer.parseInt(Config.getInstance().getAlarmConfig());
+		{
+			if (value.equalsIgnoreCase("UnSet"))
+				remainTime = Integer.parseInt(Config.getInstance().getMalFuncConfig());
+			else
+				remainTime = Integer.parseInt(Config.getInstance().getAlarmConfig());
+		}
+        else if (type.equalsIgnoreCase("Message"))
+			remainTime = Integer.parseInt(Config.getInstance().getMalFuncConfig());
 		else 
 			remainTime = Integer.parseInt(Config.getInstance().getLightConfig());
 		

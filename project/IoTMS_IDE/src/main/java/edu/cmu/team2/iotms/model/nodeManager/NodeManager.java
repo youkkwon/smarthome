@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import Database.NodeDao;
 import edu.cmu.team2.iotms.model.commManager.Adapter;
 import edu.cmu.team2.iotms.model.commManager.AdapterEvent;
 import edu.cmu.team2.iotms.model.commManager.AdapterEventListener;
@@ -211,8 +212,23 @@ public class NodeManager implements AdapterEventListener {
 			}
 			
 			// DB에서 읽은 놈을 JSONObj로 생성한다.
-			//String db = "";
-			String db = "{\"Job\":\"Registered\",\"NodeID\":\"12:23:34:45:56:67\",\"ThingList\":[{\"Id\":\"0001\",\"Type\":\"Door\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0002\",\"Type\":\"Light\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"On\"\"VMax\":\"Off\"},{\"Id\":\"0003\",\"Type\":\"Presence\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"AtHome\"\"VMax\":\"Away\"},{\"Id\":\"0004\",\"Type\":\"Temperature\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"-50\"\"VMax\":\"50\"},{\"Id\":\"0005\",\"Type\":\"Humidity\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"0\"\"VMax\":\"100\"},{\"Id\":\"0006\",\"Type\":\"DoorSensor\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0007\",\"Type\":\"MailBox\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Empty\"\"VMax\":\"Mail\"},{\"Id\":\"0008\",\"Type\":\"Alarm\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Set\"\"VMax\":\"Unset\"}]}\n";
+			JSONObject nodeObj = null;
+			nodeObj = (JSONObject) JSONValue.parse(event.getMessage());
+			if (nodeObj == null) {
+				System.out.println("[NM - Process] JSON Object is null from SA node");
+				rejectNode("reject node");
+				return;
+			}
+			String nodeID = (String)nodeObj.get("NodeID");
+			System.out.println("[NM - Process] Create NodeID: " + nodeID);
+			
+			String db = NodeDao.getInstance().getJsonOfNode(nodeID);
+			if (db == null) {
+				System.out.println("DB is null. reject to add new node!!!");
+				rejectNode("reject node");
+			}
+			
+			//String db = "{\"Job\":\"Registered\",\"NodeID\":\"12:23:34:45:56:67\",\"ThingList\":[{\"Id\":\"0001\",\"Type\":\"Door\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0002\",\"Type\":\"Light\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"On\"\"VMax\":\"Off\"},{\"Id\":\"0003\",\"Type\":\"Presence\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"AtHome\"\"VMax\":\"Away\"},{\"Id\":\"0004\",\"Type\":\"Temperature\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"-50\"\"VMax\":\"50\"},{\"Id\":\"0005\",\"Type\":\"Humidity\",\"SType\":\"Sensor\",\"VType\":\"Number\"\"VMin\":\"0\"\"VMax\":\"100\"},{\"Id\":\"0006\",\"Type\":\"DoorSensor\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Open\"\"VMax\":\"Close\"},{\"Id\":\"0007\",\"Type\":\"MailBox\",\"SType\":\"Sensor\",\"VType\":\"String\"\"VMin\":\"Empty\"\"VMax\":\"Mail\"},{\"Id\":\"0008\",\"Type\":\"Alarm\",\"SType\":\"Actuator\",\"VType\":\"String\"\"VMin\":\"Set\"\"VMax\":\"Unset\"}]}\n";
 			JSONObject JSONMsg = (JSONObject) JSONValue.parse(db);
 			
 			if (JSONMsg == null) {

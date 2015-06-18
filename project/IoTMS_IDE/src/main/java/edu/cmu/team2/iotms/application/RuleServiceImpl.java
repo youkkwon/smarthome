@@ -1,5 +1,7 @@
 package edu.cmu.team2.iotms.application;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import javax.sql.DataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -17,6 +20,7 @@ import edu.cmu.team2.iotms.model.eventBus.Logger_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.Message_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.NM_EventBusReceiver;
 import edu.cmu.team2.iotms.model.eventBus.RM_EventBusReceiver;
+import edu.cmu.team2.iotms.model.nodeManager.NodeManager;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Scheduler;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Event.RuleManager;
 
@@ -39,6 +43,9 @@ public class RuleServiceImpl implements RuleService {
 		rulemanager.start();							
 		rm_scheduler.start();
 		
+		// NodeManager
+		NodeManager 				nodemanager	= NodeManager.getInstance();	
+		
 		JSONObject msgJSON = new JSONObject();
 		JSONArray target = new JSONArray();
 		target.add("RuleManager");
@@ -48,7 +55,7 @@ public class RuleServiceImpl implements RuleService {
 		
 		IoTMSEventBus.getInstance().register(this);
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
-//*/		
+//*/
 	}
 
 	@Override
@@ -130,13 +137,10 @@ public class RuleServiceImpl implements RuleService {
 	}
 	
 	@Subscribe
-	public void SubscribeEvent(JSONObject JSONMsg)
-	{
+	public void SubscribeEvent(JSONObject JSONMsg) {
 		JSONArray targets = (JSONArray) JSONMsg.get("Targets");
-		for (int i=0; i < targets.size(); i++)
-		{
-			if (targets.get(i).equals("UIControler"))
-			{
+		for (int i=0; i < targets.size(); i++) {
+			if (targets.get(i).equals("UIControler")) {
 				if(JSONMsg.get("Job").toString().compareTo("RuleSearch") == 0)
 					processSearch(JSONMsg);
 			}
@@ -147,8 +151,7 @@ public class RuleServiceImpl implements RuleService {
 		JSONArray rules = (JSONArray) JSONMsg.get("Rules");
 		
 		ruleSet.clear();
-		for (int i=0; i < rules.size(); i++)
-		{
+		for (int i=0; i < rules.size(); i++) {
 			RuleInfo ruleinfo = new RuleInfo();
 			ruleinfo.setRuleId(String.format("%d", i));
 			ruleinfo.setRuleSet(rules.get(i).toString());
