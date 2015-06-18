@@ -100,7 +100,7 @@ boolean IoTMSMagReadComplete;                  // Loop flag
 String IoTMSCommand;
 
 // Jason message variable
-StaticJsonBuffer<128> jsonBuffer;  
+//StaticJsonBuffer<128> jsonBuffer;  
 String MacAddressString;
 
 int SendDiscoveredMessage(void);
@@ -321,8 +321,9 @@ void RegisterNodeToIoTMS(void)
 			}
 			else
 			{	
+				Serial.println("Send register message");
 				SendJSONdiscoverRegister(ServerClient, false);	// Send Discovery message 
-				ServerClient.stop();
+				//ServerClient.stop();
 				MainLoopState = MLS_CONNECTING_SERVER;
 				Serial.println("Connect To IoTMS function");
 			}
@@ -332,6 +333,8 @@ void RegisterNodeToIoTMS(void)
 
 int RegisterNodeCommandCtl(void)
 {
+	StaticJsonBuffer<128> jsonBuffer;  
+	
 	Serial.print("IoTMS Message : ");
 	Serial.println(IoTMSCommand);		// for debugging
 
@@ -344,6 +347,7 @@ int RegisterNodeCommandCtl(void)
 	{
 		Serial.println("parseObject() failed");
 		return -1;
+		//return 1;
 	}
 	else
 	{
@@ -415,8 +419,15 @@ void SendSAnodeStateCtl(void)
 {
 	if(SendStateTimer.CheckPassTime(3000, 0) == 1)
 	{
-		Serial.println("======= Send sensing data to IoTMS");
-		SendJSONstatusEvent(Client);
+		if(Client.connected())
+		{
+			Serial.println("======= Send sensing data to IoTMS");
+			SendJSONstatusEvent(Client);
+		}
+		else
+		{
+			Serial.println("=== Soket disconnected");
+		}
 	}
 }
 
@@ -476,6 +487,8 @@ int IoTMSCommandCtl(void)
 */
 int IoTMSCommandParsing(void)
 {
+	StaticJsonBuffer<128> jsonBuffer;  
+	
 	Serial.print("IoTMS Command : ");
 	Serial.println(IoTMSCommand);		// for debugging
 
