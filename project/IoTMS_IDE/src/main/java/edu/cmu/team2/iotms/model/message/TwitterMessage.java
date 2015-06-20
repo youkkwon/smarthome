@@ -23,6 +23,8 @@ public class TwitterMessage extends IoTMSMessage {
 	private String accessTokenSecretStr;
 
 	public TwitterMessage() {
+		super();
+		
 		consumerKeyStr = "5AshEt485tLe3KIDosz5tvkC9";
 		consumerSecretStr = "HqdJGOuTK12IFI6gX8A51siH1uvaB8uCnSV6kaxwfKVBMKPcs5";
 		accessTokenStr = "3325797479-ZNcQCIQWsHDph4qhCpZwSMa5DBYTfhN0TL5Xwds";

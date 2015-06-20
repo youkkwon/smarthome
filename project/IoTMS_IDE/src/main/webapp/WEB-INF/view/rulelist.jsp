@@ -66,6 +66,58 @@ function DeleteRule(ruleid)
 	});
 }
 </script>
+<script type="text/javascript">
+		var wsocket;
+		
+		function getsockurl(s) {
+		    var l = window.location;
+		    return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname + (((l.port != 80) && (l.port != 443)) ? ":" + l.port : "") + s;
+		}
+		
+		function connect() {
+			wsocket = new WebSocket(getsockurl("/iotms/rule-ws"));
+			wsocket.onopen = onOpen;
+			wsocket.onmessage = onMessage;
+			wsocket.onclose = onClose;
+		}
+		function disconnect() {
+			wsocket.close();
+		}
+		function onOpen(evt) {
+			appendMessage("연결되었습니다.");
+		}
+		function onMessage(evt) {
+			var data = evt.data;
+			appendMessage(data);
+//			location.reload();
+		}
+		function onClose(evt) {
+			appendMessage("연결을 끊었습니다.");
+		}
+		
+// 		function send() {
+// 			var nickname = $("#nickname").val();
+// 			var msg = $("#message").val();
+// 			wsocket.send("msg:"+nickname+":" + msg);
+// 			$("#message").val("");
+// 		}
+		
+		function appendMessage(msg) {
+			$("#chatMessageArea").append(msg+"<br>");
+			var chatAreaHeight = $("#chatArea").height();
+			var maxScroll = $("#chatMessageArea").height() - chatAreaHeight;
+			$("#chatArea").scrollTop(maxScroll);
+		}
+		
+		$(document).ready(function() {
+			connect();
+		});
+	</script>
+	<style>
+	#chatArea {
+		width: 200px; height: 100px; overflow-y: auto; border: 1px solid black;
+	}
+	</style>
 <body>
 <div id="dialog-confirm" title="IoTMS" style="display:none;">
   <p>Are you sure?</p>
@@ -81,6 +133,7 @@ function DeleteRule(ruleid)
       	</tr>
 	</c:forEach>
 </table>
+<div id="chatArea"><div id="chatMessageArea"></div></div>
 <p><button onClick="CreateRule()" >Add Rule</button><input id="newrule" type="text" value=""></p>
 
 <div style="display:none;">

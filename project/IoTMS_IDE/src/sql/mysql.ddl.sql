@@ -79,6 +79,7 @@ CREATE TABLE iotmsdb.node_info (
 	`port` VARCHAR(50) NULL DEFAULT NULL,
 	`serialnumber` VARCHAR(50) NULL DEFAULT NULL,
 	`json` VARCHAR(512) NULL DEFAULT NULL,
+	`registered` INT(4) NULL DEFAULT '0',
 	PRIMARY KEY (`node_id`)
 ) engine=InnoDB character set = utf8;
 

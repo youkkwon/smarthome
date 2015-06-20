@@ -17,10 +17,12 @@ public class NodeController {
 	
 	@Autowired
 	private NodeService nodeService;
+	private static final String REGISTERED = "1";
+	private static final String UNREGISTERED = "0";
 
 	@RequestMapping("/nodelist")
 	public ModelAndView getNodeList(ModelAndView model) throws IOException{
-		List<NodeInfo> nodes = nodeService.getNodeList();
+		List<NodeInfo> nodes = nodeService.getNodeList(REGISTERED);
 		
 		for(NodeInfo node:nodes) {
 			node.setThings(nodeService.getThingList(node.getNode_id()));
@@ -35,8 +37,8 @@ public class NodeController {
 	public ModelAndView newNode(ModelAndView model) throws IOException{
 		List<NodeInfo> nodes = nodeService.getNewNodes();
 		
-		model.addObject("nodelist", nodes);
-		model.setViewName("nodelist");
+		model.addObject("newnode", nodes);
+		model.setViewName("newnode");
 		
 		return model;
 	}
@@ -53,6 +55,16 @@ public class NodeController {
 			,ModelAndView model) throws IOException{
 		nodeService.registerNode(nodeid, serial);
 		return "newnode";
+	}
+	
+	@RequestMapping("/node/testnode")
+	public String testNode(@RequestParam("nodeid") String nodeid
+			,@RequestParam("thingid") String thingid
+			,@RequestParam("type") String type
+			,@RequestParam("value") String value
+			,ModelAndView model) throws IOException{
+		nodeService.testNode(nodeid, thingid, type, value);
+		return "";
 	}
 
 	@RequestMapping("/thing/control")

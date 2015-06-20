@@ -32,6 +32,66 @@
 		  document.getElementById("controlpage").setAttribute("src", loc);
 	}
   </script>
+  <script type="text/javascript">
+		var wsocket;
+		
+		function getsockurl(s) {
+		    var l = window.location;
+		    return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname + (((l.port != 80) && (l.port != 443)) ? ":" + l.port : "") + s;
+		}
+		
+		function connect() {
+			wsocket = new WebSocket(getsockurl("/iotms/node-ws"));
+			wsocket.onopen = onOpen;
+			wsocket.onmessage = onMessage;
+			wsocket.onclose = onClose;
+		}
+		function disconnect() {
+			wsocket.close();
+		}
+		function onOpen(evt) {
+			appendMessage("연결되었습니다.");
+		}
+		function onMessage(evt) {
+			var json = evt.data;
+//			appendMessage(json);
+			
+			var data = $.parseJSON(json);
+			var mon_nodeid = data.NodeID;
+			var mon_thingid = data.ThingID;
+			var mon_value = data.Value;
+			var out = "[NodeID:"+ mon_nodeid+"] [ThingID:"+ mon_thingid+"] [Value:"+ mon_value+"] ";
+//			appendMessage(out);
+			
+			document.getElementById (mon_nodeid+"_"+mon_thingid+"_value").value = mon_value;
+		}
+		function onClose(evt) {
+			appendMessage("연결을 끊었습니다.");
+		}
+		
+// 		function send() {
+// 			var nickname = $("#nickname").val();
+// 			var msg = $("#message").val();
+// 			wsocket.send("msg:"+nickname+":" + msg);
+// 			$("#message").val("");
+// 		}
+		
+		function appendMessage(msg) {
+			$("#chatMessageArea").append(msg+"<br>");
+			var chatAreaHeight = $("#chatArea").height();
+			var maxScroll = $("#chatMessageArea").height() - chatAreaHeight;
+			$("#chatArea").scrollTop(maxScroll);
+		}
+		
+		$(document).ready(function() {
+			connect();
+		});
+	</script>
+	<style>
+	#chatArea {
+		width: 500px; height: 100px; overflow-y: auto; border: 1px solid black;
+	}
+	</style>
 </head>
 
 <body>
@@ -91,6 +151,7 @@
 	</table>
 	<br>
 	</c:forEach>
+	<div id="chatArea"><div id="chatMessageArea"></div></div>
 <div style="display:none;">
 	<iframe id="controlpage" src=""></iframe>
 </div>

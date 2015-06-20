@@ -34,8 +34,8 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public List<NodeInfo> getNodeList() {
-		String sql = "select node_id,node_name,serialnumber from node_info ";
+	public List<NodeInfo> getNodeList(String register) {
+		String sql = "select node_id,node_name,serialnumber from node_info where registered="+register;
 		System.out.println("getNodeList sql : "+sql);
 		List<NodeInfo> nodelist = jdbcTemplate.query(sql, new RowMapper<NodeInfo>() {
 	        @Override
@@ -131,6 +131,10 @@ public class NodeServiceImpl implements NodeService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void registerNode(String nodeid, String serial) {
+		String sql = "update node_info set serialnumber='"+serial+"', registered=1 where node_id='"+nodeid+"'";
+		System.out.println("registerNode sql : "+sql);
+		jdbcTemplate.update(sql);
+		
 		String localIP="";
 		try {
 			localIP = InetAddress.getLocalHost().getHostAddress();
@@ -193,5 +197,23 @@ public class NodeServiceImpl implements NodeService {
 		
 		System.out.println("discoverNodes : "+newNode);
 		discoverNodes.add(newNode);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void testNode(String nodeid, String thingid, String type,
+			String value) {
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		
+		target.add("RuleManager");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "ThingCtrl");
+		msgJSON.put("NodeID", nodeid);
+		msgJSON.put("ThingID", thingid);
+		msgJSON.put("Type", type);
+		msgJSON.put("Value", value);
+		
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}
 }

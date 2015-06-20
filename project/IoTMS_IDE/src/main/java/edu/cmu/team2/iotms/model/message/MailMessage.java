@@ -19,6 +19,8 @@ public class MailMessage extends IoTMSMessage {
 	private JavaMailSenderImpl mailSender;
 	
 	public MailMessage() {
+		super();
+		
 		mailSender = new JavaMailSenderImpl();
 		
 		mailSender.setHost("smtp.gmail.com");

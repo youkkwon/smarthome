@@ -196,7 +196,7 @@ public class NodeDao {
 		PreparedStatement pstmt = null;
 
 		try {
-			String query = "insert into node_info(node_id, json) value('"+node_id+"','"+json+"')";
+			String query = "insert into node_info(node_id, json, registered) value('"+node_id+"','"+json+"',0)";
 			System.out.println("NodeDao(setJsonOfNode-insert) sql: "+query);
 			pstmt = conn.prepareStatement(query);
 			ret = pstmt.execute();
@@ -216,7 +216,7 @@ public class NodeDao {
 		
 		if(update) {
 			try {
-				String query = "update node_info set json='"+json+"' where node_id='"+node_id+"'";
+				String query = "update node_info set json='"+json+"', registered=0 where node_id='"+node_id+"'";
 				System.out.println("NodeDao(setJsonOfNode-update) sql: "+query);
 				pstmt = conn.prepareStatement(query);
 				ret = pstmt.execute();

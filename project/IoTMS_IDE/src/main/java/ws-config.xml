@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/websocket
+       http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+
+	<websocket:handlers>
+		<websocket:mapping handler="nodeHandler" path="/node-ws" />
+		<websocket:mapping handler="newNodeHandler" path="/newnode-ws" />
+		<websocket:mapping handler="ruleHandler" path="/rule-ws" />
+	</websocket:handlers>
+
+	<bean id="nodeHandler"    class="edu.cmu.team2.iotms.application.NodeWebSocketHandler" />
+	<bean id="newNodeHandler" class="edu.cmu.team2.iotms.application.NewNodeWebSocketHandler" />
+	<bean id="ruleHandler"    class="edu.cmu.team2.iotms.application.RuleWebSocketHandler" />
+	
+	<mvc:default-servlet-handler />
+</beans>
