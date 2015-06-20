@@ -20,6 +20,7 @@ public class RuleSet {
 	
 	private RuleSet ()
 	{
+		mode = "*@0010==Unset#Alarm";
 		rules = new LinkedList<Rule>();
 		loadRuleSet();
 	}
