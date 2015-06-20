@@ -417,6 +417,40 @@ public class Rule {
 		return (match == true) ? actionList : null;
 	}
 	
+	// return actions on condition(event) or no_action on condition(mode)
+	public LinkedList<Action> getActions (String mode, String[] condition)
+	{
+		boolean match = true;
+		ListIterator<Condition>	iterator = conditionList.listIterator();
+			
+		if (active == false) return null;
+			
+		// condition check
+		while (iterator.hasNext() && match == true)
+		{
+			Condition cond = iterator.next();
+			// handle mode condition 
+			if (conditionList.size() != 1 && cond.isModeCond())		
+			{
+				match = cond.isConditionMatch(mode);
+			}
+			else	// thing condition - all condition need to meet. 
+			{
+				match = false;
+				for (int i=0; i < condition.length; i++)
+				{
+					if (cond.isConditionMatch(condition[i]) == true)
+					{
+						match = true;
+						break;
+					}
+				}
+			}
+		}		
+		
+		return (match == true) ? actionList : null;
+	}
+		
 	// Or condition. ex) Auto door control system blocked on several modes such as ourdoor, night, child-protect
 	public  LinkedList<Action>getNoActions (String condition) throws InvalidRuleException
 	{

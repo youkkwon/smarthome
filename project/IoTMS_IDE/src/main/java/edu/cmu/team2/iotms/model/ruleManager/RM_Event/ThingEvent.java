@@ -48,6 +48,54 @@ public class ThingEvent {
 	{
 		System.out.println("[RM - Process] Handle ThingEvent : " + JSONMsg);
 		
+		execute_things(JSONMsg);			// Ver 2 - handle multi condition
+		//execute_thing(JSONMsg);			// Ver 1 - handle only one condition
+	}
+	
+	public void execute_things(JSONObject JSONMsg)
+	{
+		String nodeID = (String) JSONMsg.get("NodeID");
+		JSONArray thingsInfo = (JSONArray) JSONMsg.get("Status");
+		
+		String[] conditions = new String[thingsInfo.size()];
+		for (int i=0; i < thingsInfo.size(); i++)
+		{
+			JSONObject thing = (JSONObject) thingsInfo.get(i);
+			String thingID = (String) thing.get("Id");
+			String value = (String) thing.get("Value");
+			String type = (String) thing.get("Type");
+			
+			Condition condition = new Condition (nodeID, thingID, value, type);			
+			conditions[i] = condition.getStatement();
+		}
+		execute_complex_condition(conditions);
+	}
+	
+	private void execute_complex_condition(String[] conditions)
+	{
+		LinkedList<Action> actions = RuleSet.getInstance().getActions(conditions);
+		if (actions == null || actions.isEmpty())
+		{
+			System.out.println("[RM - Process] No rule for this condition.");
+			return;
+		}
+		Iterator<Action> iterator = actions.iterator();
+		while (iterator.hasNext())
+		{
+			Action action = iterator.next();
+			/*
+			if (condition.isMinMaxCond())
+			{
+				action.setDesc(condition.getType() + " is malfunction. value - " + condition.getValue());
+			}
+			*/
+			System.out.println ("[RM - Process] actions : "+ action.getStatement());
+			action.execute();
+		}
+	}
+	
+	public void execute_thing(JSONObject JSONMsg)
+	{
 		String nodeID = (String) JSONMsg.get("NodeID");
 		JSONArray thingsInfo = (JSONArray) JSONMsg.get("Status");
 		
@@ -60,11 +108,11 @@ public class ThingEvent {
 			
 			Condition condition = new Condition (nodeID, thingID, value, type);
 			
-			execute_thing(condition);
+			execute_single_condition(condition);
 		}
 	}
 	
-	private void execute_thing(Condition condition)
+	private void execute_single_condition(Condition condition)
 	{
 		LinkedList<Action> actions = RuleSet.getInstance().getActions(condition.getStatement());
 		if (actions == null || actions.isEmpty())
@@ -80,6 +128,7 @@ public class ThingEvent {
 			{
 				action.setDesc(condition.getType() + " is malfunction. value - " + condition.getValue());
 			}
+			System.out.println ("[RM - Process] actions : "+ action.getStatement());
 			action.execute();
 		}
 	}

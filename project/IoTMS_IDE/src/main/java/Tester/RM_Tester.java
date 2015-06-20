@@ -224,16 +224,28 @@ public class RM_Tester {
 		testConfigEvent("Light", "0009");
 	
 		testThingEvent (nodeID, "0003", "Presence", "Away");		// Check schedule job on changed value	
-		
-        String[] IDs = new String[3];
-		String[] types = new String[3];
-		String[] values = new String[3];
-		IDs[0] = "0005";	types[0] = "DoorSensor";		values[0] = "Open";
-		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "Away";
+
+       	// Thing Test (Node ID + Thing ID)
+		Thread.sleep(5000);
+		testThingEvent (nodeID, "0006", "DoorSensor", "Close");	    // Test no rule event
+
+      	Thread.sleep(10000);   
+
+        String[] IDs = new String[4];
+		String[] types = new String[4];
+		String[] values = new String[4];
+		IDs[0] = "0006";	types[0] = "DoorSensor";		values[0] = "Open";
+		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "Alway";
 		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32.00";		
+		IDs[3] = "0007";	types[3] = "AlarmLamp";		    values[3] = "On";		
 		testThingBulkEvent(nodeID, IDs, types, values);
 		
-		testThingEvent (nodeID, "0003", "Temperature", "32.00");		// Check schedule job on changed value	
+		Thread.sleep(3000);
+		IDs[0] = "0006";	types[0] = "DoorSensor";		values[0] = "Close";
+		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "AtHome";
+		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "42";		
+		testThingBulkEvent(nodeID, IDs, types, values);
+			
 		//*/
 		
 		/*while (true)

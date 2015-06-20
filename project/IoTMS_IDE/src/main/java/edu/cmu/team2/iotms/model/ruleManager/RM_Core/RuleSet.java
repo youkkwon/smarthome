@@ -236,6 +236,20 @@ public class RuleSet {
 		return null;
 	}
 	
+	public LinkedList<Action> getActions (String[] condition)
+	{
+		ListIterator<Rule>	iterator = rules.listIterator();
+		
+		while (iterator.hasNext()) 
+		{
+			LinkedList<Action> actions = iterator.next().getActions(mode, condition);
+			// find actions on condition.
+			if (actions != null && !actions.isEmpty())
+				return actions;
+		}
+		return null;
+	}
+	
 	public void activeRules (String condition)
 	{
 		ListIterator<Rule>	iterator = rules.listIterator();
