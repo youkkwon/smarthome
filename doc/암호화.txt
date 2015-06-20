@@ -1,0 +1,5 @@
+RSA - embedded ¿ë
+http://www.microbuilder.eu/Tutorials/SoftwareDevelopment/RSAEncryption.aspx
+
+Crypto Lib(MD5, SH1, AES128
+http://code.google.com/p/crypto-arduino-library/source/browse/trunk/Cripto.cpp
