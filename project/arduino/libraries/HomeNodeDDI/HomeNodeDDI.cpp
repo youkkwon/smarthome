@@ -146,6 +146,7 @@ int HomeNodeDDI::read1byte_tempNhumidity(void)
 	return 0;
 }
 
+/*
 // return values:
 //  0 : OK
 // -1 : checksum error
@@ -174,6 +175,7 @@ int HomeNodeDDI::read2byte_tempNhumidity(void)
 
 	return 0;
 }
+*/
 
 /////////////////////////////////////////////////////
 //

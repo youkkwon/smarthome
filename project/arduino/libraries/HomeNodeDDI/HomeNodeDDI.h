@@ -19,7 +19,7 @@
 #include "WProgram.h"
 #endif
 
-//#include "../Servo/src/Servo.h"
+#include "../Servo/src/Servo.h"
 
 #define HomeNodeDDI_LIB_VERSION "0.1.00"
 
@@ -39,8 +39,8 @@
 class HomeNodeDDI
 {
 public:
-	double humidity;
-	double temperature;
+	int humidity;
+	int temperature;
 	long proximity;
 	int BeIndoors;
 	int doorstate;
@@ -54,7 +54,7 @@ public:
 	void readDoorState();
 	void readProximityVal(void);
 	int read1byte_tempNhumidity(void);
-	int read2byte_tempNhumidity(void);
+	//int read2byte_tempNhumidity(void);
 	
 private:
 	uint8_t bits[5];  // buffer to receive data
