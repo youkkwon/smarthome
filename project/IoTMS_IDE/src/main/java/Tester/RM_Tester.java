@@ -1,9 +1,12 @@
 package Tester;
 
+import java.util.ListIterator;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
+import edu.cmu.team2.iotms.model.ruleManager.RM_Storage.RuleManagerDBStorage;
 
 public class RM_Tester {
 	
@@ -174,9 +177,9 @@ public class RM_Tester {
 	
 	public void test() throws InterruptedException {
 				
-		/*
-		String input = new String();
-		ListIterator<String> raw_rules = RuleSetFileStorage.getInstance().loadRuleSet();
+		///*
+		/*String input = new String();
+		ListIterator<String> raw_rules = RuleManagerDBStorage.getInstance().loadRuleSet();
 		while (raw_rules.hasNext())
 		{
 			input = raw_rules.next();
@@ -190,9 +193,9 @@ public class RM_Tester {
 		testRuleEvent("Delete", null, input);
 		*/
 		
-        testConfigEvent("Alarm", "0300");							// Test config 
+	    testConfigEvent("Alarm", "0300");							// Test config 
 		testConfigEvent("Light", "0600");
-
+	
 		// State Test (Alarm mode)
 		testStateEvent ("Setting");		
 
@@ -226,9 +229,42 @@ public class RM_Tester {
 		String[] types = new String[3];
 		String[] values = new String[3];
 		IDs[0] = "0005";	types[0] = "DoorSensor";		values[0] = "Open";
-		IDs[1] = "0003";	types[1] = "Presense";			values[1] = "Away";
-		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32";		
+		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "Away";
+		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32.00";		
 		testThingBulkEvent(nodeID, IDs, types, values);
+		
 		testThingEvent (nodeID, "0003", "Temperature", "32.00");		// Check schedule job on changed value	
+		//*/
+		
+		/*while (true)
+		{
+		    // Thing Test (Node ID + Thing ID)
+			testActionEvent (nodeID, "0001", "Door", "Open");			// Door open on Normal mode
+			Thread.sleep(3000);
+		
+			// Thing Test (Node ID + Thing ID)
+			testActionEvent (nodeID, "0002", "Light", "On");			// Test no rule event
+			Thread.sleep(3000);
+		
+			// Thing Test (Node ID + Thing ID)
+			testActionEvent (nodeID, "0001", "Door", "Close");			// Door open on Normal mode
+			Thread.sleep(3000);
+		
+			// Thing Test (Node ID + Thing ID)
+			testActionEvent (nodeID, "0002", "Light", "Off");			// Test no rule event
+			Thread.sleep(3000);
+						
+			// Thing Test (Node ID + Thing ID)
+			testActionEvent (nodeID, "0007", "AlarmLamp", "On");			// Test no rule event
+			Thread.sleep(3000);
+			
+			// Thing Test (Node ID + Thing ID)
+			testActionEvent (nodeID, "0007", "AlarmLamp", "Off");			// Test no rule event
+			Thread.sleep(3000);
+			
+			// State Test (Alarm mode)
+			//testStateEvent ("Setting");	
+			//Thread.sleep(15000);
+		}*/	
 	}
 }
