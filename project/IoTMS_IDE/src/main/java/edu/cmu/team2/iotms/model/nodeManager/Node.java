@@ -124,7 +124,7 @@ public class Node implements LinkEventListener {
 			if (thing != null) {
 				if (thing.setValue((String)thingObj.get("Value")) == false) {
 					// 값의 변경이 없음. 해당 Object 삭제
-					System.out.println ("[UpdateThingInfo] Remove : " + thingInfos);
+					System.out.println ("[UpdateThingInfo] Remove : " + (String)thingObj.get("Id"));
 				} else {
 					JSONObject infoThingObj = new JSONObject(); 
 					infoThingObj.put("Id", (String)thingObj.get("Id"));

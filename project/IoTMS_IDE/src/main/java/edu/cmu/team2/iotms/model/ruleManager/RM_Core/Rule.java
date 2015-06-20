@@ -399,7 +399,7 @@ public class Rule {
 	// return actions on condition(event) or no_action on condition(mode)
 	public LinkedList<Action> getActions (String condition)
 	{
-		boolean match = true;
+		boolean match = false;
 		ListIterator<Condition>	iterator = conditionList.listIterator();
 		
 		if (active == false) return null;
@@ -407,9 +407,9 @@ public class Rule {
 		// condition check
 		while (iterator.hasNext())
 		{
-			if (iterator.next().isConditionMatch(condition) == false)
+			if (iterator.next().isConditionMatch(condition) == true)
 			{
-				match = false;
+				match = true;
 				break;
 			}
 		}		

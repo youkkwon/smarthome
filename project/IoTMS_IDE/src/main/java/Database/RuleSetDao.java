@@ -60,7 +60,7 @@ public class RuleSetDao {
 		boolean ret = false;
 		PreparedStatement pstmt = null;
 		String query = "insert into ruleset_info(ruleset) value('"+rulestring+"')";
-		System.out.println("RuleSetDao(insertRule) sql: "+query);
+		//System.out.println("RuleSetDao(insertRule) sql: "+query);
 
 		try {
 			pstmt = conn.prepareStatement(query);
@@ -82,7 +82,7 @@ public class RuleSetDao {
 		boolean ret = false;
 		PreparedStatement pstmt = null;
 		String query = "delete from ruleset_info";
-		System.out.println("RuleSetDao(deleteRule) sql: "+query);
+		//System.out.println("RuleSetDao(deleteRule) sql: "+query);
 
 		try {
 			pstmt = conn.prepareStatement(query);
@@ -104,7 +104,7 @@ public class RuleSetDao {
 		boolean ret = false;
 		PreparedStatement pstmt = null;
 		String query = "delete from ruleset_info where ruleset='"+rulestring+"'";
-		System.out.println("RuleSetDao(deleteRule) sql: "+query);
+		//System.out.println("RuleSetDao(deleteRule) sql: "+query);
 
 		try {
 			pstmt = conn.prepareStatement(query);
@@ -182,7 +182,7 @@ public class RuleSetDao {
 		boolean ret = false;
 		PreparedStatement pstmt = null;
 		String query = "update setting set security_settime ="+config;
-		System.out.println("RuleSetDao(storeRuleAlarmConfig) sql: "+query);
+		//System.out.println("RuleSetDao(storeRuleAlarmConfig) sql: "+query);
 
 		try {
 			pstmt = conn.prepareStatement(query);
@@ -204,7 +204,7 @@ public class RuleSetDao {
 		boolean ret = false;
 		PreparedStatement pstmt = null;
 		String query = "update setting set lightoff_settime ="+config;
-		System.out.println("RuleSetDao(storeRuleLightOffConfig) sql: "+query);
+		//System.out.println("RuleSetDao(storeRuleLightOffConfig) sql: "+query);
 
 		try {
 			pstmt = conn.prepareStatement(query);
