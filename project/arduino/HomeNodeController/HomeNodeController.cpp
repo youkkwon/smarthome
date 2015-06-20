@@ -40,6 +40,9 @@
 #include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
 #include <MyTimer.h>
 #include <ArduinoJson.h>
+#include <EEPROM.h>
+#include <MyEeprom.h>
+
 
 //#define	CHECK_REGISTER_IOTMS
 
@@ -68,7 +71,15 @@ enum {
 #define SERVER_PORT			550
 #define CLIENT_PORT			3250
 #define SCOMMAND_SIZE		64
-#define SSID		"LGTeam2"				
+#define SSID		"LGTeam2"	
+
+/*
+#define EEP_IOTMS_IP_START_ADDR			1
+#define EEP_IPADDR_SIZE						15
+#define EEP_IOTMS_PORT_START_ADDR		16
+#define EEP_PORTNUM_SIZE					5
+*/
+
 // Node sensor/actuator control variable
 HomeNodeDDI HomeNode;
 int MainLoopState = 0;
@@ -95,13 +106,15 @@ IPAddress ip;                 // The IP address of the shield
 //IPAddress subnet;            // The subnet we are connected to
 //long rssi;                   // The WIFI shield signal strength
 byte mac[6];                   // MAC address of the WIFI shield
-char inChar;                   // This is a character sent from the client
+char inChar;                   // This is a character from the client
 boolean IoTMSMagReadComplete;                  // Loop flag
 String IoTMSCommand;
 
 // Jason message variable
 //StaticJsonBuffer<128> jsonBuffer;  
 String MacAddressString;
+
+MyEeprom EEpCtl;
 
 int SendDiscoveredMessage(void);
 
@@ -123,6 +136,17 @@ int IoTMSCommandParsing(void);
 void ActuaroControl(int);
 void SensingNode(void);
 void printConnectionStatus(void);
+int CheckWiFiNetWork(void);
+
+// Eeprom control function
+/**
+int CheckIoTMSRegistrationStatus(void);
+String GetIoTMSIpAddressFromEeprom(void);
+int GetIoTMSPortNumberFromEeprom(void);
+void SaverIoTMSInformationToEeprom(String, int);
+void ResetEeprom(int);
+void InitilaizeEeprom(void);
+**/
 
 // Jason message send function
 void SendJSONobject(WiFiClient, char *, char *, bool);
@@ -134,6 +158,8 @@ void setup() {
 	Serial.begin(115200);		// Set up a debug window
 	HomeNode.DoorServoAttach();	
 	SensingTimer.SetBaseTimer();
+	EEpCtl.InitilaizeEeprom();
+	//EEpCtl.ResetEeprom(1023);
 	MainLoopState = MLS_WIFI_CONNECTTION;
 	//MainLoopState = MLS_NORMAL_CONTROL;
       //TestTimer.SetBaseTimer();
@@ -191,10 +217,13 @@ void WiFiConnectionState(void)
 	{	
 		MainLoopState = MLS_CHECK_REGISTED_SERVER;
 		printConnectionStatus();
-		Serial.print("Connection success ot : ");
+		//Serial.print("Connection to : ");
 		Serial.print(SSID);
-		Serial.println(" WiFi network");
-		Serial.println("For demo input connection type Server or Client");
+		Serial.println();
+
+#ifdef	CHECK_REGISTER_IOTMS
+		Serial.println("For demo input connection type Server or Client :");
+#endif
 	}
 }
 
@@ -206,10 +235,21 @@ void WiFiConnectionState(void)
 */
 void CheckRegisterServer(void)
 {    
+	if(CheckWiFiNetWork() == -1)
+	{	return;
+	}
+	
 	#ifndef CHECK_REGISTER_IOTMS
 	MainLoopState = MLS_STANDBY_DISCOVERY;
 	server.begin();
 	Serial.println("======= Stand by IoTMS Discovery connection");
+
+	if(EEpCtl.CheckIoTMSRegistrationStatus())
+	{	MainLoopState = MLS_CONNECTING_SERVER;
+	}
+	else
+	{	MainLoopState = MLS_STANDBY_DISCOVERY;
+	}
 	#else
 	CheckRegisterServerForTest();
 	#endif
@@ -267,6 +307,10 @@ void CheckRegisterServerForTest(void)
 */
 void StandbyIoTMSConnection(void)
 {
+	if(CheckWiFiNetWork() == -1)
+	{	return;
+	}
+	
 	//delay(1000);
 	//Serial.println("=== StandbyToTMSConnection function ===");
 	//server.begin();
@@ -294,7 +338,11 @@ void StandbyIoTMSConnection(void)
 */
 void RegisterNodeToIoTMS(void)
 {
-	if(ServerClient)
+	if(CheckWiFiNetWork() == -1)
+	{	return;
+	}
+	
+	if(ServerClient.connected())
 	{
 		IoTMSMagReadComplete = false;            
 		IoTMSCommand = "";
@@ -329,11 +377,15 @@ void RegisterNodeToIoTMS(void)
 			}
 		}
 	}
+	else
+	{	MainLoopState = MLS_STANDBY_DISCOVERY;
+		ServerClient.stop();
+	}
 }
 
 int RegisterNodeCommandCtl(void)
 {
-	StaticJsonBuffer<128> jsonBuffer;  
+	StaticJsonBuffer<160> jsonBuffer;  
 	
 	Serial.print("IoTMS Message : ");
 	Serial.println(IoTMSCommand);		// for debugging
@@ -369,10 +421,15 @@ int RegisterNodeCommandCtl(void)
 		}
 
 		PasingMsg = iotmsMsg["URL"];
-		// IoTMS IP Address 저장 처리한다. - 이부분은 나중에 구현하고 현재는 코드상에서 입력하여 진행 한다.  
+		// Save IoTMS IP Address to Eeprom. 
+		EEpCtl.SaverIoTMSInformationToEeprom(PasingMsg, EEP_IOTMS_IP_START_ADDR, EEP_IP_END_ADDR);
 		
 		PasingMsg = iotmsMsg["Port"];
-		// IoTMS와 연결할 Port number 저장 처리한다. - 이부분은 나중에 구현하고 현재는 코드상에서 입력하여 진행 한다.  
+		// Save IoTMS Port number to Eeprom.
+		EEpCtl.SaverIoTMSInformationToEeprom(PasingMsg, EEP_IOTMS_PORT_START_ADDR, EEP_PORTNUM_END_ADDR);
+
+		char ch = '1';
+		EEpCtl.SaveIoTMSRegistrationStatus(ch);
 		
 		PasingMsg = iotmsMsg["SerialNumber"];
 		if(!PasingMsg.equals("12345678"))
@@ -386,9 +443,25 @@ int RegisterNodeCommandCtl(void)
 	}
 }
 
+/*
+* MLS_CONNECTING_SERVER
+*
+*/ 
 void ConnectToIoTMS(void)
 {
-	if(Client.connect(IoTMSIp, CLIENT_PORT))
+	int portnumber;
+	String IpAddr;
+
+	portnumber = EEpCtl.GetIoTMSPortNumberFromEeprom();
+	IpAddr = EEpCtl.GetIoTMSIpAddressFromEeprom();
+
+	Serial.println("Try Connect to IoTMS");
+	Serial.print("IoTMS Ip addr and port : ");
+	Serial.print(IpAddr);
+	Serial.print(" and ");
+	Serial.println(portnumber);
+	
+	if(Client.connect((char *)IpAddr.c_str(), portnumber))
 	{
 		Serial.println();
 		Serial.println("Connect success with IoTMS");
@@ -396,9 +469,15 @@ void ConnectToIoTMS(void)
 		MainLoopState = MLS_NORMAL_CONTROL;
 		SendStateTimer.SetBaseTimer();
 	}
+	else
+	{
+		delay(1000);
+	}
 }
 
 /*
+* MLS_NORMAL_CONTROL
+*
 * 1. Sense / Actuator control
 * 2. IoTMS Communication control (Send / Recieve)
 */
@@ -427,6 +506,10 @@ void SendSAnodeStateCtl(void)
 		else
 		{
 			Serial.println("=== Soket disconnected");
+
+			// For retry connecting to IoTMS, set MLS_CONNECTING_SERVER step
+			Client.stop();		// Stop current connection before retry connection 
+			MainLoopState = MLS_CONNECTING_SERVER;
 		}
 	}
 }
@@ -477,7 +560,7 @@ int IoTMSCommandCtl(void)
 */
 int IoTMSCommandParsing(void)
 {
-	StaticJsonBuffer<128> jsonBuffer;  
+	StaticJsonBuffer<160> jsonBuffer;  
 	
 	Serial.print("IoTMS Command : ");
 	Serial.println(IoTMSCommand);		// for debugging
@@ -499,6 +582,8 @@ int IoTMSCommandParsing(void)
 		if(!PasingMsg.equals("ActionCtrl"))
 		{
 			// invalid Jop
+			Serial.print("Invalid jop : ");
+			Serial.println(PasingMsg);
 			return 0;
 		}
 
@@ -506,6 +591,10 @@ int IoTMSCommandParsing(void)
 		if(!PasingMsg.equals(MacAddressString))
 		{
 			// invalid Node ID
+			Serial.print("Invalid Mac address (System and Recieve mac): ");
+			Serial.println(MacAddressString);
+			Serial.print(" and ");
+			Serial.println(PasingMsg);
 			return 0;
 		}
 
@@ -522,7 +611,10 @@ int IoTMSCommandParsing(void)
 				return COMMAND_DOOR_CLOSE;
 			}
 			else
-			{	return 0;
+			{	
+				Serial.print("Door command error : ");
+				Serial.println(PasingMsg);
+				return 0;
 			}
 		}
 		else if(PasingMsg.equals("Light"))
@@ -537,26 +629,35 @@ int IoTMSCommandParsing(void)
 				return COMMAND_LIGHT_OFF;
 			}
 			else
-			{	return 0;
+			{	
+				Serial.print("Light command error : ");
+				Serial.println(PasingMsg);
+				return 0;
 			}
 		}
-		else if(PasingMsg.equals("Alarm"))
+		else if(PasingMsg.equals("AlarmLamp"))
 		{
 			PasingMsg = iotmsCommand["Value"];
-			if(PasingMsg.equals("Set"))
+			if(PasingMsg.equals("On"))
 			{	
 				return COMMAND_ALARM_SET;
 			}
-			else if(PasingMsg.equals("Unset"))
+			else if(PasingMsg.equals("Off"))
 			{
 				return COMMAND_ALARM_UNSET;
 			}
 			else
-			{	return 0;
+			{	
+				Serial.print("Alarm command error : ");
+				Serial.println(PasingMsg);
+				return 0;
 			}
 		}
 		else
-		{	return 0;
+		{	
+			Serial.print("No thing : ");
+			Serial.println(PasingMsg);
+			return 0;
 		}
 	}
 }
@@ -628,6 +729,136 @@ void SensingNode(void)
 	
 }
 
+
+/*
+* After connected to WiFi network and SA node working
+* check wifi network, if disconnected, set  
+*/
+int CheckWiFiNetWork(void)
+{
+	int status = WiFi.status();
+
+	if(status == WL_CONNECTION_LOST || status == WL_DISCONNECTED)
+	{
+		Serial.println("WiFi connection lost or disconnected. Retry wifi connection");
+		MainLoopState = MLS_WIFI_CONNECTTION;
+		ServerClient.stop();
+		Client.stop();
+		return -1;
+	}
+
+	return 1;
+}
+
+/*
+// Get IoTMS registraton status from eeprom
+int CheckIoTMSRegistrationStatus(void)
+{
+	unsigned char ch;
+
+	ch  = EEPROM[0];
+
+	if(ch == 1)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+String GetIoTMSIpAddressFromEeprom(void)
+{
+	String Ipaddress;
+	char ch;
+	int i;
+
+	for(i = EEP_IOTMS_IP_START_ADDR ; i < (EEP_IOTMS_IP_START_ADDR + EEP_IPADDR_SIZE) ; i++)
+	{
+		ch  = EEPROM[i];
+		if(ch == '\0')
+		{
+			break;
+		}
+		else
+		{
+			Ipaddress += ch;
+		}
+	}
+
+	return Ipaddress;
+}
+
+int GetIoTMSPortNumberFromEeprom(void)
+{
+	String portnumber;
+	char ch;
+	int i;
+
+	for(i = EEP_IOTMS_PORT_START_ADDR ; i < (EEP_IOTMS_PORT_START_ADDR + EEP_PORTNUM_SIZE) ; i++)
+	{
+		ch = EEPROM[i];
+		if(ch == '\0')
+		{
+			break;
+		}
+		else
+		{
+			portnumber += ch;
+		}
+
+		Serial.println(portnumber);
+	}
+	
+	Serial.println(portnumber);
+	return (int)(portnumber.toInt());
+}
+
+void SaverIoTMSInformationToEeprom(String str, int startaddr)
+{
+	char *temp;
+	int i, j;
+	
+	temp = (char *)str.c_str();
+
+	for(i = 0, j = startaddr ; temp[i] != '\0' ; i++, j++)
+	{
+		EEPROM[j] = temp[i];
+	}
+}
+
+void ResetEeprom(int endaddr)
+{
+	int i;
+	for(i = 0 ; i <= endaddr ; i++)
+	{
+		EEPROM[i] = '\0';
+	}
+}
+
+void InitilaizeEeprom(void)
+{
+	unsigned char ch1, ch2;
+
+	ch1 = EEPROM[1022];
+	ch2 = EEPROM[1023];
+
+	if(ch1 == 'A' & ch2 == 'A')
+	{
+		// Already Eeprom initilaizeed
+	}
+	else
+	{
+		ResetEeprom(1021);
+		EEPROM[1022] = 'A';
+		EEPROM[1023] = 'A';
+	}
+}
+*/
+
+
 void printConnectionStatus() 
 {
 	// Print the basic connection and network information: Network, IP, and Subnet mask
@@ -658,6 +889,7 @@ void printConnectionStatus()
 	//Serial.print(rssi);
 	//Serial.println(" dBm");
 } 
+
  // printConnectionStatus
  
 /*****************************************************************
@@ -675,7 +907,7 @@ const char gJSONthings4[] PROGMEM ="{\"Id\":\"0004\",\"Type\":\"Temperature\",\"
 const char gJSONthings5[] PROGMEM ="{\"Id\":\"0005\",\"Type\":\"Humidity\"   ,\"SType\":\"Sensor\"  ,\"VType\": \"Number\",\"VMin\" : \"0\"	 ,\"VMax\" : \"100\"\ },";
 const char gJSONthings6[] PROGMEM ="{\"Id\":\"0006\",\"Type\":\"DoorSensor\" ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Open\"  ,\"VMax\" : \"Close\"},";
 const char gJSONthings7[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"	  ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Empty\" ,\"VMax\" : \"Mail\" },";
-const char gJSONthings8[] PROGMEM ="{\"Id\":\"0008\",\"Type\":\"Alarm\"	  ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"Set\"	 ,\"VMax\" : \"Unset\"}";
+const char gJSONthings8[] PROGMEM ="{\"Id\":\"0008\",\"Type\":\"AlarmLamp\"	  ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"On\"	 ,\"VMax\" : \"Off\"}";
 
 const char JSONstatus1[] PROGMEM ="{\"Id\":\"0003\",\"Type\":\"Presence\"	 ,\"Value\":\"";
 const char JSONstatus2[] PROGMEM ="{\"Id\":\"0004\",\"Type\":\"Temperature\",\"Value\":\"";
