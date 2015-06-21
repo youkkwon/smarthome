@@ -19,7 +19,8 @@
 #include "WProgram.h"
 #endif
 
-#include "../Servo/src/Servo.h"
+//#include "../Servo/src/Servo.h"
+#include <Servo.h>
 
 #define HomeNodeDDI_LIB_VERSION "0.1.00"
 
