@@ -42,7 +42,7 @@
 #include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
 #include <MyTimer.h>
 #include <MyEeprom.h>
-
+#include "EncodeNSendMessage.h"
 
 
 //#define	CHECK_REGISTER_IOTMS
@@ -116,6 +116,7 @@ String IoTMSCommand;
 String MacAddressString;
 
 MyEeprom EEpCtl;
+EncodeNSendMessage SendToIoTMS;
 
 int SendDiscoveredMessage(void);
 
@@ -134,7 +135,7 @@ void NormalControlState(void);
 void SendSAnodeStateCtl(void);
 int IoTMSCommandCtl(void);
 int IoTMSCommandParsing(void);
-void ActuaroControl(int);
+void ActuatorControl(int);
 void SensingNode(void);
 void SetWiFiConnectionStatus(void);
 void printWiFiConnectionStatus(void);
@@ -151,10 +152,12 @@ void InitilaizeEeprom(void);
 **/
 
 // Jason message send function
+/*
 void SendJSONobject(WiFiClient, char *, char *, bool);
 void SendJSONdiscoverRegister(WiFiClient, bool);
 void SendJSONstatusEvent(WiFiClient);
 void SendJSONnotAuthorizedEvent(WiFiClient);
+*/
 
 void setup() {
 	Serial.begin(115200);		// Set up a debug window
@@ -337,7 +340,7 @@ void StandbyIoTMSConnection(void)
 			Serial.println("Connected to client");
 			// Send message to IoTMS
 			// message : SA Node information
-			SendJSONdiscoverRegister(ServerClient, true);    // Send Discovery message 
+			SendToIoTMS.SendJSONdiscoverRegister(ServerClient, true, MacAddressString);    // Send Discovery message 
 			MainLoopState = MLS_REGISTER_NODE_TO_IOTMS;
 			//Serial.println("Wait IoTMS Register msg");
 		}
@@ -380,12 +383,13 @@ void RegisterNodeToIoTMS(void)
 		{
 			if(RegisterNodeCommandCtl() == -1)
 			{
-				SendJSONnotAuthorizedEvent(ServerClient);		// send Not Authorized message
+				SendToIoTMS.SendJSONnotAuthorizedEvent(ServerClient, MacAddressString);		// send Not Authorized message
 			}
 			else
 			{	
 				Serial.println("Receive & Send msg");
-				SendJSONdiscoverRegister(ServerClient, false);	// Send Discovery message 
+				//SendJSONdiscoverRegister(ServerClient, false);	// Send Discovery message 
+				SendToIoTMS.SendJSONdiscoverRegister(ServerClient, false, MacAddressString);
 				//ServerClient.stop();
 				MainLoopState = MLS_CONNECTING_SERVER;
 				Serial.println("Connect To IoTMS function");
@@ -510,7 +514,7 @@ void NormalControlState(void)
 
 	SendSAnodeStateCtl();
 	ActuatorCommand = IoTMSCommandCtl();
-	ActuaroControl(ActuatorCommand);
+	ActuatorControl(ActuatorCommand);
 }
 
 /*
@@ -524,7 +528,7 @@ void SendSAnodeStateCtl(void)
 		if(Client.connected())
 		{
 			Serial.println("=== Send sensing data to IoTMS");
-			SendJSONstatusEvent(Client);
+			SendToIoTMS.SendJSONstatusEvent(Client, MacAddressString, HomeNode);
 		}
 		else
 		{
@@ -688,7 +692,7 @@ int IoTMSCommandParsing(void)
 /*
 * Acturator control functio According to Command
 */
-void ActuaroControl(int Command)
+void ActuatorControl(int Command)
 {
 	switch(Command)
 	{
@@ -763,7 +767,7 @@ int CheckWiFiNetWork(void)
 
 	if(status == WL_CONNECT_FAILED ||  status == WL_CONNECTION_LOST || status == WL_DISCONNECTED)
 	{
-		Serial.println("WiFi connection lost or disconnected. Retry wifi connection");
+		Serial.println("WiFi connection error");
 		MainLoopState = MLS_WIFI_CONNECTTION;
 		ServerClient.stop();
 		Client.stop();
@@ -799,7 +803,7 @@ void printWiFiConnectionStatus(void)
 	//Serial.println(subnet);
 
 	// Print our MAC address.
-	Serial.print("WiFi Shield MAC address : ");                    
+	Serial.print("WiFi Shield MAC : ");                    
 	Serial.println(MacAddressString);
 
 	// Print the wireless signal strength:
@@ -816,7 +820,9 @@ void printWiFiConnectionStatus(void)
 *
 ******************************************************************/
 
+/*
 #include <avr/pgmspace.h>
+
 //JSON thing list
 const char gJSONthings1[] PROGMEM ="{\"Id\":\"0001\",\"Type\":\"Door\" 	  ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"Open\"  ,\"VMax\" : \"Close\"},";
 const char gJSONthings2[] PROGMEM ="{\"Id\":\"0002\",\"Type\":\"Light\"	  ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"On\"	 ,\"VMax\" : \"Off\"  },";
@@ -1063,7 +1069,7 @@ void SendJSONnotAuthorizedEvent(WiFiClient localclient)
 	gsBufferWiFi+="}\n";
 	localclient.print(gsBufferWiFi.c_str());
 }
-
+*/
 
 
 
