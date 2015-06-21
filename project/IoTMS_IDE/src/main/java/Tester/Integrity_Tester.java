@@ -126,7 +126,6 @@ public class Integrity_Tester {
 	public void test() throws InterruptedException 
 	{
 		String input = null;
-		String nodeID = new String();
 
 	    // Defines the standard input stream
 	    BufferedReader stdin = new BufferedReader (new InputStreamReader(System.in));
@@ -150,7 +149,7 @@ public class Integrity_Tester {
 					testRegistNode("78:c4:e:1:7f:f9");
 					break;
 				case "Register Second" :
-					testRegistNode("78:c4:e:1:7f:f9");
+					testRegistNode("78:c4:e:2:5c:a3");
 					break;
 				case "Open Door" :
 					testActionEvent (nodeID, "0001", "Door", "Open");		
@@ -159,10 +158,10 @@ public class Integrity_Tester {
 					testActionEvent (nodeID, "0001", "Door", "Close");		
 					break;
 				case "Turn on Lamp" :
-					testActionEvent (nodeID, "0002", "Light", "on");		
+					testActionEvent (nodeID, "0002", "Light", "On");		
 					break;
 				case "Turn off Lamp" :
-					testActionEvent (nodeID, "0002", "Light", "off");		
+					testActionEvent (nodeID, "0002", "Light", "Off");		
 					break;
 				case "Set Alarm" : 		// Set Alarm Mode
 					testStateEvent ("Setting");	

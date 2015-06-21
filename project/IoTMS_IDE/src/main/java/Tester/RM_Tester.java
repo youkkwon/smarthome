@@ -25,8 +25,9 @@ public class RM_Tester {
 	 * Temperature	4		number
 	 * Humidity		5		number
 	 * DoorSensor	6		Open/Close
-	 * AlarmLamp	7		On/Off
-	 * MailBox		8		Empty/Mail
+	 * AlarmLamp	8		On/Off
+	 * 
+	 * MailBox		7		Empty/Mail	(Second Node)
 	 * 
 	 * Alarm		10		Set/UnSet
 	 * Message		11 		Confirm/Emergency/MalFunction/Post
@@ -191,18 +192,19 @@ public class RM_Tester {
 		//testNodeEvent("1", "Conn");
 		testRuleEvent("Search", null, null);
 		testRuleEvent("Delete", null, input);
-		*/
-		
+				
 	    testConfigEvent("Alarm", "0300");							// Test config 
 		testConfigEvent("Light", "0600");
-	
+	*/
+		
 		// State Test (Alarm mode)
 		testStateEvent ("Setting");		
 
 		Thread.sleep(3000);
 		// Thing Test (Node ID + Thing ID)
 		testThingEvent (nodeID, "0006", "DoorSensor", "Close");	    // Test no rule event
-			
+	
+		/*
 		Thread.sleep(3000);
 		// Thing Test (Node ID : + Thing ID)
 		testActionEvent (nodeID, "0001", "Door", "Open");			// Door open on Alarm mode
@@ -230,22 +232,25 @@ public class RM_Tester {
 		testThingEvent (nodeID, "0006", "DoorSensor", "Close");	    // Test no rule event
 
       	Thread.sleep(10000);   
-
+*/
+		
         String[] IDs = new String[4];
 		String[] types = new String[4];
 		String[] values = new String[4];
-		IDs[0] = "0006";	types[0] = "DoorSensor";		values[0] = "Open";
-		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "Alway";
-		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32.00";		
-		IDs[3] = "0007";	types[3] = "AlarmLamp";		    values[3] = "On";		
-		testThingBulkEvent(nodeID, IDs, types, values);
 		
 		Thread.sleep(3000);
 		IDs[0] = "0006";	types[0] = "DoorSensor";		values[0] = "Close";
 		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "AtHome";
 		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "42";		
+		IDs[3] = "0005";	types[3] = "Humidity";		    values[3] = "30";	
+		
 		testThingBulkEvent(nodeID, IDs, types, values);
 			
+		/*IDs[0] = "0006";	types[0] = "DoorSensor";		values[0] = "Close";
+		IDs[1] = "0003";	types[1] = "Presence";			values[1] = "Alway";
+		IDs[2] = "0004";	types[2] = "Temperature";		values[2] = "32.00";		
+		IDs[3] = "0005";	types[3] = "Humidity";		    values[3] = "30";		
+		testThingBulkEvent(nodeID, IDs, types, values);*/
 		//*/
 		
 		/*while (true)
@@ -267,11 +272,11 @@ public class RM_Tester {
 			Thread.sleep(3000);
 						
 			// Thing Test (Node ID + Thing ID)
-			testActionEvent (nodeID, "0007", "AlarmLamp", "On");			// Test no rule event
+			testActionEvent (nodeID, "0008", "AlarmLamp", "On");			// Test no rule event
 			Thread.sleep(3000);
 			
 			// Thing Test (Node ID + Thing ID)
-			testActionEvent (nodeID, "0007", "AlarmLamp", "Off");			// Test no rule event
+			testActionEvent (nodeID, "0008", "AlarmLamp", "Off");			// Test no rule event
 			Thread.sleep(3000);
 			
 			// State Test (Alarm mode)

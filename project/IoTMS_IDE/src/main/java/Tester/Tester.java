@@ -11,23 +11,23 @@ public class Tester {
 		nm_tester.test();	
 		*/
 				
-		///*
+		/*
 	 	RM_Tester rm_tester = new RM_Tester(nodeID);
 		try {
 			rm_tester.test();				
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}	
-		//*/
+		*/
 		
-		/*
+		///*
 		Integrity_Tester it_tester = new Integrity_Tester(nodeID);
 		try {
 			it_tester.test();				
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}	
-		*/
+		//*/
 		
 		/*
 		TestDevice 	device_tester 	= new TestDevice(nodeID);
