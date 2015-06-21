@@ -39,7 +39,7 @@
 #include <Servo.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
-#include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
+#include "HomeNodeDDI.h"           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
 #include "MyTimer.h"
 #include "MyEeprom.h"
 #include "EncodeNSendMessage.h"
@@ -72,16 +72,12 @@ enum {
 #define SERVER_PORT			550
 #define CLIENT_PORT			3250
 #define SCOMMAND_SIZE		64
-#define SSID		"LGTeam2"	
+#define SSID					"LGTeam2"	
+
 
 /*
-#define EEP_IOTMS_IP_START_ADDR			1
-#define EEP_IPADDR_SIZE						15
-#define EEP_IOTMS_PORT_START_ADDR		16
-#define EEP_PORTNUM_SIZE					5
+* Node sensor/actuator control variable
 */
-
-// Node sensor/actuator control variable
 HomeNodeDDI HomeNode;
 int MainLoopState = 0;
 MyTimer SensingTimer;
@@ -94,26 +90,23 @@ char Scommand[SCOMMAND_SIZE];
 
 
 
-// Server connection variable
+/*
+* Server connection variable
+*/
 //char ssid[] = "LGTeam2";	  // The network SSID (name) 
 int WiFistatus = WL_IDLE_STATUS;		// The status of the network connections
 WiFiServer server(SERVER_PORT);	// The WIFI status,.. we are using port 500
 WiFiClient ServerClient;
 WiFiClient Client;
-IPAddress IoTMSIp(192, 168, 1, 143);           // 
-//String IoTmsIp;		// Ip address from Registered message 
-//int IoTmsPort;		// Port numbr from Registered message
 IPAddress ip;                 // The IP address of the shield
 //IPAddress subnet;            // The subnet we are connected to
 //long rssi;                   // The WIFI shield signal strength
 byte mac[6];                   // MAC address of the WIFI shield
+String MacAddressString;
+
 char inChar;                   // This is a character from the client
 boolean IoTMSMagReadComplete;                  // Loop flag
 String IoTMSCommand;
-
-// Jason message variable
-//StaticJsonBuffer<128> jsonBuffer;  
-String MacAddressString;
 
 MyEeprom EEpCtl;
 EncodeNSendMessage SendToIoTMS;
@@ -214,7 +207,7 @@ void WiFiConnectionState(void)
 {
 	// Attempt to connect to WIfI network indicated by SSID.
 
-	if (WiFi.status() == WL_NO_SHIELD) 
+	if(WiFi.status() == WL_NO_SHIELD) 
 	{
 		Serial.println("WiFi shield not present");
 		delay(1000);
@@ -778,6 +771,9 @@ int CheckWiFiNetWork(void)
 	return 1;
 }
 
+/*
+* Set WliFi Connection information
+*/
 void SetWiFiConnectionStatus(void)
 {
 	ip = WiFi.localIP();
@@ -792,6 +788,9 @@ void SetWiFiConnectionStatus(void)
 	//rssi = WiFi.RSSI();
 }
 
+/*
+* Print to Serial monitor about WiFi connection information
+*/
 void printWiFiConnectionStatus(void) 
 {
 	// Print the basic connection and network information: Network, IP, and Subnet mask

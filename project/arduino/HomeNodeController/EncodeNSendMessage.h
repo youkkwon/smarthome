@@ -10,7 +10,7 @@
 
 #include <SPI.h>
 #include <WiFi.h>
-#include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
+#include "HomeNodeDDI.h"           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
 
 class EncodeNSendMessage
 {
