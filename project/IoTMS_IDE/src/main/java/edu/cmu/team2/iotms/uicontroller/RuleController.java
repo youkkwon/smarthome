@@ -20,14 +20,20 @@ public class RuleController {
 	private RuleServiceImpl ruleService;
 
 	@RequestMapping("/rulelist")
-	public ModelAndView getUserList(ModelAndView model) throws IOException{
+	public ModelAndView getRulesetList(ModelAndView model) throws IOException{
 		List<RuleInfo> rulelist = ruleService.getRuleset();
 		model.addObject("rulelist", rulelist);
 		model.setViewName("rulelist");
 		return model;
 	}
+//	@RequestMapping("/rulesearch")
+//	public String getRulesetsearch() {
+//		ruleService.searchRuleset();
+//
+//		return "rulelist";
+//	}
 	@RequestMapping(value = "/rule/create", method = RequestMethod.POST)
-	public String createUser(
+	public String createRuleset(
 			@RequestParam(value="ruleSet", required=false) String ruleSet) {
 		RuleInfo ruleInfo = new RuleInfo();
 		ruleInfo.setRuleSet(ruleSet);
@@ -37,7 +43,7 @@ public class RuleController {
 		return "redirect:/rulelist";
 	}
 	@RequestMapping(value = "/rule/remove", method = RequestMethod.POST)
-	public String removeUser(
+	public String removeRuleset(
 			@RequestParam(value="ruleSet_ID", required=false) String ruleId,
 			@RequestParam(value="ruleSet", required=false) String ruleset) {
 		RuleInfo ruleInfo = new RuleInfo();
@@ -49,7 +55,7 @@ public class RuleController {
 		return "redirect:/rulelist";
 	}
 	@RequestMapping(value = "/rule/update", method = RequestMethod.POST)
-	public String updateUser(
+	public String updateRuleset(
 			@RequestParam(value="ruleSet", required=false) String ruleSet) {
 		RuleInfo ruleInfo = new RuleInfo();
 		ruleInfo.setRuleSet(ruleSet);

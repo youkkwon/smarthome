@@ -14,7 +14,9 @@
 	<script src="/iotms/jquery-ui/jquery-ui.js"></script>
 	<script  type="text/javascript">
 		function discoverNodes() {
-			var loc = "/iotms/node/testdiscover";
+			var nodeid = document.getElementById ("nodeid").value;
+			var loc = "/iotms/node/testdiscover?nodeid="+nodeid;
+			
 			$( "#dialog-confirm" ).dialog({
 				resizable: false,
 				height:230,

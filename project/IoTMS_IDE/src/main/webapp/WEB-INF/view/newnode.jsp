@@ -32,9 +32,8 @@
 				}
 			});
 		}
-		function registerNode() {
-			var nodeid = document.getElementById ("nodeid").value;
-			var serial = document.getElementById ("serial").value;
+		function registerNode(nodeid) {
+			var serial = document.getElementById (nodeid+"_sn").value;
 			var loc = "/iotms/node/register?nodeid="+nodeid+"&serial="+serial;
 			
 			$( "#dialog-confirm" ).dialog({
@@ -76,10 +75,74 @@
 			appendMessage("연결되었습니다.");
 		}
 		function onMessage(evt) {
-			var data = evt.data;
-			//if (data.substring(0, 4) == "msg:") {
-				appendMessage(data.substring(4));
-			//}
+			var json = evt.data;
+//			appendMessage(json);
+			
+			var data = $.parseJSON(json);
+			var node_id = data.NodeID;
+			var thinglist = data.ThingList;
+			var length = thinglist.length;
+			
+			var pannel = document.getElementById ("newnodepannel");
+			var nodediv = document.getElementById (node_id);
+			if(nodediv!=null) {
+				pannel.removeChild(nodediv);
+			}
+			
+			var innerNodeHTML = "<div id='"+node_id+"'><table border='1'>"
+				+"<tr>"
+		      	+"<th>Node ID</th>"
+		      	+"<th>Serial Number</th>"
+				+"</tr>"
+		      	+"<tr>"
+		      	+"<th><input id='"+node_id+"_id' type='text' value='"+node_id+"' readonly></th>"
+		      	+"<th><input id='"+node_id+"_sn' type='text' value='' ></th>"
+		      	+"<th><button onClick='registerNode('"+node_id+"')'>Register Node</button></th>"
+				+"</tr>"
+				+"</table>";
+				
+			innerNodeHTML += "<table border='1'>"
+				+"<tr>"
+				+"<th>Thing ID</th>"
+				+"<th>Thing Type</th>"
+				+"<th>Thing SType</th>"
+				+"<th>Thing VType</th>"
+				+"<th>Thing VMin</th>"
+				+"<th>Thing VMax</th>"
+				+"</tr>";
+			
+			var thing_id, thing_type, thing_vtype, thing_stype, thing_vmin, thing_vmax;
+			var i;
+			var out;
+			for(var i=0; i<length; ++i) {
+				thing_id = thinglist[i].Id;
+				thing_type = thinglist[i].Type;
+				thing_vtype = thinglist[i].VType;
+				thing_stype = thinglist[i].SType;
+				thing_vmin = thinglist[i].VMin;
+				thing_vmax = thinglist[i].VMax;
+				
+				innerNodeHTML += "<tr>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_nodeid' type='hidden' value='"+node_id+"' readonly>"
+					+"<input id='"+node_id+"_"+thing_id+"_id' type='text' value='"+thing_id+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_type' type='text' value='"+thing_type+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_stype' type='text' value='"+thing_vtype+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_vtype' type='text' value='"+thing_stype+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_vmin' type='text' value='"+thing_vmin+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_vmax' type='text' value='"+thing_vmax+"' readonly></th>"
+					+"</tr>"
+					+"</table>";
+				
+				out = "[NodeID:"+ node_id+"] [ThingID:"+ thing_id
+					+"] [Type:"+ thing_type+"] [VType:"+ thing_vtype
+					+"] [SType:"+ thing_stype+"] [VMin:"+ thing_vmin
+					+"] [VMax:"+ thing_vmax+"] ";
+				appendMessage(out);
+			}
+			innerNodeHTML += "</div>"
+			
+			pannel.innerHTML += innerNodeHTML;
+			
 		}
 		function onClose(evt) {
 			appendMessage("연결을 끊었습니다.");
@@ -113,59 +176,50 @@
 <div id="dialog-confirm" title="IoTMS" style="display:none;">
   <p>Are you sure?</p>
 </div>
-    <p>Node List</p>
-	<p><button onClick="discoverNodes()" >DiscoverNodes</button>
-	<button onClick="registerNode()" >Register Node</button></p>
-
-	<table border="1">
-		<tr>
-      		<th>Node ID</th>
-      		<th>Serial Number</th>
-		</tr>
-      	<tr>
-			<th><input id="nodeid" type="text" value="" ></th>
-			<th><input id="serial" type="text" value="" ></th>
-		</tr>
-	</table>
+    <p>New Node List</p>
+	<p><button onClick="discoverNodes()" >Discover Nodes</button></p>
 	
-	<c:forEach var="node" items="${newnode}">
-	<table border="1">
-		<tr>
-      		<th>Node ID</th>
-      		<th>Node Name</th>
-      		<th>Serial Number</th>
-		</tr>
-      	<tr>
-      		<th><input id="${node.node_id}_id" type="text" value="${node.node_id}" readonly></th>
-      		<th><input id="${node.node_id}_name" type="text" value="${node.node_name}" readonly></th>
-      		<th><input id="${node.node_id}_sn" type="text" value="${node.serialnumber}" readonly></th>
-		</tr>
-	</table>
-	<table border="1">
-		<tr>
-			<th>Thing ID</th>
-			<th>Thing Name</th>
-			<th>Thing Type</th>
-			<th>Thing Value</th>
-			<th>Thing Control</th>
-		</tr>
-		<c:forEach var="thing" items="${node.things}">
-		<tr>
-			<th><input id="${node.node_id}_${thing.thing_id}_nodeid" type="hidden" value="${node.node_id}" readonly>
-				<input id="${node.node_id}_${thing.thing_id}_id" type="text" value="${thing.thing_id}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_name" type="text" value="${thing.thing_name}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_type" type="text" value="${thing.type}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_value" type="text" value="${thing.value}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_stype" type="text" value="${thing.stype}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_vtype" type="text" value="${thing.vtype}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_vmin" type="text" value="${thing.vmin}" readonly></th>
-			<th><input id="${node.node_id}_${thing.thing_id}_vmax" type="text" value="${thing.vmax}" readonly></th>
-		</tr>
+	<div id="newnodepannel">
+		<c:forEach var="node" items="${newnode}">
+		<div id="${node.node_id}">
+		<table border="1">
+			<tr>
+	      		<th>Node ID</th>
+	      		<th>Serial Number</th>
+			</tr>
+	      	<tr>
+	      		<th><input id="${node.node_id}_id" type="text" value="${node.node_id}" readonly></th>
+	      		<th><input id="${node.node_id}_sn" type="text" value="${node.serialnumber}" ></th>
+	      		<th><button onClick="registerNode('${node.node_id}')">Register Node</button></th>
+			</tr>
+		</table>
+		<table border="1">
+			<tr>
+				<th>Thing ID</th>
+				<th>Thing Type</th>
+				<th>Thing SType</th>
+				<th>Thing VType</th>
+				<th>Thing VMin</th>
+				<th>Thing VMax</th>
+			</tr>
+			<c:forEach var="thing" items="${node.things}">
+			<tr>
+				<th><input id="${node.node_id}_${thing.thing_id}_nodeid" type="hidden" value="${node.node_id}" readonly>
+					<input id="${node.node_id}_${thing.thing_id}_id" type="text" value="${thing.thing_id}" readonly></th>
+				<th><input id="${node.node_id}_${thing.thing_id}_type" type="text" value="${thing.type}" readonly></th>
+				<th><input id="${node.node_id}_${thing.thing_id}_stype" type="text" value="${thing.stype}" readonly></th>
+				<th><input id="${node.node_id}_${thing.thing_id}_vtype" type="text" value="${thing.vtype}" readonly></th>
+				<th><input id="${node.node_id}_${thing.thing_id}_vmin" type="text" value="${thing.vmin}" readonly></th>
+				<th><input id="${node.node_id}_${thing.thing_id}_vmax" type="text" value="${thing.vmax}" readonly></th>
+			</tr>
+			</c:forEach>
+		</table>
+		<br>
+		</div>
 		</c:forEach>
-	</table>
-	<br>
-	</c:forEach>
-	<div id="chatArea"><div id="chatMessageArea"></div></div>
+	</div>
+
+	<div id="chatArea" style="display:none;"><div id="chatMessageArea"></div></div>
 <div style="display:none;">
 	<iframe id="subnewnode" src=""></iframe>
 </div>

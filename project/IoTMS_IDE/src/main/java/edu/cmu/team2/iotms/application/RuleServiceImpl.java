@@ -24,7 +24,7 @@ import edu.cmu.team2.iotms.model.ruleManager.RM_Event.RuleManager;
 
 public class RuleServiceImpl implements RuleService {
 	private JdbcTemplate jdbcTemplate;
-	private List<RuleInfo> ruleSet = new ArrayList<RuleInfo>();
+	//private List<RuleInfo> ruleSet = new ArrayList<RuleInfo>();
 
 	public RuleServiceImpl(DataSource datasource) {
 		jdbcTemplate = new JdbcTemplate(datasource);
@@ -49,14 +49,14 @@ public class RuleServiceImpl implements RuleService {
 		msgJSON.put("Job", "RuleCtrl");
 		msgJSON.put("Type", "Search");
 		
-		IoTMSEventBus.getInstance().register(this);
+		//IoTMSEventBus.getInstance().register(this);
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 //*/
 	}
 
 	@Override
 	public List<RuleInfo> getRuleset() {
-/*
+//*
 		String sql = "SELECT ruleset_id, ruleset FROM ruleset_info";
 		System.out.println("getRules sql : "+sql);
 		List<RuleInfo> ruleSet = jdbcTemplate.query(sql, new RowMapper<RuleInfo>() {
@@ -73,9 +73,20 @@ public class RuleServiceImpl implements RuleService {
 	 
 	    return ruleSet;
 //*/
-		return ruleSet;
+//		return ruleSet;
 	}
-
+	
+	@Override
+	public void searchRuleset() {
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		target.add("RuleManager");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "RuleCtrl");
+		msgJSON.put("Type", "Search");
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
+	}
+	
 	@Override
 	public void createRuleSet(RuleInfo ruleInfo) {
 //		String sql = "insert user_info(ruleset) values('"+ruleInfo.getRuleSet()+"') ";
@@ -89,7 +100,6 @@ public class RuleServiceImpl implements RuleService {
 		msgJSON.put("Job", "RuleCtrl");
 		msgJSON.put("Type", "Add");
 		msgJSON.put("Rule", ruleInfo.getRuleSet());
-		
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 		
 		msgJSON = new JSONObject();
@@ -130,31 +140,6 @@ public class RuleServiceImpl implements RuleService {
 	public void updateRuleSet(RuleInfo ruleInfo) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	@Subscribe
-	public void SubscribeEvent(JSONObject JSONMsg) {
-		JSONArray targets = (JSONArray) JSONMsg.get("Targets");
-		for (int i=0; i < targets.size(); i++) {
-			if (targets.get(i).equals("UIControler")) {
-				if(JSONMsg.get("Job").toString().compareTo("RuleSearch") == 0)
-					processSearch(JSONMsg);
-			}
-		}
-	}
-
-	private void processSearch(JSONObject JSONMsg) {
-		JSONArray rules = (JSONArray) JSONMsg.get("Rules");
-		
-		ruleSet.clear();
-		for (int i=0; i < rules.size(); i++) {
-			RuleInfo ruleinfo = new RuleInfo();
-			ruleinfo.setRuleId(String.format("%d", i));
-			ruleinfo.setRuleSet(rules.get(i).toString());
-			
-			System.out.println("ruleset : "+ruleinfo.getRuleSet());
-			ruleSet.add(ruleinfo);
-		}
 	}
 
 }

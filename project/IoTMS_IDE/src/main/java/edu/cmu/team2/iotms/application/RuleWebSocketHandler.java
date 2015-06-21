@@ -14,6 +14,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.google.common.eventbus.Subscribe;
 
+import edu.cmu.team2.iotms.domain.RuleInfo;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 
 public class RuleWebSocketHandler extends TextWebSocketHandler {
@@ -72,7 +73,21 @@ public class RuleWebSocketHandler extends TextWebSocketHandler {
 			}
 		}
 	}
-
+	
+//	private void processSearch(JSONObject JSONMsg) {
+//		JSONArray rules = (JSONArray) JSONMsg.get("Rules");
+//		
+//		ruleSet.clear();
+//		for (int i=0; i < rules.size(); i++) {
+//			RuleInfo ruleinfo = new RuleInfo();
+//			ruleinfo.setRuleId(String.format("%d", i));
+//			ruleinfo.setRuleSet(rules.get(i).toString());
+//			
+//			System.out.println("ruleset : "+ruleinfo.getRuleSet());
+//			ruleSet.add(ruleinfo);
+//		}
+//	}
+	
 	private void processSearch(JSONObject JSONMsg) {
 		TextMessage message = new TextMessage(JSONMsg.toJSONString());
 		

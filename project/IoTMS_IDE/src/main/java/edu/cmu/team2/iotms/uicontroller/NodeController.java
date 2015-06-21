@@ -32,15 +32,44 @@ public class NodeController {
 		model.setViewName("nodelist");
 		return model;
 	}
+
+	@RequestMapping("/node/remove")
+	public String removeNode(@RequestParam("nodeid") String nodeid) {
+		nodeService.removeNode(nodeid);
+		
+		return "nodelist";
+	}
+	
+	@RequestMapping("/thing/control")
+	public String controlThing(@RequestParam("nodeid") String nodeid
+			,@RequestParam("thingid") String thingid
+			,@RequestParam("type") String type
+			,@RequestParam("value") String value) {
+		
+		nodeService.controlThing(nodeid, thingid, type, value);
+		
+		return "redirect:/nodelist";
+	}
 	
 	@RequestMapping("/newnode")
 	public ModelAndView newNode(ModelAndView model) throws IOException{
+		List<NodeInfo> nodes = nodeService.getNodeList(UNREGISTERED);
+		
+		for(NodeInfo node:nodes) {
+			node.setThings(nodeService.getThingList(node.getNode_id()));
+		}
+		
+		model.addObject("newnode", nodes);
+		model.setViewName("newnode");
+		return model;
+/*		
 		List<NodeInfo> nodes = nodeService.getNewNodes();
 		
 		model.addObject("newnode", nodes);
 		model.setViewName("newnode");
 		
 		return model;
+//*/		
 	}
 	
 	@RequestMapping("/node/discover")
@@ -66,15 +95,11 @@ public class NodeController {
 		nodeService.testNode(nodeid, thingid, type, value);
 		return "";
 	}
-
-	@RequestMapping("/thing/control")
-	public String controlThing(@RequestParam("nodeid") String nodeid
-			,@RequestParam("thingid") String thingid
-			,@RequestParam("type") String type
-			,@RequestParam("value") String value) {
-		
-		nodeService.controlThing(nodeid, thingid, type, value);
-		
-		return "redirect:/nodelist";
+	
+	@RequestMapping("/node/testdiscover")
+	public String testNodeDiscover(@RequestParam("nodeid") String nodeid
+			,ModelAndView model) throws IOException{
+		nodeService.testNodeDiscover(nodeid);
+		return "";
 	}
 }

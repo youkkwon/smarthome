@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -14,23 +13,16 @@ import org.json.simple.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import Database.NodeDao;
-
-import com.google.common.eventbus.Subscribe;
-
 import edu.cmu.team2.iotms.domain.NodeInfo;
-import edu.cmu.team2.iotms.domain.RuleInfo;
 import edu.cmu.team2.iotms.domain.ThingInfo;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 
 public class NodeServiceImpl implements NodeService {
 	private JdbcTemplate jdbcTemplate;
-	private List<NodeInfo> discoverNodes = new ArrayList<NodeInfo>();
+	//private List<NodeInfo> discoverNodes = new ArrayList<NodeInfo>();
 
 	public NodeServiceImpl(DataSource datasource) {
 		jdbcTemplate = new JdbcTemplate(datasource);
-		
-		IoTMSEventBus.getInstance().register(this);
 	}
 
 	@Override
@@ -79,6 +71,24 @@ public class NodeServiceImpl implements NodeService {
 	    return thinglist;
 	}
 
+	@Override
+	public void removeNode(String nodeid) {
+		String sql = "update node_info set registered=0 where node_id='"+nodeid+"'";
+		//String sql = "delete from node_info where node_id='"+nodeid+"'";
+		System.out.println("removeNode sql : "+sql);
+		jdbcTemplate.update(sql);
+		
+//		JSONObject msgJSON = new JSONObject();
+//		JSONArray target = new JSONArray();
+//		target.add("RuleManager");
+//		target.add("NodeManager");
+//		msgJSON.put("Targets",target);
+//		msgJSON.put("Job", "RemoveNode");
+//		msgJSON.put("NodeID", nodeid);
+//		
+//		IoTMSEventBus.getInstance().postEvent(msgJSON);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void controlThing(String nodeid, String thingid, String type,
@@ -109,14 +119,18 @@ public class NodeServiceImpl implements NodeService {
 		
 	}
 
-	@Override
-	public List<NodeInfo> getNewNodes() {
-		return discoverNodes;
-	}
+	//@Override
+	//public List<NodeInfo> getNewNodes() {
+	//	return discoverNodes;
+	//}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void discoverNodes() {
+		String sql = "delete from node_info where registered=0";
+		System.out.println("before discoverNodes sql : "+sql);
+		jdbcTemplate.update(sql);
+		
 		JSONObject msgJSON = new JSONObject();
 		JSONArray target = new JSONArray();
 		target.add("NodeManager");
@@ -124,7 +138,7 @@ public class NodeServiceImpl implements NodeService {
 		msgJSON.put("Job", "Discover");
 		msgJSON.put("Duration", "30000");
 		
-		discoverNodes.clear();
+		//discoverNodes.clear();
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}
 
@@ -156,48 +170,6 @@ public class NodeServiceImpl implements NodeService {
 		
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}
-	
-	@Subscribe
-	public void SubscribeEvent(JSONObject JSONMsg) {
-		JSONArray targets = (JSONArray) JSONMsg.get("Targets");
-		for (int i=0; i < targets.size(); i++) {
-			if (targets.get(i).equals("UIControler")) {
-				if(JSONMsg.get("Job").toString().compareTo("Discovered") == 0)
-					processSearch(JSONMsg);
-			}
-		}
-	}
-
-	private void processSearch(JSONObject JSONMsg) {
-		JSONObject node = (JSONObject) JSONMsg.get("NodeID");
-		
-		NodeDao.getInstance().setJsonOfNode(node.toString(), JSONMsg.toString());
-		
-		NodeInfo newNode = new NodeInfo();
-		newNode.setNode_id(node.toString());
-		
-		JSONArray thinglist = (JSONArray) JSONMsg.get("ThingList");
-		List<ThingInfo> things = new ArrayList<ThingInfo>();
-		for (int i=0; i < thinglist.size(); i++) {
-			ThingInfo thing = new ThingInfo();
-			JSONObject thingobj = (JSONObject) thinglist.get(i);
-			
-			thing.setNode_id(node.get(i).toString());
-			thing.setThing_id(thingobj.get("Id").toString());
-			thing.setType(thingobj.get("Type").toString());
-			thing.setStype(thingobj.get("SType").toString());
-			thing.setVtype(thingobj.get("VType").toString());
-			thing.setVmin(thingobj.get("VMin").toString());
-			thing.setVmax(thingobj.get("VMax").toString());
-			
-			things.add(thing);
-		}
-		
-		newNode.setThings(things);
-		
-		System.out.println("discoverNodes : "+newNode);
-		discoverNodes.add(newNode);
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -213,6 +185,86 @@ public class NodeServiceImpl implements NodeService {
 		msgJSON.put("ThingID", thingid);
 		msgJSON.put("Type", type);
 		msgJSON.put("Value", value);
+		
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void testNodeDiscover(String nodeid) {
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		
+		JSONArray thinglist = new JSONArray();
+		JSONObject thing = new JSONObject();
+		thing.put("Id", "0001");
+		thing.put("Type", "Door");
+		thing.put("SType", "Actuator");
+		thing.put("VType", "String");
+		thing.put("VMin", "Open");
+		thing.put("VMax", "Close");
+		thinglist.add(thing);
+		
+		thing = new JSONObject();
+		thing.put("Id", "0002");
+		thing.put("Type", "Light");
+		thing.put("SType", "Actuator");
+		thing.put("VType", "String");
+		thing.put("VMin", "On");
+		thing.put("VMax", "Off");
+		thinglist.add(thing);
+		
+		thing = new JSONObject();
+		thing.put("Id", "0003");
+		thing.put("Type", "Presence");
+		thing.put("SType", "Sensor");
+		thing.put("VType", "String");
+		thing.put("VMin", "AtHome");
+		thing.put("VMax", "Away");
+		thinglist.add(thing);
+		
+		thing = new JSONObject();
+		thing.put("Id", "0004");
+		thing.put("Type", "Temperature");
+		thing.put("SType", "Sensor");
+		thing.put("VType", "Number");
+		thing.put("VMin", "-50");
+		thing.put("VMax", "50");
+		thinglist.add(thing);
+		
+		thing = new JSONObject();
+		thing.put("Id", "0005");
+		thing.put("Type", "Humidity");
+		thing.put("SType", "Sensor");
+		thing.put("VType", "Number");
+		thing.put("VMin", "0");
+		thing.put("VMax", "100");
+		thinglist.add(thing);
+		
+		thing = new JSONObject();
+		thing.put("Id", "0006");
+		thing.put("Type", "DoorSensor");
+		thing.put("SType", "Sensor");
+		thing.put("VType", "String");
+		thing.put("VMin", "Open");
+		thing.put("VMax", "Close");
+		thinglist.add(thing);
+		
+		thing = new JSONObject();
+		thing.put("Id", "0008");
+		thing.put("Type", "Alarm");
+		thing.put("SType", "Actuator");
+		thing.put("VType", "String");
+		thing.put("VMin", "Set");
+		thing.put("VMax", "Unset");
+		thinglist.add(thing);
+		
+		target.add("UIControler");
+		target.add("UI");
+		msgJSON.put("Targets",target);
+		msgJSON.put("NodeID", nodeid);
+		msgJSON.put("Job", "Discovered");
+		msgJSON.put("ThingList", thinglist);
 		
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}

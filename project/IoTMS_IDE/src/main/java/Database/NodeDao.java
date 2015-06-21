@@ -238,10 +238,13 @@ public class NodeDao {
 		return ret;
 	}
 
-	public boolean insertThing(String thing_id) {
+	public boolean insertThing(String node_id, String thing_id, String thing_name
+			, String type, String stype, String vtype, String vmin, String vmax) {
 		boolean ret = false;
 		PreparedStatement pstmt = null;
-		String query = "insert into thing_info(node_id, thing_id) value('"+thing_id+"','"+thing_id+"')";
+		String query = "insert into thing_info(node_id, thing_id, thing_name, type, stype, vtype, vmin, vmax) "
+				+ "value('"+node_id+"','"+thing_id+"','"+thing_name+"','"+type+"','"+stype+"','"+vtype+"','"+vmin+"','"+vmax+"')";
+		
 		System.out.println("NodeDao(insertThing) sql: "+query);
 
 		try {
