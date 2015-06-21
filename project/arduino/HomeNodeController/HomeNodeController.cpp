@@ -40,8 +40,8 @@
 #include <ArduinoJson.h>
 #include <EEPROM.h>
 #include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
-#include <MyTimer.h>
-#include <MyEeprom.h>
+#include "MyTimer.h"
+#include "MyEeprom.h"
 #include "EncodeNSendMessage.h"
 
 
