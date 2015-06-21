@@ -37,11 +37,12 @@
 #include <SPI.h>
 #include <WiFi.h>
 #include <Servo.h>
-#include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
-#include <MyTimer.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
+#include <HomeNodeDDI.h>           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
+#include <MyTimer.h>
 #include <MyEeprom.h>
+
 
 
 //#define	CHECK_REGISTER_IOTMS
@@ -135,7 +136,8 @@ int IoTMSCommandCtl(void);
 int IoTMSCommandParsing(void);
 void ActuaroControl(int);
 void SensingNode(void);
-void printConnectionStatus(void);
+void SetWiFiConnectionStatus(void);
+void printWiFiConnectionStatus(void);
 int CheckWiFiNetWork(void);
 
 // Eeprom control function
@@ -209,6 +211,13 @@ void WiFiConnectionState(void)
 {
 	// Attempt to connect to WIfI network indicated by SSID.
 
+	if (WiFi.status() == WL_NO_SHIELD) 
+	{
+		Serial.println("WiFi shield not present");
+		delay(1000);
+		return;
+	}
+	
 	//Serial.print("Attempting to connect to SSID: ");
 	//Serial.println(ssid);
 	WiFistatus = WiFi.begin(SSID);
@@ -216,7 +225,8 @@ void WiFiConnectionState(void)
 	if(WiFistatus == WL_CONNECTED)
 	{	
 		MainLoopState = MLS_CHECK_REGISTED_SERVER;
-		printConnectionStatus();
+		SetWiFiConnectionStatus();
+		printWiFiConnectionStatus();
 		//Serial.print("Connection to : ");
 		Serial.print(SSID);
 		Serial.println();
@@ -224,6 +234,11 @@ void WiFiConnectionState(void)
 #ifdef	CHECK_REGISTER_IOTMS
 		Serial.println("For demo input connection type Server or Client :");
 #endif
+	}
+	else
+	{	
+		Serial.println("WiFi not connect");
+		delay(1000);
 	}
 }
 
@@ -324,7 +339,7 @@ void StandbyIoTMSConnection(void)
 			// message : SA Node information
 			SendJSONdiscoverRegister(ServerClient, true);    // Send Discovery message 
 			MainLoopState = MLS_REGISTER_NODE_TO_IOTMS;
-			Serial.println("Wait IoTMS Register msg");
+			//Serial.println("Wait IoTMS Register msg");
 		}
 	}
 }
@@ -369,7 +384,7 @@ void RegisterNodeToIoTMS(void)
 			}
 			else
 			{	
-				Serial.println("Send register message");
+				Serial.println("Receive & Send msg");
 				SendJSONdiscoverRegister(ServerClient, false);	// Send Discovery message 
 				//ServerClient.stop();
 				MainLoopState = MLS_CONNECTING_SERVER;
@@ -452,6 +467,10 @@ void ConnectToIoTMS(void)
 	int portnumber;
 	String IpAddr;
 
+	if(CheckWiFiNetWork() == -1)
+	{	return;
+	}
+
 	portnumber = EEpCtl.GetIoTMSPortNumberFromEeprom();
 	IpAddr = EEpCtl.GetIoTMSIpAddressFromEeprom();
 
@@ -460,7 +479,8 @@ void ConnectToIoTMS(void)
 	Serial.print(IpAddr);
 	Serial.print(" and ");
 	Serial.println(portnumber);
-	
+
+	Client.stop();
 	if(Client.connect((char *)IpAddr.c_str(), portnumber))
 	{
 		Serial.println();
@@ -472,6 +492,9 @@ void ConnectToIoTMS(void)
 	else
 	{
 		delay(1000);
+		int status = WiFi.status();
+		Serial.println(status);
+		
 	}
 }
 
@@ -738,153 +761,48 @@ int CheckWiFiNetWork(void)
 {
 	int status = WiFi.status();
 
-	if(status == WL_CONNECTION_LOST || status == WL_DISCONNECTED)
+	if(status == WL_CONNECT_FAILED ||  status == WL_CONNECTION_LOST || status == WL_DISCONNECTED)
 	{
 		Serial.println("WiFi connection lost or disconnected. Retry wifi connection");
 		MainLoopState = MLS_WIFI_CONNECTTION;
 		ServerClient.stop();
 		Client.stop();
+		WiFi.disconnect();
 		return -1;
 	}
 
 	return 1;
 }
 
-/*
-// Get IoTMS registraton status from eeprom
-int CheckIoTMSRegistrationStatus(void)
+void SetWiFiConnectionStatus(void)
 {
-	unsigned char ch;
-
-	ch  = EEPROM[0];
-
-	if(ch == 1)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-
-String GetIoTMSIpAddressFromEeprom(void)
-{
-	String Ipaddress;
-	char ch;
-	int i;
-
-	for(i = EEP_IOTMS_IP_START_ADDR ; i < (EEP_IOTMS_IP_START_ADDR + EEP_IPADDR_SIZE) ; i++)
-	{
-		ch  = EEPROM[i];
-		if(ch == '\0')
-		{
-			break;
-		}
-		else
-		{
-			Ipaddress += ch;
-		}
-	}
-
-	return Ipaddress;
-}
-
-int GetIoTMSPortNumberFromEeprom(void)
-{
-	String portnumber;
-	char ch;
-	int i;
-
-	for(i = EEP_IOTMS_PORT_START_ADDR ; i < (EEP_IOTMS_PORT_START_ADDR + EEP_PORTNUM_SIZE) ; i++)
-	{
-		ch = EEPROM[i];
-		if(ch == '\0')
-		{
-			break;
-		}
-		else
-		{
-			portnumber += ch;
-		}
-
-		Serial.println(portnumber);
-	}
-	
-	Serial.println(portnumber);
-	return (int)(portnumber.toInt());
-}
-
-void SaverIoTMSInformationToEeprom(String str, int startaddr)
-{
-	char *temp;
-	int i, j;
-	
-	temp = (char *)str.c_str();
-
-	for(i = 0, j = startaddr ; temp[i] != '\0' ; i++, j++)
-	{
-		EEPROM[j] = temp[i];
-	}
-}
-
-void ResetEeprom(int endaddr)
-{
-	int i;
-	for(i = 0 ; i <= endaddr ; i++)
-	{
-		EEPROM[i] = '\0';
-	}
-}
-
-void InitilaizeEeprom(void)
-{
-	unsigned char ch1, ch2;
-
-	ch1 = EEPROM[1022];
-	ch2 = EEPROM[1023];
-
-	if(ch1 == 'A' & ch2 == 'A')
-	{
-		// Already Eeprom initilaizeed
-	}
-	else
-	{
-		ResetEeprom(1021);
-		EEPROM[1022] = 'A';
-		EEPROM[1023] = 'A';
-	}
-}
-*/
-
-
-void printConnectionStatus() 
-{
-	// Print the basic connection and network information: Network, IP, and Subnet mask
 	ip = WiFi.localIP();
-	Serial.print("Connected to ");
-	Serial.print(SSID);
-	Serial.print(" IP Address:: ");
-	Serial.println(ip);
 	//subnet = WiFi.subnetMask();
-	//Serial.print("Netmask: ");
-	//Serial.println(subnet);
-
-	// Print our MAC address.
 	WiFi.macAddress(mac);
-	Serial.print("WiFi Shield MAC address ");
 	int i;
 	for(i = 5 ; i > -1 ; i--)
 	{
 		MacAddressString += String(mac[i], HEX);
 		if(i != 0) MacAddressString += ":";
 	}
-	Serial.print("String object mac address : ");                    
+	//rssi = WiFi.RSSI();
+}
+
+void printWiFiConnectionStatus(void) 
+{
+	// Print the basic connection and network information: Network, IP, and Subnet mask
+	Serial.print("Connected to ");
+	Serial.println(SSID);
+	Serial.print("IP Address:: ");
+	Serial.println(ip);
+	//Serial.print("Netmask: ");
+	//Serial.println(subnet);
+
+	// Print our MAC address.
+	Serial.print("WiFi Shield MAC address : ");                    
 	Serial.println(MacAddressString);
 
 	// Print the wireless signal strength:
-	//rssi = WiFi.RSSI();
 	//Serial.print("Signal strength (RSSI): ");
 	//Serial.print(rssi);
 	//Serial.println(" dBm");
