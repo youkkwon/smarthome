@@ -7,6 +7,7 @@ public class Config {
 	private int alarm_config = 300;			// 5m by default
 	private int light_config = 600;			// 10m by default
     private int malfunc_config = 10;        // 10s by default
+    private int doorsensor_config = 4;		// 4s by default
 			
 	private static Config config = new Config(); 
 
@@ -28,6 +29,8 @@ public class Config {
 			light_config = time;
         else if (type.equalsIgnoreCase("MalFunc"))
             malfunc_config = time;
+        else if (type.equalsIgnoreCase("DoorSensor"))
+            doorsensor_config = time;
 		
 		storeConfig();
 	}
@@ -47,17 +50,22 @@ public class Config {
 		return Integer.toString(malfunc_config); 
 	}
 
+   	public String getDoorSensorConfig()
+	{
+		return Integer.toString(doorsensor_config); 
+	}
+
 	private void loadConfig () {
 		alarm_config = RuleManagerDBStorage.getInstance().loadRuleAlarmConfig();
 		light_config = RuleManagerDBStorage.getInstance().loadRuleLightOffConfig();
 		malfunc_config = RuleManagerDBStorage.getInstance().loadRuleMalFuncConfig();
+		doorsensor_config = RuleManagerDBStorage.getInstance().loadRuleDoorSensorConfig();
 	}
-	
-	
+		
 	public void storeConfig() {
 		RuleManagerDBStorage.getInstance().storeRuleAlarmConfig(alarm_config);
 		RuleManagerDBStorage.getInstance().storeRuleLightOffConfig(light_config);
 		RuleManagerDBStorage.getInstance().storeRuleMalFuncConfig(malfunc_config);
+		RuleManagerDBStorage.getInstance().storeRuleDoorSensorConfig(doorsensor_config);
 	}
-
 }

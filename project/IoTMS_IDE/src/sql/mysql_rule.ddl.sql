@@ -7,7 +7,7 @@ create table iotmsdb.ruleset_info (
 	PRIMARY KEY (`ruleset_id`)
 ) engine=InnoDB character set = utf8;
 
-insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Setting#Alarm 											then 78:c4:e:1:7f:f9@0001=Close#Door, *@0011=Malfunction#MessageDelay, *@0010=UnSet#AlarmDelay");
+insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Setting#Alarm 											then 78:c4:e:1:7f:f9@0001=Close#Door, 78:c4:e:1:7f:f9@0006=Open#DoorSensorDelay, *@0011=Malfunction#MessageDelay, *@0010=UnSet#AlarmDelay");
 insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Setting#Alarm, 78:c4:e:1:7f:f9@0006==Close#DoorSensor	then *@0010=Set#Alarm");
 insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==Set#Alarm 												then !78:c4:e:1:7f:f9@0001=Open#Door, 78:c4:e:1:7f:f9@0008=On#AlarmLamp");
 insert into iotmsdb.ruleset_info(ruleset) value ("if *@0010==UnSet#Alarm 											then 78:c4:e:1:7f:f9@0008=Off#AlarmLamp");
