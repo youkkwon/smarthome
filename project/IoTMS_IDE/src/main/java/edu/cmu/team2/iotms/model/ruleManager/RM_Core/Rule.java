@@ -429,8 +429,8 @@ public class Rule {
 		while (iterator.hasNext() && match == true)
 		{
 			Condition cond = iterator.next();
-			// handle mode condition 
-			if (conditionList.size() != 1 && cond.isModeCond())		
+			// handle mode condition (except mode only condition)
+			if (conditionList.size() > 1 && cond.isModeCond())		
 			{
 				match = cond.isConditionMatch(mode);
 			}

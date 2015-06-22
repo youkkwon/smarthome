@@ -18,3 +18,4 @@ insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0003==Away#
 insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0003==Away#Presence, 78:c4:e:1:7f:f9@0010==Over50#Temperature		then *@0011=Malfunction#Message");
 insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0003==Away#Presence, 78:c4:e:1:7f:f9@0010==Under0#Temperature		then *@0011=Malfunction#Message");
 insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:1:7f:f9@0003==AtHome#Presence, 78:c4:e:1:7f:f9@0010==Over40#Temperature	then 78:c4:e:1:7f:f9@0001=Open#Door");
+insert into iotmsdb.ruleset_info(ruleset) value ("if 78:c4:e:2:5c:a3@0001==Mail#MailBox								then *@0011=POST#Message");
