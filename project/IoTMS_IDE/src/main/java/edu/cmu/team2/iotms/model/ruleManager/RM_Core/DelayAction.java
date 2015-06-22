@@ -10,8 +10,8 @@ public class DelayAction extends Action {
 
 	public String getStatement()
 	{
-		String timeStr = statement; 
-		
+		String timeStr = statement + "Delay"; 
+	/*	
 		if (type.equalsIgnoreCase("Alarm"))
 		{
 			if (value.equalsIgnoreCase("UnSet"))
@@ -30,7 +30,7 @@ public class DelayAction extends Action {
 		else 
 		{
 			timeStr = timeStr + " in " + Config.getInstance().getLightConfig() + " seconds";
-		}
+		}*/
 		
 		return timeStr;			
 	}
