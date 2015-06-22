@@ -99,6 +99,7 @@ public class Node implements LinkEventListener {
 	/* from SA Node
 	 * SA Node로부터 올라온 Data를 Update한다.
 	*/
+	@SuppressWarnings("unchecked")
 	public void updateThingInfo(JSONObject JSONMsg) {
 		int changeCount = 0;
 		Thing thing = null;
@@ -122,15 +123,16 @@ public class Node implements LinkEventListener {
 			String thingID = (String)thingObj.get("Id");
 			thing = getThing(thingID); 
 			if (thing != null) {
+				JSONObject infoThingObj = new JSONObject(); 
+				infoThingObj.put("Id", (String)thingObj.get("Id"));
+				infoThingObj.put("Type", (String)thingObj.get("Type"));
+				infoThingObj.put("Value", (String)thingObj.get("Value"));
+				infoList.add(infoThingObj);
+				
 				if (thing.setValue((String)thingObj.get("Value")) == false) {
-					// 값의 변경이 없음. 해당 Object 삭제
-					System.out.println ("[UpdateThingInfo] Remove : " + (String)thingObj.get("Id"));
+					// 값의 변경이 없음. 해당 Object 삭제 - 정C 요청으로 삭제하지 않음
+					//System.out.println ("[UpdateThingInfo] Remove : " + thingInfos);
 				} else {
-					JSONObject infoThingObj = new JSONObject(); 
-					infoThingObj.put("Id", (String)thingObj.get("Id"));
-					infoThingObj.put("Type", (String)thingObj.get("Type"));
-					infoThingObj.put("Value", (String)thingObj.get("Value"));
-					infoList.add(infoThingObj);
 					changeCount++;
 				}
 			}
