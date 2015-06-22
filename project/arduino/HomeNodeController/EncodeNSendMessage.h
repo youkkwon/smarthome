@@ -19,6 +19,7 @@ class EncodeNSendMessage
 		void SendJSONdiscoverRegister(WiFiClient , bool, String);
 		void SendJSONstatusEvent(WiFiClient, String, HomeNodeDDI);
 		void SendJSONnotAuthorizedEvent(WiFiClient, String);
+		void SendJSONMsgErrEvent(WiFiClient, String);
 };
 
 #endif

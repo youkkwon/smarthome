@@ -237,11 +237,21 @@ void EncodeNSendMessage::SendJSONstatusEvent(WiFiClient localclient, String MacA
 void EncodeNSendMessage::SendJSONnotAuthorizedEvent(WiFiClient localclient, String MacAddr)
 {
 	gsBufferWiFi="";
-	//localclient.write('{');	
 	gsBufferWiFi+='{';
-	SendJSONobject(localclient, "Job", "Event", false);
+	SendJSONobject(localclient, "Job", "Registered", false);
 	SendJSONobject(localclient, "NodeID", (char *)MacAddr.c_str(), false); 
 	SendJSONobject(localclient, "Result", "NotAuthorized", false);
+	gsBufferWiFi+="}\n";
+	localclient.print(gsBufferWiFi.c_str());
+}
+
+void EncodeNSendMessage::SendJSONMsgErrEvent(WiFiClient localclient, String MacAddr)
+{
+	gsBufferWiFi="";
+	gsBufferWiFi+='{';
+	SendJSONobject(localclient, "Job", "ActionCtrl", false);
+	SendJSONobject(localclient, "NodeID", (char *)MacAddr.c_str(), false); 
+	SendJSONobject(localclient, "Result", "ActionCtrlMsgError", false);
 	gsBufferWiFi+="}\n";
 	localclient.print(gsBufferWiFi.c_str());
 }

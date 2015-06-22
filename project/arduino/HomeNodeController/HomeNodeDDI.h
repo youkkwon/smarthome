@@ -45,6 +45,8 @@ public:
 	int BeIndoors;
 	int doorstate;
 	Servo doorservo;
+	int Light;
+	int AlarmLamp;
 	
 	void DoorServoAttach(void);
 	void DoorControl(int order);

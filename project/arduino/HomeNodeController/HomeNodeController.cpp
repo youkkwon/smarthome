@@ -341,6 +341,11 @@ void CheckManualSensingInput(void)
 	{
 		if(Serial.available())
 		{		
+			int i;
+			for(i = 0 ; i < SCOMMAND_SIZE ; i++)
+			{
+				Scommand[i] = '\0';
+			}
 			//Serial.readBytesUntil('\n', SerialCommand, 32); 
 			Serial.readBytesUntil('\n', Scommand, 32);
 			SerialCommand = Scommand;
@@ -360,17 +365,24 @@ void CheckManualSensingInput(void)
 			{
 				// temperature, humidity option
 				Spaceindex = SerialCommand.indexOf(' ');
-				if(SerialCommand.substring(0, Spaceindex - 1) == "temperature")
+				String Stemp;
+				Stemp = SerialCommand.substring(0, Spaceindex);
+				//Serial.println(Stemp);
+				//if(SerialCommand.substring(0, Spaceindex - 1) == "temperature")
+				if(Stemp.equals("temperature"))
 				{
-					String Stemp;
+					//String Stemp;
 					Stemp = SerialCommand.substring(Spaceindex + 1);
+					//Serial.println(Stemp);
 					HomeNode.temperature = Stemp.toInt();
 					Serial.println(HomeNode.temperature);
 				}
-				else if(SerialCommand.substring(0, Spaceindex - 1) == "humidity")
+				//else if(SerialCommand.substring(0, Spaceindex - 1) == "humidity")
+				if(Stemp.equals("humidity"))
 				{
-					String Stemp;
+					//String Stemp;
 					Stemp = SerialCommand.substring(Spaceindex + 1);
+					//Serial.println(Stemp);
 					HomeNode.humidity = Stemp.toInt();
 					Serial.println(HomeNode.humidity);
 				}
@@ -794,6 +806,8 @@ void ActuatorControl(int Command)
 			break;
 
 		default :
+			//message error, send error message to IoTMS
+			SendToIoTMS.SendJSONMsgErrEvent(ServerClient, MacAddressString);
 			break;
 		
 	}
@@ -812,7 +826,8 @@ void SensingNode(void)
 #ifdef MANUAL_SET_SENSOR
 		if(ManualSetSensor == true)
 		{	
-			Serial.println(HomeNode.temperature);
+			Serial.print(HomeNode.temperature);
+			Serial.print(" : ");
 			Serial.println(HomeNode.humidity);
 			return;
 		}
@@ -823,8 +838,14 @@ void SensingNode(void)
 		HomeNode.readProximityVal();
 		HomeNode.read1byte_tempNhumidity();
 
+		Serial.print(HomeNode.doorstate);
+		Serial.print(" : ");
+		Serial.print(HomeNode.proximity);
+		Serial.print(" : ");
+		Serial.print(HomeNode.temperature);
+		Serial.print(" : ");
+		Serial.println(HomeNode.humidity);
 		/*
-		Serial.println("===========================");
 		Serial.print("Door State : ");
 		Serial.println(HomeNode.doorstate);
 		Serial.print("Proximity Value : ");
@@ -833,7 +854,6 @@ void SensingNode(void)
 		Serial.println(HomeNode.temperature);
 		Serial.print("Humidity Value : ");
 		Serial.println(HomeNode.humidity);
-		Serial.println("===========================");
 		*/
 	}
 	
