@@ -20,9 +20,17 @@ public class DelayAction extends Action {
 				timeStr = timeStr + " in " + Config.getInstance().getAlarmConfig() + " seconds";
 		}
         else if (type.equalsIgnoreCase("Message"))
+        {
             timeStr = timeStr + " in " + Config.getInstance().getMalFuncConfig() + " seconds";
+        }
+        else if (type.equalsIgnoreCase("DoorSensor"))
+        {
+            timeStr = timeStr + " in " + Config.getInstance().getDoorSensorConfig() + " seconds";
+        }
 		else 
+		{
 			timeStr = timeStr + " in " + Config.getInstance().getLightConfig() + " seconds";
+		}
 		
 		return timeStr;			
 	}
@@ -58,9 +66,17 @@ public class DelayAction extends Action {
 				remainTime = Integer.parseInt(Config.getInstance().getAlarmConfig());
 		}
         else if (type.equalsIgnoreCase("Message"))
+        {
 			remainTime = Integer.parseInt(Config.getInstance().getMalFuncConfig());
+        }
+        else if (type.equalsIgnoreCase("DoorSensor"))
+        {
+        	remainTime = Integer.parseInt(Config.getInstance().getDoorSensorConfig());
+        }
 		else 
+		{
 			remainTime = Integer.parseInt(Config.getInstance().getLightConfig());
+		}
 		
 		generateJSONMsg();
 		Scheduler.getInstance().addAction(this);

@@ -94,7 +94,10 @@ public abstract class Action
 		{	
 			targets.add("NodeManager");
 			JSONMsg.put("Targets", targets);
-			JSONMsg.put("Job", "ActionCtrl");
+			if (type.equalsIgnoreCase("DoorSensor"))
+				JSONMsg.put("Job", "ThingMonitor");
+			else
+				JSONMsg.put("Job", "ActionCtrl");
 			JSONMsg.put("NodeID",  nodeID);
 			JSONMsg.put("ThingID", thingID);
 			JSONMsg.put("Type",  type);

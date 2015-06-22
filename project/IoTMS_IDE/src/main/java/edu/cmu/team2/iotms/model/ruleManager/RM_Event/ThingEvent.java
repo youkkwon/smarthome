@@ -22,7 +22,7 @@ public class ThingEvent {
 		return thingEvent;
 	}
 	
-	/*public void execute_single(JSONObject JSONMsg)
+	public void execute_single(JSONObject JSONMsg)
 	{
 		System.out.println("[RM - Process] Handle ThingEvent : " + JSONMsg);
 		
@@ -42,14 +42,24 @@ public class ThingEvent {
 		Iterator<Action> iterator = actions.iterator();
 		while (iterator.hasNext())
 			iterator.next().execute();		
-	}*/
+	}
 	
 	public void execute(JSONObject JSONMsg)
 	{
 		System.out.println("[RM - Process] Handle ThingEvent : " + JSONMsg);
 		
-		execute_things(JSONMsg);			// Ver 2 - handle multi condition
-		//execute_thing(JSONMsg);			// Ver 1 - handle only one condition
+		String job = (String) JSONMsg.get("Job");
+		if (job.equalsIgnoreCase("ThingMonitor"))
+		{
+			// Handle actuator mal-function
+			System.out.println ("JSONMsg: " + JSONMsg);
+			execute_single(JSONMsg);
+		}
+		else
+		{
+			execute_things(JSONMsg);			// Ver 2 - handle multi condition
+			//execute_thing(JSONMsg);			// Ver 1 - handle only one condition
+		}
 	}
 	
 	public void execute_things(JSONObject JSONMsg)

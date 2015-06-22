@@ -37,7 +37,7 @@ public class RuleManager extends Thread {
 			NodeEvent.getInstance().execute(JSONMsg);
 		else if (job.equalsIgnoreCase("ActionCtrl"))
 			ActionEvent.getInstance().execute(JSONMsg);
-		else if (job.equalsIgnoreCase("ThingCtrl"))
+		else if (job.equalsIgnoreCase("ThingCtrl") || job.equalsIgnoreCase("ThingMonitor"))
 			ThingEvent.getInstance().execute(JSONMsg);
 		else if (job.equalsIgnoreCase("ConfigCtrl"))
 			ConfigEvent.getInstance().execute(JSONMsg);
