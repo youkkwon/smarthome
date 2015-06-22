@@ -45,7 +45,8 @@
 #include "EncodeNSendMessage.h"
 
 
-//#define	CHECK_REGISTER_IOTMS
+#define	CHECK_REGISTER_IOTMS
+#define	MANUAL_SET_SENSOR
 
 // main loop state(MLS) define
 enum {
@@ -56,6 +57,7 @@ enum {
 	MLS_REGISTER_NODE_TO_IOTMS,
 	MLS_CONNECTING_SERVER,
 	MLS_NORMAL_CONTROL,
+	MLS_REMOVE_NODE,
 };
 
 // Actuator command
@@ -88,6 +90,9 @@ String SerialCommand;
 char Scommand[SCOMMAND_SIZE];
 #endif
 
+#ifdef MANUAL_SET_SENSOR
+boolean ManualSetSensor;
+#endif
 
 
 /*
@@ -130,6 +135,8 @@ int IoTMSCommandCtl(void);
 int IoTMSCommandParsing(void);
 void ActuatorControl(int);
 void SensingNode(void);
+void RemoveNode(void);
+
 void SetWiFiConnectionStatus(void);
 void printWiFiConnectionStatus(void);
 int CheckWiFiNetWork(void);
@@ -161,9 +168,18 @@ void setup() {
 	MainLoopState = MLS_WIFI_CONNECTTION;
 	//MainLoopState = MLS_NORMAL_CONTROL;
       //TestTimer.SetBaseTimer();
+
+#ifdef MANUAL_SET_SENSOR
+	ManualSetSensor = false;
+#endif
 }
 
 void loop() {	
+
+	
+#ifdef MANUAL_SET_SENSOR
+	CheckManualSensingInput();
+#endif
 	SensingNode();
 
 	switch(MainLoopState)
@@ -194,6 +210,13 @@ void loop() {
 
 		case MLS_NORMAL_CONTROL :
 			NormalControlState();
+			break;
+
+		case MLS_REMOVE_NODE :
+			RemoveNode();
+			break;
+
+		default :
 			break;
 	}
 }
@@ -251,15 +274,17 @@ void CheckRegisterServer(void)
 	}
 	
 	#ifndef CHECK_REGISTER_IOTMS
-	MainLoopState = MLS_STANDBY_DISCOVERY;
 	server.begin();
-	Serial.println("======= Stand by IoTMS Discovery connection");
+	Serial.println("Stand by IoTMS");
 
 	if(EEpCtl.CheckIoTMSRegistrationStatus())
 	{	MainLoopState = MLS_CONNECTING_SERVER;
 	}
 	else
-	{	MainLoopState = MLS_STANDBY_DISCOVERY;
+	{			
+		server.begin();
+		Serial.println("Stand by IoTMS");
+		MainLoopState = MLS_STANDBY_DISCOVERY;
 	}
 	#else
 	CheckRegisterServerForTest();
@@ -282,23 +307,23 @@ void CheckRegisterServerForTest(void)
 		if(SerialCommand.equals("Server"))
 		{
 			// servier connection
-			Serial.print("User input valid : ");
+			Serial.print("input valid : ");
 			Serial.println(SerialCommand);
-			Serial.println("Go to the Server connectio state for standby IoTMS Discovery connection");
+			//Serial.println("Go to the Server connectio state for standby IoTMS Discovery connection");
 			MainLoopState = MLS_STANDBY_DISCOVERY;
 			server.begin();
 		}
 		else if(SerialCommand.equals("Client"))
 		{		 
 			// client connecton
-			Serial.print("User input valid : ");
+			Serial.print("input valid : ");
 			Serial.println(SerialCommand);
-			Serial.println("Go to the Clinet connectio state");
+			//Serial.println("Go to the Clinet connectio state");
 			MainLoopState = MLS_CONNECTING_SERVER;
 		}
 		else
 		{
-			Serial.print("User input not valid : ");
+			//Serial.print("input not valid : ");
 			Serial.println(SerialCommand);
 			SerialCommand.remove(0);
 			for(i = 0 ; i < SCOMMAND_SIZE ; i++)
@@ -309,6 +334,60 @@ void CheckRegisterServerForTest(void)
 	}
 }
 #endif
+
+#ifdef MANUAL_SET_SENSOR
+void CheckManualSensingInput(void)
+{
+	int Spaceindex;
+	
+	if(MainLoopState != MLS_CHECK_REGISTED_SERVER)
+	{
+		if(Serial.available())
+		{		
+			//Serial.readBytesUntil('\n', SerialCommand, 32); 
+			Serial.readBytesUntil('\n', Scommand, 32);
+			SerialCommand = Scommand;
+			Serial.println(SerialCommand);
+			if(SerialCommand.equals("manual"))
+			{
+				if(ManualSetSensor == false)
+				{	
+					ManualSetSensor = true;
+				}
+				else
+				{
+					ManualSetSensor = false;
+				}
+			}
+			else
+			{
+				// temperature, humidity option
+				Spaceindex = SerialCommand.indexOf(' ');
+				if(SerialCommand.substring(0, Spaceindex - 1) == 'temperature')
+				{
+					String Stemp;
+					Stemp = SerialCommand.substring(Spaceindex + 1);
+					HomeNode.temperature = Stemp.toInt();
+					Serial.println(HomeNode.temperature);
+				}
+				else if(SerialCommand.substring(0, Spaceindex - 1) == 'humidity')
+				{
+					String Stemp;
+					Stemp = SerialCommand.substring(Spaceindex + 1);
+					HomeNode.humidity = Stemp.toInt();
+					Serial.println(HomeNode.humidity);
+				}
+				else
+				{
+					Serial.println(SerialCommand);
+				}
+			}
+		}
+	}
+}
+#endif
+
+
 
 /*
 * MLS_STANDBY_DISCOVERY
@@ -672,6 +751,11 @@ int IoTMSCommandParsing(void)
 				return 0;
 			}
 		}
+		else if(PasingMsg.equals("Remove"))
+		{
+			MainLoopState = MLS_REMOVE_NODE;
+			return 0;
+		}
 		else
 		{	
 			Serial.print("No thing : ");
@@ -712,6 +796,7 @@ void ActuatorControl(int Command)
 			HomeNode.SecureAlarmLightControl(OFF);
 			break;
 
+		case 
 		default :
 			break;
 		
@@ -727,6 +812,16 @@ void SensingNode(void)
         //Serial.println(SensingTimer.BaseTime);
 	if(SensingTimer.CheckPassTime(1000, 0) == 1)
 	{
+
+#ifdef MANUAL_SET_SENSOR
+		if(ManualSetSensor == true)
+		{	
+			Serial.println(HomeNode.temperature);
+			Serial.println(HomeNode.humidity);
+			return;
+		}
+#endif
+
 		// ToDo : check every 1 second
 		HomeNode.readDoorState();
 		HomeNode.readProximityVal();
@@ -746,6 +841,19 @@ void SensingNode(void)
 		*/
 	}
 	
+}
+
+void RemoveNode(void)
+{
+	// soket disconnect
+	server.stop();
+	ServerClient.stop();
+	Client.stop();
+
+	// erase eeprom IoTMS information
+	EEpCtl.SaveIoTMSRegistrationStatus('0');
+
+	MainLoopState = MLS_CHECK_REGISTED_SERVER;
 }
 
 

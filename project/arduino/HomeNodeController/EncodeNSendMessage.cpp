@@ -9,7 +9,7 @@ const char gJSONthings3[] PROGMEM ="{\"Id\":\"0003\",\"Type\":\"Presence\"   ,\"
 const char gJSONthings4[] PROGMEM ="{\"Id\":\"0004\",\"Type\":\"Temperature\",\"SType\":\"Sensor\"  ,\"VType\": \"Number\",\"VMin\" : \"-50\"	 ,\"VMax\" : \"50\"   },";
 const char gJSONthings5[] PROGMEM ="{\"Id\":\"0005\",\"Type\":\"Humidity\"   ,\"SType\":\"Sensor\"  ,\"VType\": \"Number\",\"VMin\" : \"0\"	 ,\"VMax\" : \"100\"\ },";
 const char gJSONthings6[] PROGMEM ="{\"Id\":\"0006\",\"Type\":\"DoorSensor\" ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Open\"  ,\"VMax\" : \"Close\"},";
-const char gJSONthings7[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"	  ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Empty\" ,\"VMax\" : \"Mail\" },";
+//const char gJSONthings7[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"	  ,\"SType\":\"Sensor\"  ,\"VType\": \"String\",\"VMin\" : \"Empty\" ,\"VMax\" : \"Mail\" },";
 const char gJSONthings8[] PROGMEM ="{\"Id\":\"0008\",\"Type\":\"AlarmLamp\"	  ,\"SType\":\"Actuator\",\"VType\": \"String\",\"VMin\" : \"On\"	 ,\"VMax\" : \"Off\"}";
 
 const char JSONstatus1[] PROGMEM ="{\"Id\":\"0003\",\"Type\":\"Presence\"	 ,\"Value\":\"";
@@ -132,7 +132,8 @@ void EncodeNSendMessage::SendJSONdiscoverRegister(WiFiClient localclient , bool 
 			}
 		}
 		localclient.print(gsBufferWiFi.c_str());
-		
+
+		/*
 		//thing7
 		gsBufferWiFi="";
 		for(i = 0 ; i < strlen(gJSONthings7) ; i++) 
@@ -145,6 +146,7 @@ void EncodeNSendMessage::SendJSONdiscoverRegister(WiFiClient localclient , bool 
 			}
 		}
 		localclient.print(gsBufferWiFi.c_str());
+		*/
 		
 		//thing8
 		gsBufferWiFi="";
@@ -166,8 +168,6 @@ void EncodeNSendMessage::SendJSONdiscoverRegister(WiFiClient localclient , bool 
 
 void EncodeNSendMessage::SendJSONstatusEvent(WiFiClient localclient, String MacAddr, HomeNodeDDI Hnode)
 {
-	Serial.print(millis());
-	
 	gsBufferWiFi="";
 	gsBufferWiFi+='{';  
 	SendJSONobject(localclient, "Job", "Event", false);
@@ -232,9 +232,6 @@ void EncodeNSendMessage::SendJSONstatusEvent(WiFiClient localclient, String MacA
 		localclient.print(gsBufferWiFi.c_str());
 	}
 	localclient.print("]}\n");
-
-	Serial.print(" : ");
-	Serial.println(millis());
 }
 
 void EncodeNSendMessage::SendJSONnotAuthorizedEvent(WiFiClient localclient, String MacAddr)
