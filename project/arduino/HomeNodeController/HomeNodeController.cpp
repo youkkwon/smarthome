@@ -81,7 +81,7 @@ enum {
 * Node sensor/actuator control variable
 */
 HomeNodeDDI HomeNode;
-int MainLoopState = 0;
+int MainLoopState;
 MyTimer SensingTimer;
 MyTimer SendStateTimer;
 
@@ -140,6 +140,9 @@ void RemoveNode(void);
 void SetWiFiConnectionStatus(void);
 void printWiFiConnectionStatus(void);
 int CheckWiFiNetWork(void);
+
+void CheckManualSensingInput(void);
+
 
 // Eeprom control function
 /**
@@ -246,9 +249,6 @@ void WiFiConnectionState(void)
 		MainLoopState = MLS_CHECK_REGISTED_SERVER;
 		SetWiFiConnectionStatus();
 		printWiFiConnectionStatus();
-		//Serial.print("Connection to : ");
-		Serial.print(SSID);
-		Serial.println();
 
 #ifdef	CHECK_REGISTER_IOTMS
 		Serial.println("For demo input connection type Server or Client :");
@@ -268,15 +268,12 @@ void WiFiConnectionState(void)
 * check registered server : confirm eeprom save data 
 */
 void CheckRegisterServer(void)
-{    
+{    	
 	if(CheckWiFiNetWork() == -1)
 	{	return;
 	}
 	
 	#ifndef CHECK_REGISTER_IOTMS
-	server.begin();
-	Serial.println("Stand by IoTMS");
-
 	if(EEpCtl.CheckIoTMSRegistrationStatus())
 	{	MainLoopState = MLS_CONNECTING_SERVER;
 	}
@@ -363,14 +360,14 @@ void CheckManualSensingInput(void)
 			{
 				// temperature, humidity option
 				Spaceindex = SerialCommand.indexOf(' ');
-				if(SerialCommand.substring(0, Spaceindex - 1) == 'temperature')
+				if(SerialCommand.substring(0, Spaceindex - 1) == "temperature")
 				{
 					String Stemp;
 					Stemp = SerialCommand.substring(Spaceindex + 1);
 					HomeNode.temperature = Stemp.toInt();
 					Serial.println(HomeNode.temperature);
 				}
-				else if(SerialCommand.substring(0, Spaceindex - 1) == 'humidity')
+				else if(SerialCommand.substring(0, Spaceindex - 1) == "humidity")
 				{
 					String Stemp;
 					Stemp = SerialCommand.substring(Spaceindex + 1);
@@ -796,7 +793,6 @@ void ActuatorControl(int Command)
 			HomeNode.SecureAlarmLightControl(OFF);
 			break;
 
-		case 
 		default :
 			break;
 		
@@ -846,11 +842,12 @@ void SensingNode(void)
 void RemoveNode(void)
 {
 	// soket disconnect
-	server.stop();
+	//server.stop();
 	ServerClient.stop();
 	Client.stop();
 
-	// erase eeprom IoTMS information
+	// Erase eeprom IoTMS information.
+	// Not erase ip address and port number.
 	EEpCtl.SaveIoTMSRegistrationStatus('0');
 
 	MainLoopState = MLS_CHECK_REGISTED_SERVER;
