@@ -100,7 +100,7 @@ public class NodeManager implements AdapterEventListener {
 		System.out.println ("[NM - Process] [EventBus] ShowThingInfo: " + info);
 		
 		JSONArray targets = new JSONArray();
-		targets.add("RuleManager");
+		targets.add("RuleManager");					
 		sendEvent(info, targets, "ThingMonitor");
 	}
 
@@ -158,11 +158,18 @@ public class NodeManager implements AdapterEventListener {
 		adapter.disconnectNode(mac);
 	}
 	
-	public void removeNode(String mac)
+	public void removeNode(JSONObject JSONMsg)
 	{
-		Node node = getNode(mac);
+		String nodeId = (String)JSONMsg.get("NodeID");
+		Node node = getNode(nodeId);
 		if(node != null)
 			node.disconnect();
+		
+		JSONMsg.remove("Targets");
+		JSONMsg.remove("Job");
+		node.send(JSONMsg.toString());
+		node.disconnect();
+		
 		removeNode(node);
 	}
 
