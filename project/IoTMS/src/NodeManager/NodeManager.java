@@ -99,7 +99,7 @@ public class NodeManager implements AdapterEventListener {
 		System.out.println ("[NM - Process] [EventBus] ShowThingInfo: " + info);
 		
 		JSONArray targets = new JSONArray();
-		targets.add("UI");
+		targets.add("RuleManager");
 		sendEvent(info, targets, "ThingMonitor");
 	}
 
