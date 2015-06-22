@@ -167,6 +167,15 @@ public class Node implements LinkEventListener {
 		thing.doCommand(JSONMsg);
 		send(JSONMsg.toString());
 	}
+	
+	public void returnThingCommand(JSONObject JSONMsg) {
+		JSONArray targets = new JSONArray();
+		targets.add("UI");
+		JSONMsg.put("Targets", targets);
+		JSONMsg.put("NodeID", getMacAddress());
+		
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+	}
 
 	public void send(String msg)
 	{
@@ -189,6 +198,7 @@ public class Node implements LinkEventListener {
 	@Override
 	public void onData(LinkEvent event) {
 		// TODO Auto-generated method stub
+		String strJob;
 		System.out.println("[NM - Process] # Node Event: " + event.getType() + ":" + event.getStatus() + ":" + event.getMessage());
 		JSONObject thingObj = null;
 		thingObj = (JSONObject) JSONValue.parse(event.getMessage());
@@ -196,7 +206,12 @@ public class Node implements LinkEventListener {
 			System.out.println("[NM - Process] JSON Object is null from SA node");
 			return;
 		}
-		updateThingInfo(thingObj);
+		
+		strJob = (String)thingObj.get("Job");
+		if (strJob.equalsIgnoreCase("ActionCtrl")) {
+			returnThingCommand(thingObj);
+		} else 
+			updateThingInfo(thingObj);
 	}
 
 	@Override
