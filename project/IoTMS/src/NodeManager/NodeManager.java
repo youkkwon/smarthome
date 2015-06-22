@@ -45,7 +45,6 @@ public class NodeManager implements AdapterEventListener {
 		return null;
 	}
 	
-	@SuppressWarnings("unused")
 	private void removeNode(Node node) {
 		Nodes.remove(node);
 	}
@@ -155,11 +154,18 @@ public class NodeManager implements AdapterEventListener {
 		adapter.disconnectNode(mac);
 	}
 	
-	public void removeNode(String mac)
+	public void removeNode(JSONObject JSONMsg)
 	{
-		Node node = getNode(mac);
+		String nodeId = (String)JSONMsg.get("NodeID");
+		Node node = getNode(nodeId);
 		if(node != null)
 			node.disconnect();
+		
+		JSONMsg.remove("Targets");
+		JSONMsg.remove("Job");
+		node.send(JSONMsg.toString());
+		node.disconnect();
+		
 		removeNode(node);
 	}
 

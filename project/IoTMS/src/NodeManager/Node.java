@@ -123,8 +123,13 @@ public class Node implements LinkEventListener {
 			thing = getThing(thingID); 
 			if (thing != null) {
 				if (thing.setValue((String)thingObj.get("Value")) == false) {
-					// 값의 변경이 없음. 해당 Object 삭제
-					System.out.println ("[UpdateThingInfo] Remove : " + thingInfos);
+					// 값의 변경이 없음. 해당 Object 삭제 - 정C 요청으로 삭제하지 않음
+					//System.out.println ("[UpdateThingInfo] Remove : " + thingInfos);
+					JSONObject infoThingObj = new JSONObject(); 
+					infoThingObj.put("Id", (String)thingObj.get("Id"));
+					infoThingObj.put("Type", (String)thingObj.get("Type"));
+					infoThingObj.put("Value", (String)thingObj.get("Value"));
+					infoList.add(infoThingObj);
 				} else {
 					JSONObject infoThingObj = new JSONObject(); 
 					infoThingObj.put("Id", (String)thingObj.get("Id"));
