@@ -1,0 +1,31 @@
+{
+	"Job":"Event",
+	"NodeID":"MAC_ADDRESS",
+	"Status":[
+		{
+			"Id":"0003",
+			"Type":"Presence",
+			"Value":"AtHome"
+		},
+		{
+			"Id":"0004",
+			"Type":"Temperature",
+			"Value":"50"
+		},
+		{
+			"Id":"0005",
+			"Type":"Humidity",
+			"Value":"100"
+		},
+		{
+			"Id":"0006",
+			"Type":"DoorSensor",
+			"Value":"Close"
+		},
+		{
+			"Id":"0007",
+			"Type":"MailBox",
+			"Value":"Mail"
+		}
+	]
+}
