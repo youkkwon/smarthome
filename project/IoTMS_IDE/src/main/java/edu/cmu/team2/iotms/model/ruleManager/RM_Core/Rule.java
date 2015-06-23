@@ -407,45 +407,32 @@ public class Rule {
 	private void setActionDesc()
 	{
 		String 	desc = "N/A";
-		ListIterator<Condition>	iterator = conditionList.listIterator();
-		
-		while (iterator.hasNext())
-		{
-			Condition condition = iterator.next();
-			if (condition.getType().equalsIgnoreCase("DoorSensor") && condition.getValue().equalsIgnoreCase("Open"))
-			{
-				desc = "Somebody is braking house! - Door is open on Alarm mode.";
-				addActionDesc(desc, "Message");
-			}				
-			else if (condition.getType().equalsIgnoreCase("Presence") && condition.getValue().equalsIgnoreCase("AtHome"))
-			{
-				desc = "Somebody is braking house! - Somebody in home. ";
-				addActionDesc(desc, "Message");
-			}
-			else if (condition.isMinMaxCond())
-			{
-				desc = condition.getType() + " is malfunction. value - " + condition.getValue();		
-				addActionDesc(desc, "Message");
-			}
-			else if (condition.getType().equalsIgnoreCase("Alarm") && condition.getValue().equalsIgnoreCase("Setting") )
-			{
-				desc = "Fail to set Alarm - Closing door is failed";
-				addActionDesc(desc, "Message");
-			}
-		}
-	}
-	
-	private void addActionDesc(String desc, String type)
-	{
 		ListIterator<Action>	iterator = actionList.listIterator();
 		
 		while (iterator.hasNext())
 		{
 			Action action = iterator.next();
-			if (action.isActionOnType(type))
+			if (action.isActionOnType("Message"))
 			{
+				desc = action.getValue() + " : ";
+				ListIterator<Condition>	cond_iterator = conditionList.listIterator();
+				boolean first = true;
+				while (cond_iterator.hasNext())
+				{
+					if (!first) 
+						desc = desc + ", ";					
+					else
+						first = false;
+					Condition condition = cond_iterator.next();
+					desc = desc + "\"" + condition.getType() + "(" + condition.getThingID() + ")";
+					if (!condition.getNodeID().equals("*"))
+						desc = desc + " on " + condition.getNodeID();
+					desc = desc + " is " + condition.getValue() + ".\"";
+					if (action.getStatement().indexOf("Delay") != -1)
+						desc = desc + " is not completed.";		
+				}
 				action.setDesc(desc);
-				//System.out.println("[RM - Process] " + statement + " : " + action.getStatement() + " desc : " + desc);
+				//System.out.println ("[RM - Process] action desc : " + desc);
 			}
 		}
 	}
