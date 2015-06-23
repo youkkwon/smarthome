@@ -222,6 +222,7 @@ public class RuleSet {
 		return mode;
 	}
 	
+	// Only one matched rule. (0 or 1)
 	public LinkedList<Action> getActions (String condition)
 	{
 		ListIterator<Rule>	iterator = rules.listIterator();
@@ -236,6 +237,26 @@ public class RuleSet {
 		return null;
 	}
 	
+	// Many matched rules are possible (*)
+	// Ver 2.0 - execute all matched rule, thing event comes together. (bulk-event)
+	public LinkedList<Action> getActions (String[] condition)
+	{
+		ListIterator<Rule>	iterator = rules.listIterator();
+		LinkedList<Action>  allActions = new LinkedList<Action>();
+		while (iterator.hasNext()) 
+		{
+			LinkedList<Action> actions = iterator.next().getActions(mode, condition);
+			// find actions on condition.
+			if (actions != null && !actions.isEmpty())
+			{
+				allActions.addAll(actions);
+				
+			}
+		}
+		return (allActions.isEmpty()) ? null : allActions;
+	}
+	
+	/* Ver 1.0 - Only execute first matched rule.
 	public LinkedList<Action> getActions (String[] condition)
 	{
 		ListIterator<Rule>	iterator = rules.listIterator();
@@ -249,6 +270,7 @@ public class RuleSet {
 		}
 		return null;
 	}
+	*/
 	
 	public void activeRules (String condition)
 	{

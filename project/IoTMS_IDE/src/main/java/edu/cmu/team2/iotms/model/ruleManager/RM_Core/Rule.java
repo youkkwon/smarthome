@@ -133,6 +133,10 @@ public class Rule {
 			actionList.add(action);
 		
 		updateStatement();
+		
+		// setDesc
+		setActionDesc();
+		
 		return true;
 	}
 	
@@ -333,6 +337,9 @@ public class Rule {
 		if (alarmMode_condition)
 			active = false;
 		updateStatement();
+		
+		// setDesc
+		setActionDesc();
 	}
 
 	// If a node become valid again (delete, broken), active all rules based on the node.
@@ -394,6 +401,53 @@ public class Rule {
 	public boolean isActive ()
 	{
 		return active;
+	}
+	
+	// Set desc message for pre-defined rule.
+	private void setActionDesc()
+	{
+		String 	desc = "N/A";
+		ListIterator<Condition>	iterator = conditionList.listIterator();
+		
+		while (iterator.hasNext())
+		{
+			Condition condition = iterator.next();
+			if (condition.getType().equalsIgnoreCase("DoorSensor") && condition.getValue().equalsIgnoreCase("Open"))
+			{
+				desc = "Somebody is braking house! - Door is open on Alarm mode.";
+				addActionDesc(desc, "Message");
+			}				
+			else if (condition.getType().equalsIgnoreCase("Presence") && condition.getValue().equalsIgnoreCase("AtHome"))
+			{
+				desc = "Somebody is braking house! - Somebody in home. ";
+				addActionDesc(desc, "Message");
+			}
+			else if (condition.isMinMaxCond())
+			{
+				desc = condition.getType() + " is malfunction. value - " + condition.getValue();		
+				addActionDesc(desc, "Message");
+			}
+			else if (condition.getType().equalsIgnoreCase("Alarm") && condition.getValue().equalsIgnoreCase("Setting") )
+			{
+				desc = "Fail to set Alarm - Closing door is failed";
+				addActionDesc(desc, "Message");
+			}
+		}
+	}
+	
+	private void addActionDesc(String desc, String type)
+	{
+		ListIterator<Action>	iterator = actionList.listIterator();
+		
+		while (iterator.hasNext())
+		{
+			Action action = iterator.next();
+			if (action.isActionOnType(type))
+			{
+				action.setDesc(desc);
+				//System.out.println("[RM - Process] " + statement + " : " + action.getStatement() + " desc : " + desc);
+			}
+		}
 	}
 	
 	// return actions on condition(event) or no_action on condition(mode)

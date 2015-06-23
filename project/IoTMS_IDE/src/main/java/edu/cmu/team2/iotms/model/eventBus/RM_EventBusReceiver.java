@@ -29,7 +29,7 @@ public class RM_EventBusReceiver { //extends Observable implements Runnable {
 		{
 			if (targets.get(i).equals(ID))
 			{
-				System.out.println ("[EventBus] Process RuleManager Event : " + JSONMsg);
+				//System.out.println ("[EventBus] Process RuleManager Event : " + JSONMsg);
 				RuleManager.getInstance().pushEvent(JSONMsg);				
 			}
 		}

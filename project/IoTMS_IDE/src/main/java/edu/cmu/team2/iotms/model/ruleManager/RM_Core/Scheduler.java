@@ -34,7 +34,7 @@ public class Scheduler extends Thread {
 	
 	public synchronized void addAction (DelayAction action)
 	{
-		System.out.println("Scheduled Action is arrived." + action.getStatement());
+//		System.out.println("Scheduled Action is arrived." + action.getStatement());
 		deleteAction(action);	//	delete if there is already actions (same or confilct)
 		actions.add(action);
 	}
@@ -48,8 +48,8 @@ public class Scheduler extends Thread {
 			if (cancle_action.isConflict(action))
 			{	
 				boolean deleted = actions.remove(action);
-				if (deleted)
-					System.out.println("delete action : " + action.getStatement());
+//				if (deleted)
+//					System.out.println("delete action : " + action.getStatement());
 			}
 		}
 	}
@@ -63,8 +63,8 @@ public class Scheduler extends Thread {
 			if (action.isActionOn(state))
 			{
 				boolean deleted = actions.remove(action);
-				if (deleted)
-					System.out.println("cancel action due to state change: " + action.getStatement());
+//				if (deleted)
+//					System.out.println("cancel action due to state change: " + action.getStatement());
 			}
 		}
 	}
@@ -79,8 +79,8 @@ public class Scheduler extends Thread {
 			if (action.isActionMatch(actStr))
 			{
 				boolean deleted = actions.remove(action);
-				if (deleted)
-					System.out.println("cancel action due to state change: " + action.getStatement());				
+//				if (deleted)
+//					System.out.println("cancel action due to state change: " + action.getStatement());				
 			}
 		}
 	}
