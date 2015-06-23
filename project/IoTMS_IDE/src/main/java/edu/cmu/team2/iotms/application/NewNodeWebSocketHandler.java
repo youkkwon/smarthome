@@ -71,12 +71,29 @@ public class NewNodeWebSocketHandler extends TextWebSocketHandler {
 			if (targets.get(i).equals("UIControler") || targets.get(i).equals("UI")) {
 				if(JSONMsg.get("Job").toString().compareTo("Discovered") == 0) {
 					processDiscover(JSONMsg);
-					sendDiscover(JSONMsg);
+					sendTextMessage(JSONMsg);
+				}
+				if(JSONMsg.get("Job").toString().compareTo("Registered") == 0) {
+					processRegistered(JSONMsg);
+					sendTextMessage(JSONMsg);
 				}
 			}
 		}
 	}
 	
+	private void processRegistered(JSONObject JSONMsg) {
+
+		String node_id = JSONMsg.get("NodeID").toString();
+		String result = JSONMsg.get("Result").toString();
+		
+		if(result.toLowerCase().compareTo("authorized")==0) {
+			NodeDao.getInstance().authorizedNode(node_id);
+		}
+		else {
+			System.out.println("not authorized : "+JSONMsg.toString());
+		}
+	}
+
 	private void processDiscover(JSONObject JSONMsg) {
 		String node_id = JSONMsg.get("NodeID").toString();
 		
@@ -99,7 +116,7 @@ public class NewNodeWebSocketHandler extends TextWebSocketHandler {
 	}
 	
 
-	private void sendDiscover(JSONObject JSONMsg) {
+	private void sendTextMessage(JSONObject JSONMsg) {
 		TextMessage message = new TextMessage(JSONMsg.toJSONString());
 		
 		for (WebSocketSession s : users.values()) {

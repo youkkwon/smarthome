@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import edu.cmu.team2.iotms.application.RuleServiceImpl;
+import edu.cmu.team2.iotms.application.RuleService;
 import edu.cmu.team2.iotms.domain.RuleInfo;
 
 @Controller
 public class RuleController {
 	
 	@Autowired
-	private RuleServiceImpl ruleService;
+	private RuleService ruleService;
 
 	@RequestMapping("/rulelist")
 	public ModelAndView getRulesetList(ModelAndView model) throws IOException{
@@ -63,5 +63,12 @@ public class RuleController {
 		ruleService.updateRuleSet(ruleInfo);
 
 		return "redirect:/rulelist";
+	}
+	
+	@RequestMapping(value = "/rule/confirm", method = RequestMethod.POST)
+	public String confirmMessage(@RequestParam(value="yesno", required=false) String yesno) {
+		ruleService.confirm(yesno);
+
+		return "";
 	}
 }

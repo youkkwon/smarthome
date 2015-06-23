@@ -34,6 +34,27 @@
 				}
 			});
 		}
+		function authorizeNode() {
+			var nodeid = document.getElementById ("nodeid").value;
+			var loc = "/iotms/node/testauthorized?nodeid="+nodeid;
+			
+			$( "#dialog-confirm" ).dialog({
+				resizable: false,
+				height:230,
+				width:320,
+				modal: true,
+				buttons: {
+					"Authorize Node": function() {
+					     	// Do this after Confirm
+					     	document.getElementById("subnewnode").setAttribute("src", loc);
+					$( this ).dialog( "close" );
+					     },
+					     Cancel: function() {
+					$( this ).dialog( "close" );
+					     }
+				}
+			});
+		}
 		function updateThing() {
 			var nodeid = document.getElementById ("nodeid").value;
 			var thingid = document.getElementById ("thingid").value;
@@ -66,7 +87,8 @@
 </div>
     <p>Node List</p>
 	<p><button onClick="discoverNodes()" >DiscoverNodes</button>
-	<button onClick="updateThing()" >Update Thing</button></p>
+	<button onClick="updateThing()" >Update Thing</button>
+	<button onClick="authorizeNode()" >Authorize Node</button></p>
 
 	<table border="1">
 		<tr>

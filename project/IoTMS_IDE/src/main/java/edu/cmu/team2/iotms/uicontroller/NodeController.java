@@ -102,4 +102,10 @@ public class NodeController {
 		nodeService.testNodeDiscover(nodeid);
 		return "";
 	}
+	@RequestMapping("/node/testauthorized")
+	public String testNodeAuthorized(@RequestParam("nodeid") String nodeid
+			,ModelAndView model) throws IOException{
+		nodeService.testAuthorized(nodeid);
+		return "";
+	}
 }

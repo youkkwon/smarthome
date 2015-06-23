@@ -13,7 +13,7 @@
 	<script src="/iotms/jquery-ui/external/jquery/jquery.js"></script>
 	<script src="/iotms/jquery-ui/jquery-ui.js"></script>
 	<script>
-	function registerNode(nodeid) {
+	function removeNode(nodeid) {
 		var serial = document.getElementById (nodeid+"_sn").value;
 		var loc = "/iotms/node/remove?nodeid="+nodeid;
 		
@@ -23,7 +23,7 @@
 			width:320,
 			modal: true,
 			buttons: {
-				"Register Node": function() {
+				"Remove Node": function() {
 				     	// Do this after Confirm
 				     	document.getElementById("controlpage").setAttribute("src", loc);
 				$( this ).dialog( "close" );

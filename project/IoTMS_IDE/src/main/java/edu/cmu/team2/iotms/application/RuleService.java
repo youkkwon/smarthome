@@ -10,4 +10,5 @@ public interface RuleService {
 	public void createRuleSet(RuleInfo ruleInfo);
 	public void removeRuleSet(RuleInfo ruleInfo);
 	public void updateRuleSet(RuleInfo ruleInfo);
+	public void confirm(String yesno);
 }

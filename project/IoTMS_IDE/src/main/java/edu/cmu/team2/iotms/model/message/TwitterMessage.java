@@ -1,5 +1,7 @@
 package edu.cmu.team2.iotms.model.message;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,11 +40,34 @@ public class TwitterMessage extends IoTMSMessage {
 	private List<UserInfo> getReceiver() {
 		return userService.getUsers();
 	}
+	
 
 	@Override
 	protected void sendConfirmMessage(String desc) {
-		// TODO Auto-generated method stub
+		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Calendar cal = Calendar.getInstance();
+		
+		List<UserInfo> users = getReceiver();
+		for(UserInfo user:users) {
+			String recipientId = user.getUserTwitter();
+			if(recipientId != null && recipientId.compareTo("")!=0) {
+				directMessage(recipientId, dateFormat.format(cal.getTime())+" Confirm : "+desc
+						+ " Alarm set http://"+getLocalIp()+":8080/iotms/rule/confirm?yesno=yes \n"
+						+ " Alarm unset http://"+getLocalIp()+"www.daum.net:8080/iotms/rule/confirm?yesno=no");
+				LoggerDao.getInstance().addMessageHistory("Send Confirm message("+desc+") to "+recipientId);
+			}
+		}
+	}
 
+	private String getLocalIp() {
+		String localIP="";
+		try {
+			localIP = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return localIP;
 	}
 
 	@Override

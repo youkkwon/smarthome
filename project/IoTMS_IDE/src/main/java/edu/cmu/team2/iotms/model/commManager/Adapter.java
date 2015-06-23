@@ -101,6 +101,11 @@ public class Adapter implements Runnable, LinkEventListener {
 		{
 			if(link.getMACAddress().equals(mac))
 			{
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				link.disconnect();
 				linkList.remove(link);
 			}

@@ -81,7 +81,7 @@ public class RuleServiceImpl implements RuleService {
 	
 	@Override
 	public void createRuleSet(RuleInfo ruleInfo) {
-//		String sql = "insert user_info(ruleset) values('"+ruleInfo.getRuleSet()+"') ";
+//		String sql = "insert ruleset_info(ruleset) values('"+ruleInfo.getRuleSet()+"') ";
 //		System.out.println("createRuleset sql : "+sql);
 //		jdbcTemplate.execute(sql);
 		

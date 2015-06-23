@@ -169,7 +169,7 @@
 	</script>
 	<style>
 	#chatArea {
-		width: 500px; height: 100px; overflow-y: auto; border: 1px solid black;
+		width: 600px; height: 30px; overflow-y: auto; border: 1px solid black;
 	}
 	</style>
 </head>
@@ -177,6 +177,7 @@
 <div id="dialog-confirm" title="IoTMS" style="display:none;">
   <p>Are you sure?</p>
 </div>
+	<div id="chatArea" style="display:none;"><div id="chatMessageArea"></div></div>
     <p>New Node List</p>
 	<p><button onClick="discoverNodes()" >Discover Nodes</button></p>
 	
@@ -220,7 +221,7 @@
 		</c:forEach>
 	</div>
 
-	<div id="chatArea" style="display:none;"><div id="chatMessageArea"></div></div>
+
 <div style="display:none;">
 	<iframe id="subnewnode" src=""></iframe>
 </div>

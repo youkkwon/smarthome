@@ -321,4 +321,27 @@ public class NodeDao {
 
 		return ret;
 	}
+
+	public boolean authorizedNode(String node_id) {
+		boolean ret = false;
+		PreparedStatement pstmt = null;
+		String query = "update node_info set registered=1 where node_id='"+node_id+"'";
+		
+		//System.out.println("LoggerDao(updateEvent) sql: "+query);
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			ret = pstmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return ret;
+	}
 }

@@ -1,5 +1,7 @@
 package edu.cmu.team2.iotms.model.message;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -53,7 +55,31 @@ public class MailMessage extends IoTMSMessage {
 
 	@Override
 	protected void sendConfirmMessage(String desc) {
-		// TODO Auto-generated method stub
+		String[] address = getReceiver();
+		
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setSubject("[IoTMS] This is a Emergency Message");
+		message.setFrom("no-reply@iotms.com");
+		message.setText(" Confirm : "+desc
+				+ " Alarm set http://"+getLocalIp()+":8080/iotms/rule/confirm?yesno=yes \n"
+				+ " Alarm unset http://"+getLocalIp()+"www.daum.net:8080/iotms/rule/confirm?yesno=no");
+		message.setTo(address);
+		try {
+			mailSender.send(message);
+			LoggerDao.getInstance().addMessageHistory("Send emergency mail("+desc+") to "+address.toString());
+		} catch(MailException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String getLocalIp() {
+		String localIP="";
+		try {
+			localIP = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return localIP;
 	}
 
 	@Override

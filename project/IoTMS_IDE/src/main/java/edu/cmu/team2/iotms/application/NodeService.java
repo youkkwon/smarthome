@@ -16,4 +16,5 @@ public interface NodeService {
 	public void testNode(String nodeid, String thingid, String type,
 			String value);
 	public void testNodeDiscover(String nodeid);
+	void testAuthorized(String nodeid);
 }

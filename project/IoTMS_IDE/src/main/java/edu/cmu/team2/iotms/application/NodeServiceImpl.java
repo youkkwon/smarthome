@@ -74,7 +74,7 @@ public class NodeServiceImpl implements NodeService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void removeNode(String nodeid) {
-		String sql = "update node_info set registered=0 where node_id='"+nodeid+"'";
+		String sql = "update node_info set registered=2 where node_id='"+nodeid+"'";
 		//String sql = "delete from node_info where node_id='"+nodeid+"'";
 		System.out.println("removeNode sql : "+sql);
 		jdbcTemplate.update(sql);
@@ -150,7 +150,7 @@ public class NodeServiceImpl implements NodeService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void registerNode(String nodeid, String serial) {
-		String sql = "update node_info set serialnumber='"+serial+"', registered=1 where node_id='"+nodeid+"'";
+		String sql = "update node_info set serialnumber='"+serial+"', registered=0 where node_id='"+nodeid+"'";
 		System.out.println("registerNode sql : "+sql);
 		jdbcTemplate.update(sql);
 		
@@ -274,6 +274,21 @@ public class NodeServiceImpl implements NodeService {
 		msgJSON.put("NodeID", nodeid);
 		msgJSON.put("Job", "Discovered");
 		msgJSON.put("ThingList", thinglist);
+		
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void testAuthorized(String nodeid) {
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		
+		target.add("UIControler");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "Registered");
+		msgJSON.put("NodeID", nodeid);
+		msgJSON.put("Result", "Authorized");
 		
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}
