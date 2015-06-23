@@ -4,6 +4,7 @@ package edu.cmu.team2.iotms.model.ruleManager.RM_Core;
 public class Condition {
 	
 	private String			nodeID;
+	private String			thingID;
 	private String			value;
 	private String			type;
 	protected String 		statement;			// ex) If alarm mode (Mode == 1), If Light one (Light ID == 1)
@@ -14,6 +15,7 @@ public class Condition {
 	public Condition (String nodeID, String thingID, String value, String type)
 	{
 		this.nodeID		= nodeID;
+		this.thingID 	= thingID;
 		this.value		= value;
 		this.type		= type;
 		statement 		= nodeID + "@" + thingID + "==" + value + "#" + type;
@@ -37,6 +39,15 @@ public class Condition {
 		return type;
 	}
 	
+
+	public String getThingID() {
+		return thingID;
+	}
+	
+	public Object getNodeID() {
+		return nodeID;
+	}
+
 	public boolean isConditionOn (String cond)
 	{
 		return nodeID.equalsIgnoreCase(cond);
