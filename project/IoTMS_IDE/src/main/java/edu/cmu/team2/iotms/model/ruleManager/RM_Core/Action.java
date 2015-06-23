@@ -68,6 +68,11 @@ public abstract class Action
 		return this.type.equalsIgnoreCase(type);
 	}
 	
+	public String getValue()
+	{
+		return this.value;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected void generateJSONMsg() 
 	{
@@ -88,7 +93,7 @@ public abstract class Action
 			JSONMsg.put("Job", "ReceiveMsg");
 			//JSONMsg.put("Type",  type);					// TODO - does it needed? send kind? (SNS, SMS, Email?.. or Message will decide)
 			JSONMsg.put("Value", value);	 
-			JSONMsg.put("Desc", desc);						// TODO - add some desc. talk with Message
+			JSONMsg.put("Desc", desc);				
 		}
 		else
 		{	

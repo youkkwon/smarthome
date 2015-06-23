@@ -11,7 +11,7 @@ import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Condition;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.RuleSet;
 
 public class ThingEvent {
-
+	
 	private static ThingEvent thingEvent = new ThingEvent();
 
 	private ThingEvent() { 
@@ -52,7 +52,7 @@ public class ThingEvent {
 		if (job.equalsIgnoreCase("ThingMonitor"))
 		{
 			// Handle actuator mal-function
-			System.out.println ("JSONMsg: " + JSONMsg);
+			//System.out.println ("[RM - Process] JSONMsg: " + JSONMsg);
 			execute_single(JSONMsg);
 		}
 		else
@@ -93,12 +93,6 @@ public class ThingEvent {
 		while (iterator.hasNext())
 		{
 			Action action = iterator.next();
-			/*
-			if (condition.isMinMaxCond())
-			{
-				action.setDesc(condition.getType() + " is malfunction. value - " + condition.getValue());
-			}
-			*/
 			System.out.println ("[RM - Process] actions : "+ action.getStatement());
 			action.execute();
 		}
@@ -134,10 +128,6 @@ public class ThingEvent {
 		while (iterator.hasNext())
 		{
 			Action action = iterator.next();
-			if (condition.isMinMaxCond())
-			{
-				action.setDesc(condition.getType() + " is malfunction. value - " + condition.getValue());
-			}
 			System.out.println ("[RM - Process] actions : "+ action.getStatement());
 			action.execute();
 		}
