@@ -27,24 +27,29 @@ public abstract class IoTMSMessage {
 	}
 	
 	private void ProcessMessage(JSONObject msgJSON) {
-		String  value= (String) msgJSON.get("Value");
-
- 			switch(value.toUpperCase()) {
- 			case CONFIRM :
- 				sendConfirmMessage();
- 				break;
- 			case EMERGENCY :
- 				sendEmergencyMessage();
- 				break;
- 			case MALFUNCTION :
- 				sendMalFunctionMessage();
- 				break;
- 			case POST :
- 				sendPostMessage();
- 				break;
- 			default:
- 				break;
- 			}	 			
+		String  value = (String) msgJSON.get("Value");
+		String  desc = "";
+		try{
+			desc = msgJSON.get("Desc").toString();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		switch(value.toUpperCase()) {
+		case CONFIRM :
+			sendConfirmMessage(desc);
+			break;
+		case EMERGENCY :
+			sendEmergencyMessage(desc);
+			break;
+		case MALFUNCTION :
+			sendMalFunctionMessage(desc);
+			break;
+		case POST :
+			sendPostMessage(desc);
+			break;
+		default:
+			break;
+		}	 			
  	}
 
 	/*
@@ -71,8 +76,8 @@ public abstract class IoTMSMessage {
 	}
 
 	 */
-	protected abstract void sendConfirmMessage();
-	protected abstract void sendEmergencyMessage();
-	protected abstract void sendMalFunctionMessage();
-	protected abstract void sendPostMessage();
+	protected abstract void sendConfirmMessage(String desc);
+	protected abstract void sendEmergencyMessage(String desc);
+	protected abstract void sendMalFunctionMessage(String desc);
+	protected abstract void sendPostMessage(String desc);
 }

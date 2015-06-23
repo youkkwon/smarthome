@@ -14,7 +14,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.google.common.eventbus.Subscribe;
 
-import edu.cmu.team2.iotms.domain.RuleInfo;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 
 public class RuleWebSocketHandler extends TextWebSocketHandler {

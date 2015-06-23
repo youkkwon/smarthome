@@ -1,9 +1,7 @@
 package edu.cmu.team2.iotms.application;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +16,6 @@ import Database.NodeDao;
 
 import com.google.common.eventbus.Subscribe;
 
-import edu.cmu.team2.iotms.domain.ThingInfo;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 
 public class NewNodeWebSocketHandler extends TextWebSocketHandler {
@@ -84,25 +81,11 @@ public class NewNodeWebSocketHandler extends TextWebSocketHandler {
 		String node_id = JSONMsg.get("NodeID").toString();
 		
 		NodeDao.getInstance().setJsonOfNode(node_id, JSONMsg.toString());
-		
-		//NodeInfo newNode = new NodeInfo();
-		//newNode.setNode_id(node_id);
-
 		NodeDao.getInstance().deleteThingsInNode(node_id);
 
 		JSONArray thinglist = (JSONArray) JSONMsg.get("ThingList");
-		List<ThingInfo> things = new ArrayList<ThingInfo>();
 		for (int i=0; i < thinglist.size(); i++) {
-			//ThingInfo thing = new ThingInfo();
 			JSONObject thingobj = (JSONObject) thinglist.get(i);
-			
-			//thing.setNode_id(node_id);
-			//thing.setThing_id(thingobj.get("Id").toString());
-			//thing.setType(thingobj.get("Type").toString());
-			//thing.setStype(thingobj.get("SType").toString());
-			//thing.setVtype(thingobj.get("VType").toString());
-			//thing.setVmin(thingobj.get("VMin").toString());
-			//thing.setVmax(thingobj.get("VMax").toString());
 			
 			NodeDao.getInstance().insertThing(node_id
 					, thingobj.get("Id").toString() // thing_id
@@ -112,14 +95,7 @@ public class NewNodeWebSocketHandler extends TextWebSocketHandler {
 					,thingobj.get("VType").toString() // vtype
 					,thingobj.get("VMin").toString() // vmin
 					,thingobj.get("VMax").toString()); // vmax
-			
-			//things.add(thing);
 		}
-		
-		//newNode.setThings(things);
-		
-		//System.out.println("discoverNodes : "+newNode);
-		//discoverNodes.add(newNode);
 	}
 	
 

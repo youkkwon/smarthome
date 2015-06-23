@@ -1,9 +1,7 @@
 package edu.cmu.team2.iotms.application;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,8 +16,6 @@ import Database.NodeDao;
 
 import com.google.common.eventbus.Subscribe;
 
-import edu.cmu.team2.iotms.domain.NodeInfo;
-import edu.cmu.team2.iotms.domain.ThingInfo;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
 
 public class NodeWebSocketHandler extends TextWebSocketHandler {
@@ -76,14 +72,22 @@ public class NodeWebSocketHandler extends TextWebSocketHandler {
 				if(JSONMsg.get("Job").toString().compareTo("ThingCtrl") == 0)
 					processSearch(JSONMsg);
 			}
-			else if(targets.get(i).equals("UI")) {
-				if(JSONMsg.get("Job").toString().compareTo("ThingMonitor") == 0)
-					processSearch(JSONMsg);
-			}
 		}
 	}
 
 	private void processSearch(JSONObject JSONMsg) {
+		String nodeID = JSONMsg.get("NodeID").toString();
+		JSONArray thingInfos = (JSONArray) JSONMsg.get("Status");
+		for (int i=0; i < thingInfos.size(); i++)
+		{
+			JSONObject thingObj = (JSONObject) thingInfos.get(i);
+			String thingID = (String)thingObj.get("Id");
+			//String thingType = (String)thingObj.get("Type");
+			String thingValue = (String)thingObj.get("Value");
+			
+			NodeDao.getInstance().updateThing(nodeID, thingID, thingValue);
+		}
+		
 		TextMessage message = new TextMessage(JSONMsg.toJSONString());
 		
 		for (WebSocketSession s : users.values()) {

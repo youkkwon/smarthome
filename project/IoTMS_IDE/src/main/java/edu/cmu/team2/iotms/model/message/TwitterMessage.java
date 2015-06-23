@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
+import Database.LoggerDao;
 import edu.cmu.team2.iotms.application.UserServiceImpl;
 import edu.cmu.team2.iotms.conf.SpringAppConfig;
 import edu.cmu.team2.iotms.domain.UserInfo;
@@ -39,47 +40,53 @@ public class TwitterMessage extends IoTMSMessage {
 	}
 
 	@Override
-	protected void sendConfirmMessage() {
+	protected void sendConfirmMessage(String desc) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void sendEmergencyMessage() {
+	protected void sendEmergencyMessage(String desc) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
 		List<UserInfo> users = getReceiver();
 		for(UserInfo user:users) {
 			String recipientId = user.getUserTwitter();
-			if(recipientId != null && recipientId.compareTo("")!=0)
-				directMessage(recipientId, dateFormat.format(cal.getTime())+" Emergency");
+			if(recipientId != null && recipientId.compareTo("")!=0) {
+				directMessage(recipientId, dateFormat.format(cal.getTime())+" Emergency "+desc);
+				LoggerDao.getInstance().addMessageHistory("Send emergency message("+desc+") to "+recipientId);
+			}
 		}
 	}
 
 	@Override
-	protected void sendMalFunctionMessage() {
+	protected void sendMalFunctionMessage(String desc) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
 		List<UserInfo> users = getReceiver();
 		for(UserInfo user:users) {
 			String recipientId = user.getUserTwitter();
-			if(recipientId != null && recipientId.compareTo("")!=0)
-				directMessage(recipientId, dateFormat.format(cal.getTime())+" Emerge mulfunction on system.");
+			if(recipientId != null && recipientId.compareTo("")!=0) {
+				directMessage(recipientId, dateFormat.format(cal.getTime())+" Emerge mulfunction on system. "+desc);
+				LoggerDao.getInstance().addMessageHistory("Send mulfunction message("+desc+") to "+recipientId);
+			}
 		}
 	}
 
 	@Override
-	protected void sendPostMessage() {
+	protected void sendPostMessage(String desc) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		
 		List<UserInfo> users = getReceiver();
 		for(UserInfo user:users) {
 			String recipientId = user.getUserTwitter();
-			if(recipientId != null && recipientId.compareTo("")!=0)
-				directMessage(recipientId, dateFormat.format(cal.getTime())+" Check your mailbox in your house.");
+			if(recipientId != null && recipientId.compareTo("")!=0) {
+				directMessage(recipientId, dateFormat.format(cal.getTime())+" Check your mailbox in your house. "+desc);
+				LoggerDao.getInstance().addMessageHistory("Send check mailbox message("+desc+") to "+recipientId);
+			}
 		}
 	}
 	

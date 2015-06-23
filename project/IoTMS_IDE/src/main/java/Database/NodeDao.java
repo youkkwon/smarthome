@@ -202,16 +202,6 @@ public class NodeDao {
 			ret = pstmt.execute();
 		} catch (SQLException e) {
 			update = true;
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-					pstmt = null;
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		
 		if(update) {
@@ -221,18 +211,18 @@ public class NodeDao {
 				pstmt = conn.prepareStatement(query);
 				ret = pstmt.execute();
 			} catch (SQLException e) {
-				update = true;
 				e.printStackTrace();
-			} finally {
-				try {
-					if(pstmt != null) {
-						pstmt.close();
-						pstmt = null;
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 			}
+		}
+		
+		try {
+			if(pstmt != null) {
+				pstmt.close();
+				pstmt = null;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return ret;
@@ -291,6 +281,30 @@ public class NodeDao {
 		String query = "delete from thing_info "
 					+"where node_id='"+node_id+"' and thing_id='"+thing_id+"'";
 		System.out.println("NodeDao(deleteThing) sql: "+query);
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			ret = pstmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return ret;
+	}
+	
+	public boolean updateThing(String nodeid, String thingid, String thingValue) {
+		boolean ret = false;
+		PreparedStatement pstmt = null;
+		String query = "update thing_info set value='" + thingValue
+				+ "' where node_id='" + nodeid + "' and thing_id='" + thingid + "' ";
+		
+		//System.out.println("LoggerDao(updateEvent) sql: "+query);
 
 		try {
 			pstmt = conn.prepareStatement(query);

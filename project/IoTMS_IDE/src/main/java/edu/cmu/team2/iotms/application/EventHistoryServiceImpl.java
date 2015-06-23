@@ -8,14 +8,24 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import edu.cmu.team2.iotms.domain.EventHistory;
+import edu.cmu.team2.iotms.model.logger.LogManager;
 
 public class EventHistoryServiceImpl implements EventHistoryService {
 	private JdbcTemplate jdbcTemplate;
 	
 	public EventHistoryServiceImpl(DataSource datasource) {
 		jdbcTemplate = new JdbcTemplate(datasource);
+		LogManager.getInstance().start();
+	}
+
+	@Scheduled(fixedRate = 60000, initialDelay=10000)
+	public void handle() {
+		String sql = "delete from eventhistory "
+				+ "where eventdate < (select DATE_ADD(now(),INTERVAL -logging_duration MINUTE) from setting)";
+		jdbcTemplate.update(sql);
 	}
 	
 	@Override
@@ -40,5 +50,5 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 	 
 	    return listEventHistory;
 	}
-
+	
 }

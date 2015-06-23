@@ -42,15 +42,7 @@ public class RuleServiceImpl implements RuleService {
 		// NodeManager
 		NodeManager 				nodemanager	= NodeManager.getInstance();	
 		
-		JSONObject msgJSON = new JSONObject();
-		JSONArray target = new JSONArray();
-		target.add("RuleManager");
-		msgJSON.put("Targets",target);
-		msgJSON.put("Job", "RuleCtrl");
-		msgJSON.put("Type", "Search");
-		
-		//IoTMSEventBus.getInstance().register(this);
-		IoTMSEventBus.getInstance().postEvent(msgJSON);
+		searchRuleset();
 //*/
 	}
 

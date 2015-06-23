@@ -221,4 +221,104 @@ public class RuleSetDao {
 
 		return ret;
 	}
+
+	public int loadRuleMalFuncCConfig() {
+		int malfunc = 10;
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement("select malfunc_settime from setting");
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				do {
+					malfunc = rs.getInt("malfunc_settime");
+				} while(rs.next());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return malfunc;
+	}
+
+	public boolean storeRuleMalFuncConfig(int config) {
+		boolean ret = false;
+		PreparedStatement pstmt = null;
+		String query = "update setting set malfunc_settime ="+config;
+		//System.out.println("RuleSetDao(storeRuleLightOffConfig) sql: "+query);
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			ret = pstmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return ret;
+	}
+
+	public int loadRuleDoorSensorCConfig() {
+		int doorsensor = 10;
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement("select doorsensor_settime from setting");
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				do {
+					doorsensor = rs.getInt("doorsensor_settime");
+				} while(rs.next());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return doorsensor;
+	}
+
+	public boolean storeRuleDoorSensorCConfig(int config) {
+		boolean ret = false;
+		PreparedStatement pstmt = null;
+		String query = "update setting set doorsensor_settime ="+config;
+		//System.out.println("RuleSetDao(storeRuleLightOffConfig) sql: "+query);
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			ret = pstmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return ret;
+	}
 }

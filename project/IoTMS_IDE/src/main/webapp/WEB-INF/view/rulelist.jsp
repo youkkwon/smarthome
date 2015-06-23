@@ -128,7 +128,7 @@ function DeleteRule(ruleid)
 	</tr>
 	<c:forEach var="item" items="${rulelist}">
       	<tr>
-      		<th><input id="${item.ruleId}" type="text" value="${item.ruleSet}" readonly></th>
+      		<th><input id="${item.ruleId}" type="text" value="${item.ruleSet}"  style="width:900px;" readonly></th>
       		<th><A href="javascript: DeleteRule('${item.ruleId}')">Delete</A></th>
       	</tr>
 	</c:forEach>

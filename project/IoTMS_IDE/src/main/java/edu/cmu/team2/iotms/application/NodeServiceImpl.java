@@ -71,6 +71,7 @@ public class NodeServiceImpl implements NodeService {
 	    return thinglist;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void removeNode(String nodeid) {
 		String sql = "update node_info set registered=0 where node_id='"+nodeid+"'";
@@ -78,15 +79,15 @@ public class NodeServiceImpl implements NodeService {
 		System.out.println("removeNode sql : "+sql);
 		jdbcTemplate.update(sql);
 		
-//		JSONObject msgJSON = new JSONObject();
-//		JSONArray target = new JSONArray();
-//		target.add("RuleManager");
-//		target.add("NodeManager");
-//		msgJSON.put("Targets",target);
-//		msgJSON.put("Job", "RemoveNode");
-//		msgJSON.put("NodeID", nodeid);
-//		
-//		IoTMSEventBus.getInstance().postEvent(msgJSON);
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		target.add("RuleManager");
+		target.add("NodeManager");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "RemoveNode");
+		msgJSON.put("NodeID", nodeid);
+		
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -94,24 +95,28 @@ public class NodeServiceImpl implements NodeService {
 	public void controlThing(String nodeid, String thingid, String type,
 			String value) {
 		
-		JSONObject msgJSON = new JSONObject();
-		JSONArray target = new JSONArray();
-		target.add("RuleManager");
-		msgJSON.put("Targets",target);
-		msgJSON.put("Job", "ActionCtrl");
-		msgJSON.put("NodeID", nodeid);
-		msgJSON.put("ThingID", thingid);
-		msgJSON.put("Type", type);
-		msgJSON.put("Value", value);
-		
-		IoTMSEventBus.getInstance().postEvent(msgJSON);
-		
-		if(type.compareToIgnoreCase("alarm")==0) {
+		if(type.compareToIgnoreCase("alarmlamp")==0) {
+			if(value.compareToIgnoreCase("on")==0) value = "Set";
+			if(value.compareToIgnoreCase("off")==0) value = "UnSet";
+			JSONObject msgJSON = new JSONObject();
+			JSONArray target = new JSONArray();
 			msgJSON = new JSONObject();
 			target = new JSONArray();
 			target.add("RuleManager");
 			msgJSON.put("Targets",target);
 			msgJSON.put("Job", "Alarm");
+			msgJSON.put("Value", value);
+			
+			IoTMSEventBus.getInstance().postEvent(msgJSON);
+		} else {
+			JSONObject msgJSON = new JSONObject();
+			JSONArray target = new JSONArray();
+			target.add("RuleManager");
+			msgJSON.put("Targets",target);
+			msgJSON.put("Job", "ActionCtrl");
+			msgJSON.put("NodeID", nodeid);
+			msgJSON.put("ThingID", thingid);
+			msgJSON.put("Type", type);
 			msgJSON.put("Value", value);
 			
 			IoTMSEventBus.getInstance().postEvent(msgJSON);
@@ -165,7 +170,7 @@ public class NodeServiceImpl implements NodeService {
 		msgJSON.put("Job", "Register");
 		msgJSON.put("NodeID", nodeid);
 		msgJSON.put("URL", localIP);
-		msgJSON.put("Port", "550");
+		msgJSON.put("Port", "3250");
 		msgJSON.put("SerialNumber", serial);
 		
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
@@ -177,14 +182,18 @@ public class NodeServiceImpl implements NodeService {
 			String value) {
 		JSONObject msgJSON = new JSONObject();
 		JSONArray target = new JSONArray();
+		JSONArray status = new JSONArray();
+		JSONObject thinginfo = new JSONObject();
 		
 		target.add("RuleManager");
 		msgJSON.put("Targets",target);
 		msgJSON.put("Job", "ThingCtrl");
 		msgJSON.put("NodeID", nodeid);
-		msgJSON.put("ThingID", thingid);
-		msgJSON.put("Type", type);
-		msgJSON.put("Value", value);
+		thinginfo.put("Id", thingid);
+		thinginfo.put("Type", type);
+		thinginfo.put("Value", value);
+		status.add(thinginfo);
+		msgJSON.put("Status", status);
 		
 		IoTMSEventBus.getInstance().postEvent(msgJSON);
 	}

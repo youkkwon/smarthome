@@ -97,7 +97,7 @@
 		      	+"<tr>"
 		      	+"<th><input id='"+node_id+"_id' type='text' value='"+node_id+"' readonly></th>"
 		      	+"<th><input id='"+node_id+"_sn' type='text' value='' ></th>"
-		      	+"<th><button onClick='registerNode('"+node_id+"')'>Register Node</button></th>"
+		      	+"<th><button onClick=\"registerNode('"+node_id+"')\">Register Node</button></th>"
 				+"</tr>"
 				+"</table>";
 				
@@ -126,12 +126,12 @@
 					+"<th><input id='"+node_id+"_"+thing_id+"_nodeid' type='hidden' value='"+node_id+"' readonly>"
 					+"<input id='"+node_id+"_"+thing_id+"_id' type='text' value='"+thing_id+"' readonly></th>"
 					+"<th><input id='"+node_id+"_"+thing_id+"_type' type='text' value='"+thing_type+"' readonly></th>"
-					+"<th><input id='"+node_id+"_"+thing_id+"_stype' type='text' value='"+thing_vtype+"' readonly></th>"
-					+"<th><input id='"+node_id+"_"+thing_id+"_vtype' type='text' value='"+thing_stype+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_stype' type='text' value='"+thing_stype+"' readonly></th>"
+					+"<th><input id='"+node_id+"_"+thing_id+"_vtype' type='text' value='"+thing_vtype+"' readonly></th>"
 					+"<th><input id='"+node_id+"_"+thing_id+"_vmin' type='text' value='"+thing_vmin+"' readonly></th>"
 					+"<th><input id='"+node_id+"_"+thing_id+"_vmax' type='text' value='"+thing_vmax+"' readonly></th>"
 					+"</tr>"
-					+"</table>";
+					
 				
 				out = "[NodeID:"+ node_id+"] [ThingID:"+ thing_id
 					+"] [Type:"+ thing_type+"] [VType:"+ thing_vtype
@@ -139,7 +139,8 @@
 					+"] [VMax:"+ thing_vmax+"] ";
 				appendMessage(out);
 			}
-			innerNodeHTML += "</div>"
+			
+			innerNodeHTML += "</table><br></div>"
 			
 			pannel.innerHTML += innerNodeHTML;
 			

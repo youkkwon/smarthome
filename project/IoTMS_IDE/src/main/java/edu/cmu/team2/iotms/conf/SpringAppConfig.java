@@ -1,6 +1,8 @@
 package edu.cmu.team2.iotms.conf;
 
 import java.beans.PropertyVetoException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -12,6 +14,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -32,8 +37,9 @@ import edu.cmu.team2.iotms.application.UserServiceImpl;
 
 @Configuration
 @EnableTransactionManagement
+@EnableScheduling
 @EnableJpaRepositories(basePackages = "edu.cmu.team2.iotms.domain")
-public class SpringAppConfig {
+public class SpringAppConfig implements SchedulingConfigurer {
 
 	@Bean(destroyMethod = "close")
 	public DataSource dataSource() {
@@ -103,4 +109,15 @@ public class SpringAppConfig {
 		NodeServiceImpl service = new NodeServiceImpl(dataSource());
 		return service;
 	}
+
+	@Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.setScheduler(taskExecutor());
+    }
+ 
+    @Bean(destroyMethod="shutdown")
+    public Executor taskExecutor() {
+        return Executors.newScheduledThreadPool(10);
+    }
+
 }

@@ -18,21 +18,21 @@
         	<!-- 
 			<th>${setting.securitySettime}</th>
 			 -->
-			<th><form:input path="securitySettime" value="${setting.securitySettime}" /></th>
+			<th><form:input path="securitySettime" value="${setting.securitySettime}" />Seconds</th>
 		</tr>
 		<tr>
         	<th>Auto Light Off</th>
 			<!-- 
 			<th>${setting.lightoffSettime}</th>
 			-->
-			<th><form:input path="lightoffSettime" value="${setting.lightoffSettime}" /></th>
+			<th><form:input path="lightoffSettime" value="${setting.lightoffSettime}" />Seconds</th>
 		</tr>        	
        	<tr>
         	<th>Logging Duration</th>
         	<!--  
 			<th>${setting.loggingDuration}</th>
 			-->
-			<th><form:input path="loggingDuration" value="${setting.loggingDuration}" /></th>
+			<th><form:input path="loggingDuration" value="${setting.loggingDuration}" />Minutes</th>
        	</tr>
        	<tr>
         	<th><input type="submit" value="Save"></th>

@@ -62,25 +62,19 @@ public class RuleManagerDBStorage extends RuleManagerStroage {
 		return RuleSetDao.getInstance().storeRuleLightOffConfig(config);
 	}
 
-   	 // TODO 
     public int loadRuleMalFuncConfig() {
-		//return RuleSetDao.getInstance().loadRuleMalFuncCConfig();
-        return 10;
+		return RuleSetDao.getInstance().loadRuleMalFuncCConfig();
 	}
 
     public boolean storeRuleMalFuncConfig(int config) {
-		//return RuleSetDao.getInstance().storeRuleMalFuncConfig(config);
-        return true;
+		return RuleSetDao.getInstance().storeRuleMalFuncConfig(config);
 	}
     
-	 // TODO 
     public int loadRuleDoorSensorConfig() {
-		//return RuleSetDao.getInstance().loadRuleMalFuncCConfig();
-        return 4;
+		return RuleSetDao.getInstance().loadRuleDoorSensorCConfig();
 	}
 
     public boolean storeRuleDoorSensorConfig(int config) {
-		//return RuleSetDao.getInstance().storeRuleMalFuncConfig(config);
-        return true;
+		return RuleSetDao.getInstance().storeRuleDoorSensorCConfig(config);
 	}
 }

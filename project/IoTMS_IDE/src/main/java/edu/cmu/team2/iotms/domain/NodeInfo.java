@@ -1,6 +1,5 @@
 package edu.cmu.team2.iotms.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NodeInfo {

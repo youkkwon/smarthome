@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import edu.cmu.team2.iotms.domain.Message;
 import edu.cmu.team2.iotms.model.eventBus.IoTMSEventBus;
@@ -22,6 +23,13 @@ public class MessageServiceImpl implements MessageService {
 		
 		IoTMSEventBus.getInstance().register(new MailMessage());
 		IoTMSEventBus.getInstance().register(new TwitterMessage());
+	}
+	
+	@Scheduled(fixedRate = 60000, initialDelay=10000)
+	public void handle() {
+		String sql = "delete from MessageHistory "
+				+ "where messagedate < (select DATE_ADD(now(),INTERVAL -logging_duration MINUTE) from setting)";
+		jdbcTemplate.update(sql);
 	}
 	
 	@Override
