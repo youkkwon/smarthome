@@ -44,7 +44,7 @@ public class Scalability extends Thread {
 	
 	public void execute(JSONObject JSONMsg)
 	{
-		System.out.println("Pong : " + JSONMsg.get("Value") + " Time : " + System.currentTimeMillis() / 1000);
+		System.out.println("Pong : " + JSONMsg.get("Value") + " Time : " + System.currentTimeMillis());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -59,7 +59,7 @@ public class Scalability extends Thread {
 		JSONMsg.put("NodeID",  nodeID);
 		JSONMsg.put("Value", Integer.toString(number));	
 		
-		System.out.println("Ping : " + number + " Time : " + System.currentTimeMillis() / 1000);
+		System.out.println("Ping : " + number + " Time : " + System.currentTimeMillis());
 		
 		// post event.
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);

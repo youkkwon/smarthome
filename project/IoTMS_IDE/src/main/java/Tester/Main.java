@@ -8,6 +8,7 @@ import edu.cmu.team2.iotms.model.message.MailMessage;
 import edu.cmu.team2.iotms.model.message.TwitterMessage;
 
 import edu.cmu.team2.iotms.model.nodeManager.NodeManager;
+import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Scalability;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Scheduler;
 import edu.cmu.team2.iotms.model.ruleManager.RM_Event.RuleManager;
 
@@ -27,6 +28,9 @@ public class Main {
 		rulemanager.start();							
 		rm_scheduler.start();
 	
+		Scalability					sc_tester = Scalability.getInstance();
+		sc_tester.start();
+		
 		// NodeManager
 		NodeManager 				nodemanager	= NodeManager.getInstance();	
 		

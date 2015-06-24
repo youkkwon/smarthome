@@ -169,6 +169,18 @@ public class Integrity_Tester {
 				case "UnSet Alarm" : 		// Set Alarm Mode
 					testStateEvent ("UnSet");	
 					break;
+				case "Pong" :
+					JSONObject 	JSONMsg = new JSONObject();
+					JSONArray 	targets = new JSONArray();
+					
+					targets.add("RuleManager");
+					JSONMsg.put("Targets", targets);
+					JSONMsg.put("Job", "Pong");
+					JSONMsg.put("NodeID",  nodeID);
+					JSONMsg.put("Value", Integer.toString(number++));	
+										
+					// post event.
+					IoTMSEventBus.getInstance().postEvent(JSONMsg);
 				case "Quit" :
 				case "Bye" :
 					return;
