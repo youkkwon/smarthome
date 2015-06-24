@@ -1,4 +1,5 @@
 
+#include <SPI.h>
 #include "EncodeNSendMessage.h"
 #include <avr/pgmspace.h>
 
@@ -21,7 +22,7 @@ const char JSONstatus5[] PROGMEM ="{\"Id\":\"0007\",\"Type\":\"MailBox\"	 ,\"Val
 #define MAX_WIFI_STRING_LENGTH 70
 String gsBufferWiFi;
 
-void EncodeNSendMessage::SendJSONobject(WiFiClient localclient, char *key, char *value, bool bEnd)
+void EncodeNSendMessage::SendJSONobject(char *key, char *value, bool bEnd)
 {
 	gsBufferWiFi+='"';
 		gsBufferWiFi+=key;
@@ -40,14 +41,15 @@ void EncodeNSendMessage::SendJSONdiscoverRegister(WiFiClient localclient , bool 
 	gsBufferWiFi+='{';
 	if(bDiscoverRegister)
 	{
-		SendJSONobject(localclient, "Job", "Discovered", false);
-		SendJSONobject(localclient, "NodeID", (char *)MacAddr.c_str(), false); 
+		SendJSONobject("Job", "Discovered", false);
+		SendJSONobject("NodeID", (char *)MacAddr.c_str(), false); 
+		Serial.println(gsBufferWiFi);		// for debug
 	}
 	else
 	{
-		SendJSONobject(localclient, "Job", "Registered", false);
-		SendJSONobject(localclient, "NodeID",(char *)MacAddr.c_str(), false); 
-		SendJSONobject(localclient, "Result", "Authorized", false); 
+		SendJSONobject("Job", "Registered", false);
+		SendJSONobject("NodeID",(char *)MacAddr.c_str(), false); 
+		SendJSONobject("Result", "Authorized", false); 
 	}
 	gsBufferWiFi+="\"ThingList\":[";
 	localclient.print(gsBufferWiFi.c_str());
@@ -170,8 +172,8 @@ void EncodeNSendMessage::SendJSONstatusEvent(WiFiClient localclient, String MacA
 {
 	gsBufferWiFi="";
 	gsBufferWiFi+='{';  
-	SendJSONobject(localclient, "Job", "Event", false);
-	SendJSONobject(localclient, "NodeID", (char *)MacAddr.c_str(), false);  
+	SendJSONobject("Job", "Event", false);
+	SendJSONobject("NodeID", (char *)MacAddr.c_str(), false);  
 	gsBufferWiFi+="\"Status\":[";
 	localclient.print(gsBufferWiFi.c_str());	  
 
@@ -238,9 +240,9 @@ void EncodeNSendMessage::SendJSONnotAuthorizedEvent(WiFiClient localclient, Stri
 {
 	gsBufferWiFi="";
 	gsBufferWiFi+='{';
-	SendJSONobject(localclient, "Job", "Registered", false);
-	SendJSONobject(localclient, "NodeID", (char *)MacAddr.c_str(), false); 
-	SendJSONobject(localclient, "Result", "NotAuthorized", false);
+	SendJSONobject("Job", "Registered", false);
+	SendJSONobject("NodeID", (char *)MacAddr.c_str(), false); 
+	SendJSONobject("Result", "NotAuthorized", false);
 	gsBufferWiFi+="}\n";
 	localclient.print(gsBufferWiFi.c_str());
 }
@@ -249,9 +251,9 @@ void EncodeNSendMessage::SendJSONMsgErrEvent(WiFiClient localclient, String MacA
 {
 	gsBufferWiFi="";
 	gsBufferWiFi+='{';
-	SendJSONobject(localclient, "Job", "ActionCtrl", false);
-	SendJSONobject(localclient, "NodeID", (char *)MacAddr.c_str(), false); 
-	SendJSONobject(localclient, "Result", "ActionCtrlMsgError", false);
+	SendJSONobject("Job", "ActionCtrl", false);
+	SendJSONobject("NodeID", (char *)MacAddr.c_str(), false); 
+	SendJSONobject("Result", "ActionCtrlMsgError", false);
 	gsBufferWiFi+="}\n";
 	localclient.print(gsBufferWiFi.c_str());
 }

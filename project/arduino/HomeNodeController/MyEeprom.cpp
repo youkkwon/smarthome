@@ -62,19 +62,19 @@ int MyEeprom::GetIoTMSPortNumberFromEeprom(void)
 	return (int)(portnumber.toInt());
 }
 
-void MyEeprom::SaverIoTMSInformationToEeprom(String str, int startaddr, int endaddr)
+void MyEeprom::SaverIoTMSInformationToEeprom(String str, int strlen, int startaddr, int endaddr)
 {
 	char *temp;
 	int i, j;
 	
 	temp = (char *)str.c_str();
 
-	for(i = 0, j = startaddr ; temp[i] != '\0' ; i++, j++)
+	for(i = 0, j = startaddr ; i < strlen ; i++, j++)
 	{
 		EEPROM[j] = temp[i];
 	}
 
-	for(j++ ; j <= endaddr ; j++)
+	for( ; j <= endaddr ; j++)
 	{
 		EEPROM[j] = '\0';
 	}

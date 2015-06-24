@@ -39,14 +39,17 @@
 #include <Servo.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
+#include <avr/wdt.h>
 #include "HomeNodeDDI.h"           // Note that the DHT file must be in your Arduino installation folder, in the library foler.
 #include "MyTimer.h"
 #include "MyEeprom.h"
 #include "EncodeNSendMessage.h"
 
 
-#define	CHECK_REGISTER_IOTMS
-#define	MANUAL_SET_SENSOR
+//#define	CHECK_REGISTER_IOTMS
+//#define	MANUAL_SET_SENSOR
+#define	ERASE_IOTMS_REGISTE_STATUS
+#define	REMOVE_FUNCTION
 
 // main loop state(MLS) define
 enum {
@@ -68,6 +71,8 @@ enum {
 	COMMAND_LIGHT_OFF,
 	COMMAND_ALARM_SET,
 	COMMAND_ALARM_UNSET,
+	COMMAND_REMOVE_NODE,
+	COMMAND_ERROR,
 };
 
 
@@ -93,6 +98,7 @@ char Scommand[SCOMMAND_SIZE];
 #ifdef MANUAL_SET_SENSOR
 boolean ManualSetSensor;
 #endif
+
 
 
 /*
@@ -127,7 +133,8 @@ void CheckRegisterServerForTest(void);
 void RegisterNodeToIoTMS(void);
 int RegisterNodeCommandCtl(void);
 void StandbyIoTMSConnection(void);
-void CheckRegisterServer(void);
+void CheckRegisteredServer(void);
+void CheckRegistrationStatusNSetNextState(void);
 void WiFiConnectionState(void);
 void NormalControlState(void);
 void SendSAnodeStateCtl(void);
@@ -135,14 +142,22 @@ int IoTMSCommandCtl(void);
 int IoTMSCommandParsing(void);
 void ActuatorControl(int);
 void SensingNode(void);
+
+#ifdef REMOVE_FUNCTION
 void RemoveNode(void);
+#endif
 
 void SetWiFiConnectionStatus(void);
 void printWiFiConnectionStatus(void);
 int CheckWiFiNetWork(void);
 
+#ifdef MANUAL_SET_SENSOR
 void CheckManualSensingInput(void);
+#endif
 
+#ifdef ERASE_IOTMS_REGISTE_STATUS
+void EraseIoTmsRegistStatus(void);
+#endif
 
 // Eeprom control function
 /**
@@ -172,6 +187,8 @@ void setup() {
 	//MainLoopState = MLS_NORMAL_CONTROL;
       //TestTimer.SetBaseTimer();
 
+	MCUSR = 0;  // clear out any flags of prior resets.
+	
 #ifdef MANUAL_SET_SENSOR
 	ManualSetSensor = false;
 #endif
@@ -183,6 +200,11 @@ void loop() {
 #ifdef MANUAL_SET_SENSOR
 	CheckManualSensingInput();
 #endif
+
+#ifdef ERASE_IOTMS_REGISTE_STATUS
+	EraseIoTmsRegistStatus();
+#endif
+
 	SensingNode();
 
 	switch(MainLoopState)
@@ -196,7 +218,7 @@ void loop() {
 			break;
 
 		case MLS_CHECK_REGISTED_SERVER :
-			CheckRegisterServer();
+			CheckRegisteredServer();
 			break;
 
 		case MLS_STANDBY_DISCOVERY : 
@@ -215,9 +237,11 @@ void loop() {
 			NormalControlState();
 			break;
 
+#ifdef REMOVE_FUNCTION
 		case MLS_REMOVE_NODE :
 			RemoveNode();
 			break;
+#endif
 
 		default :
 			break;
@@ -249,14 +273,10 @@ void WiFiConnectionState(void)
 		MainLoopState = MLS_CHECK_REGISTED_SERVER;
 		SetWiFiConnectionStatus();
 		printWiFiConnectionStatus();
-
-#ifdef	CHECK_REGISTER_IOTMS
-		Serial.println("For demo input connection type Server or Client :");
-#endif
 	}
 	else
 	{	
-		Serial.println("WiFi not connect");
+		//Serial.println("WiFi not connect");
 		delay(1000);
 	}
 }
@@ -267,13 +287,21 @@ void WiFiConnectionState(void)
 * check Registered server and set next state
 * check registered server : confirm eeprom save data 
 */
-void CheckRegisterServer(void)
+void CheckRegisteredServer(void)
 {    	
 	if(CheckWiFiNetWork() == -1)
 	{	return;
 	}
 	
 	#ifndef CHECK_REGISTER_IOTMS
+	CheckRegistrationStatusNSetNextState();
+	#else
+	CheckRegisterServerForTest();
+	#endif
+}
+
+void CheckRegistrationStatusNSetNextState(void)
+{
 	if(EEpCtl.CheckIoTMSRegistrationStatus())
 	{	MainLoopState = MLS_CONNECTING_SERVER;
 	}
@@ -283,9 +311,6 @@ void CheckRegisterServer(void)
 		Serial.println("Stand by IoTMS");
 		MainLoopState = MLS_STANDBY_DISCOVERY;
 	}
-	#else
-	CheckRegisterServerForTest();
-	#endif
 }
 
 #ifdef CHECK_REGISTER_IOTMS
@@ -304,7 +329,7 @@ void CheckRegisterServerForTest(void)
 		if(SerialCommand.equals("Server"))
 		{
 			// servier connection
-			Serial.print("input valid : ");
+			//Serial.print("input valid : ");
 			Serial.println(SerialCommand);
 			//Serial.println("Go to the Server connectio state for standby IoTMS Discovery connection");
 			MainLoopState = MLS_STANDBY_DISCOVERY;
@@ -313,15 +338,20 @@ void CheckRegisterServerForTest(void)
 		else if(SerialCommand.equals("Client"))
 		{		 
 			// client connecton
-			Serial.print("input valid : ");
+			//Serial.print("input valid : ");
 			Serial.println(SerialCommand);
 			//Serial.println("Go to the Clinet connectio state");
 			MainLoopState = MLS_CONNECTING_SERVER;
 		}
+		else if(SerialCommand.equals("Check"))
+		{
+			Serial.println(SerialCommand);
+			CheckRegistrationStatusNSetNextState();
+		}
 		else
 		{
 			//Serial.print("input not valid : ");
-			Serial.println(SerialCommand);
+			//Serial.println(SerialCommand);
 			SerialCommand.remove(0);
 			for(i = 0 ; i < SCOMMAND_SIZE ; i++)
 			{
@@ -419,6 +449,7 @@ void StandbyIoTMSConnection(void)
 		if(ServerClient.connected())
 		{
 			Serial.println("Connected with IoTMS");
+			ServerClient.flush();
 			// Send message to IoTMS
 			// message : SA Node information
 			SendToIoTMS.SendJSONdiscoverRegister(ServerClient, true, MacAddressString);    // Send Discovery message 
@@ -484,7 +515,7 @@ void RegisterNodeToIoTMS(void)
 
 int RegisterNodeCommandCtl(void)
 {
-	StaticJsonBuffer<160> jsonBuffer;  
+	StaticJsonBuffer<192> jsonBuffer;  
 	
 	Serial.print("IoTMS Msg : ");
 	Serial.println(IoTMSCommand);		// for debugging
@@ -518,17 +549,6 @@ int RegisterNodeCommandCtl(void)
 			Serial.println(PasingMsg);		// for debugging
 			return -1;
 		}
-
-		PasingMsg = iotmsMsg["URL"];
-		// Save IoTMS IP Address to Eeprom. 
-		EEpCtl.SaverIoTMSInformationToEeprom(PasingMsg, EEP_IOTMS_IP_START_ADDR, EEP_IP_END_ADDR);
-		
-		PasingMsg = iotmsMsg["Port"];
-		// Save IoTMS Port number to Eeprom.
-		EEpCtl.SaverIoTMSInformationToEeprom(PasingMsg, EEP_IOTMS_PORT_START_ADDR, EEP_PORTNUM_END_ADDR);
-
-		char ch = '1';
-		EEpCtl.SaveIoTMSRegistrationStatus(ch);
 		
 		PasingMsg = iotmsMsg["SerialNumber"];
 		if(!PasingMsg.equals(SERIAL_NUMBER))
@@ -538,6 +558,17 @@ int RegisterNodeCommandCtl(void)
 			return -1;
 		}
 
+		PasingMsg = iotmsMsg["URL"];
+		// Save IoTMS IP Address to Eeprom. 
+		EEpCtl.SaverIoTMSInformationToEeprom(PasingMsg, PasingMsg.length(), EEP_IOTMS_IP_START_ADDR, EEP_IP_END_ADDR);
+		
+		PasingMsg = iotmsMsg["Port"];
+		// Save IoTMS Port number to Eeprom.
+		EEpCtl.SaverIoTMSInformationToEeprom(PasingMsg, PasingMsg.length(), EEP_IOTMS_PORT_START_ADDR, EEP_PORTNUM_END_ADDR);
+
+		char ch = '1';
+		EEpCtl.SaveIoTMSRegistrationStatus(ch);
+		
 		return 1;
 	}
 }
@@ -558,10 +589,9 @@ void ConnectToIoTMS(void)
 	portnumber = EEpCtl.GetIoTMSPortNumberFromEeprom();
 	IpAddr = EEpCtl.GetIoTMSIpAddressFromEeprom();
 
-	Serial.println("Try Connect to IoTMS");
-	Serial.print("IoTMS Ip addr and port : ");
+	Serial.print("Try Connect to IoTMS Ip addr - port : ");
 	Serial.print(IpAddr);
-	Serial.print(" and ");
+	Serial.print(" - ");
 	Serial.println(portnumber);
 
 	Client.stop();
@@ -667,7 +697,7 @@ int IoTMSCommandCtl(void)
 */
 int IoTMSCommandParsing(void)
 {
-	StaticJsonBuffer<160> jsonBuffer;  
+	StaticJsonBuffer<192> jsonBuffer;  
 	
 	Serial.print("IoTMS Command : ");
 	Serial.println(IoTMSCommand);		// for debugging
@@ -680,19 +710,11 @@ int IoTMSCommandParsing(void)
 	if (!iotmsCommand.success()) 
 	{
 		Serial.println("Command message parseObject() failed");
-		return 0;
+		return COMMAND_ERROR;
 	}
 	else
 	{
 		String PasingMsg;
-		PasingMsg = iotmsCommand["Job"];
-		if(!PasingMsg.equals("ActionCtrl"))
-		{
-			// invalid Jop
-			Serial.print("Invalid jop : ");
-			Serial.println(PasingMsg);
-			return 0;
-		}
 
 		PasingMsg = iotmsCommand["NodeID"];
 		if(!PasingMsg.equals(MacAddressString))
@@ -702,7 +724,24 @@ int IoTMSCommandParsing(void)
 			Serial.println(MacAddressString);
 			Serial.print(" and ");
 			Serial.println(PasingMsg);
-			return 0;
+			return COMMAND_ERROR;
+		}
+		
+		PasingMsg = iotmsCommand["Job"];
+#ifdef REMOVE_FUNCTION
+		if(PasingMsg.equals("RemoveNode"))
+		{
+			MainLoopState = MLS_REMOVE_NODE;
+			return COMMAND_REMOVE_NODE;
+		}
+		else 
+#endif
+		if(!PasingMsg.equals("ActionCtrl"))
+		{
+			// invalid Jop
+			Serial.print("Invalid jop : ");
+			Serial.println(PasingMsg);
+			return COMMAND_ERROR;
 		}
 
 		PasingMsg = iotmsCommand["Type"];
@@ -721,7 +760,7 @@ int IoTMSCommandParsing(void)
 			{	
 				Serial.print("Door command error : ");
 				Serial.println(PasingMsg);
-				return 0;
+				return COMMAND_ERROR;
 			}
 		}
 		else if(PasingMsg.equals("Light"))
@@ -739,7 +778,7 @@ int IoTMSCommandParsing(void)
 			{	
 				Serial.print("Light command error : ");
 				Serial.println(PasingMsg);
-				return 0;
+				return COMMAND_ERROR;
 			}
 		}
 		else if(PasingMsg.equals("AlarmLamp"))
@@ -757,19 +796,14 @@ int IoTMSCommandParsing(void)
 			{	
 				Serial.print("Alarm command error : ");
 				Serial.println(PasingMsg);
-				return 0;
+				return COMMAND_ERROR;
 			}
-		}
-		else if(PasingMsg.equals("Remove"))
-		{
-			MainLoopState = MLS_REMOVE_NODE;
-			return 0;
 		}
 		else
 		{	
 			Serial.print("No thing : ");
 			Serial.println(PasingMsg);
-			return 0;
+			return COMMAND_ERROR;
 		}
 	}
 }
@@ -805,7 +839,10 @@ void ActuatorControl(int Command)
 			HomeNode.SecureAlarmLightControl(OFF);
 			break;
 
-		default :
+		case COMMAND_REMOVE_NODE :
+			break;
+
+		case COMMAND_ERROR :
 			//message error, send error message to IoTMS
 			SendToIoTMS.SendJSONMsgErrEvent(ServerClient, MacAddressString);
 			break;
@@ -859,20 +896,30 @@ void SensingNode(void)
 	
 }
 
+
+#ifdef REMOVE_FUNCTION
 void RemoveNode(void)
 {
+	Serial.println("Remove");
 	// soket disconnect
 	//server.stop();
+	ServerClient.flush();
 	ServerClient.stop();
+	Client.flush();
 	Client.stop();
 
 	// Erase eeprom IoTMS information.
 	// Not erase ip address and port number.
 	EEpCtl.SaveIoTMSRegistrationStatus('0');
 
-	MainLoopState = MLS_CHECK_REGISTED_SERVER;
-}
+	//MainLoopState = MLS_CHECK_REGISTED_SERVER;
 
+	wdt_enable(WDTO_15MS); // turn on the WatchDog and don't stroke it.
+	for(;;) { 
+  		// do nothing and wait for the eventual...
+	} 
+}
+#endif
 
 /*
 * After connected to WiFi network and SA node working
@@ -886,7 +933,9 @@ int CheckWiFiNetWork(void)
 	{
 		Serial.println("WiFi connection error");
 		MainLoopState = MLS_WIFI_CONNECTTION;
+		ServerClient.flush();
 		ServerClient.stop();
+		Client.flush();
 		Client.stop();
 		WiFi.disconnect();
 		return -1;
@@ -904,6 +953,7 @@ void SetWiFiConnectionStatus(void)
 	//subnet = WiFi.subnetMask();
 	WiFi.macAddress(mac);
 	int i;
+	MacAddressString = "";
 	for(i = 5 ; i > -1 ; i--)
 	{
 		MacAddressString += String(mac[i], HEX);
@@ -934,4 +984,21 @@ void printWiFiConnectionStatus(void)
 	//Serial.print(rssi);
 	//Serial.println(" dBm");
 } 
+
+#ifdef ERASE_IOTMS_REGISTE_STATUS
+void EraseIoTmsRegistStatus(void)
+{
+	char ch;
+	
+	if(Serial.available())
+	{
+		ch = Serial.read();
+		if(ch == 'd')
+		{
+			Serial.println(ch);
+			EEpCtl.SaveIoTMSRegistrationStatus('0');
+		}
+	}
+}
+#endif
 

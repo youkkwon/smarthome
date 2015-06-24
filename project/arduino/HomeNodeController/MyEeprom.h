@@ -29,7 +29,7 @@ public :
 	int CheckIoTMSRegistrationStatus(void);
 	String GetIoTMSIpAddressFromEeprom(void);
 	int GetIoTMSPortNumberFromEeprom(void);
-	void SaverIoTMSInformationToEeprom(String, int, int);
+	void SaverIoTMSInformationToEeprom(String, int, int, int);
 	void ResetEeprom(int);
 	void InitilaizeEeprom(void);
 	void SaveIoTMSRegistrationStatus(char);

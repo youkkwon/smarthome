@@ -1,4 +1,5 @@
 
+
 #ifndef EncodNSendMessage_h
 #define EncodNSendMessage_h
 
@@ -15,11 +16,14 @@
 class EncodeNSendMessage
 {
 	public : 
-		void SendJSONobject(WiFiClient, char *, char *, bool);
+		void SendJSONobject(char *, char *, bool);
 		void SendJSONdiscoverRegister(WiFiClient , bool, String);
 		void SendJSONstatusEvent(WiFiClient, String, HomeNodeDDI);
 		void SendJSONnotAuthorizedEvent(WiFiClient, String);
 		void SendJSONMsgErrEvent(WiFiClient, String);
+
+	private :
+		//void SendJSONThing(WiFiClient, char *, int);
 };
 
 #endif
