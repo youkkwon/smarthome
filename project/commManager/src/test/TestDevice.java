@@ -12,32 +12,52 @@ public class TestDevice
 
 	static String inputLine;								// String from the server
 	static boolean done;									// Loop flag.
-	static int	portNum = CommUtil.getServerPort();								// Port number for server socket
+	static int	portNum = 3250; //CommUtil.getServerPort();								// Port number for server socket
 
 	static String macaddr = "12:23:34:45:56:67";
+	static int count = 0;
+
 
 	public static void main(String[] args)
  	{
     	// args[0] == 0 // factory reset mode
     	// args[0] == 1 // registered mode
 
-    	int mode = Integer.parseInt(args[0]);
 
-		if(mode == 0)
+    	int node_num = 1;
+
+		if(args[0].length() > 0)
+	    	node_num = Integer.parseInt(args[0]);
+
+
+		System.out.println("node_num = " + node_num);
+
+		//if(mode == 0)
+		{
+
+			for(int i = 0; i < node_num; i++)
 		{
 			try {
+					Thread.sleep(500);
+				}
+				catch(Exception e) {}
+
+				try {
 				Thread discThread = (new Thread() {
+						int thread_count = count++;
 
 					public void run()
 					{
-						runDiscoveryState(macaddr);
+							String new_macaddr = "12:23:34:45:56:" + thread_count;
+
+							runDiscoveryState(new_macaddr, thread_count);
 						try {
 							Thread.sleep(3000);
 						}
 						catch(Exception e)
 						{
 						}
-						runClientState(macaddr);
+							runClientState(new_macaddr);
 					}
 				});
 				discThread.start();
@@ -46,6 +66,7 @@ public class TestDevice
 			{
 
 			}
+		}
 		}
 
 
@@ -71,7 +92,7 @@ public class TestDevice
 		return "";
 	}
 
-	public static void runDiscoveryState(String mac_address)
+	public static void runDiscoveryState(String mac_address, int port_add)
 	{
 
 		Socket clientSocket = null;						// The socket.
@@ -80,10 +101,10 @@ public class TestDevice
 
     	{
 
-			System.out.println("Server Socket Thread Start... (001)");
+			System.out.println("Server Socket Thread Start... (" + (CommUtil.getDiscoveryPort() + port_add) + ", " + mac_address + ")");
 
 			ServerSocket serverSocket = null;							// Client socket object
-			int	discPortNum = CommUtil.getDiscoveryPort();											// Port number for server socket
+			int	discPortNum = /*CommUtil.getDiscoveryPort()*/ 551 + port_add;											// Port number for server socket
 
 			/*****************************************************************************
 			* First we instantiate the server socket. The ServerSocket class also does
@@ -198,7 +219,8 @@ public class TestDevice
 	public static void runClientState(String mac_address)
 	{
 		Socket clientSocket;
-		String json_event = getJSON("json/event.json", mac_address);
+		String json_event1 = getJSON("json/event1.json", mac_address);
+		String json_event2 = getJSON("json/event2.json", mac_address);
 
 		while(true)
 		{
@@ -240,10 +262,13 @@ public class TestDevice
 					*****************************************************************************/
 					/* Here we write a message...												*/
 
-		    		for(int i = 0; i < 3; i++)
+		    		for(int i = 0; i < 1000; i++)
 		    		{
 		    			String json_string;
-		    			json_string = json_event;
+		    			if(i%2 == 0)
+		    				json_string = json_event1;
+		    			else
+		    				json_string = json_event2;
 
 		    			System.out.println(json_string);
 						out.write( json_string, 0, json_string.length() );
