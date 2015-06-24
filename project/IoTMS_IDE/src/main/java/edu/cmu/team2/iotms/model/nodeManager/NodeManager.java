@@ -158,6 +158,18 @@ public class NodeManager implements AdapterEventListener {
 		adapter.disconnectNode(mac);
 	}
 	
+	public void ping(JSONObject JSONMsg)
+	{
+		String nodeId = (String)JSONMsg.get("NodeID");
+		Node node = getNode(nodeId); 
+		if (node == null) {
+			System.out.println ("[NM - Process] [doCommand] Error: Node is null");
+			return;
+		}
+		
+		node.send(JSONMsg.toString());
+	}
+	
 	public void removeNode(JSONObject JSONMsg)
 	{
 		String nodeId = (String)JSONMsg.get("NodeID");
@@ -213,8 +225,9 @@ public class NodeManager implements AdapterEventListener {
 			// 1. look-up DB
 			// Thing을 DB에서 받아서 Thing을 추가한다.
 			if (Nodes.size() > 50) {
-				System.out.println("Node is more 50. reject to add new node!!!");
-				rejectNode("reject node");
+				//System.out.println("Node is more 50. reject to add new node!!!");
+				//rejectNode("reject node");
+				System.out.println("Node is more 50: Node count is " + Nodes.size());
 			}
 			
 			// DB에서 읽은 놈을 JSONObj로 생성한다.
@@ -254,6 +267,32 @@ public class NodeManager implements AdapterEventListener {
 				System.out.println("[NM - Process] Existing node = " + ((Link)event.getLink()).getMACAddress());
 				node.updateLink((Link)(event.getLink()));
 			}
+			/*
+			if (Nodes.size() == 50) {
+				for(int i=0; i<50; i++) {
+					Node tmpNode = Nodes.get(i);
+					JSONObject temp = new JSONObject();
+					temp.put("Job", "Period");
+					temp.put("Value", "5000");
+					tmpNode.send(temp.toJSONString());
+				}
+			}
+			
+			if (Nodes.size() > 50) {
+				if (Nodes.size() > 200) {
+					JSONObject temp = new JSONObject();
+					temp.put("Job", "Period");
+					temp.put("Value", "7000");
+					node.send(temp.toJSONString());
+				}
+				else {
+					JSONObject temp = new JSONObject();
+					temp.put("Job", "Period");
+					temp.put("Value", "5000");
+					node.send(temp.toJSONString());
+				}
+			}
+			*/
 		}
 	}
 

@@ -195,6 +195,14 @@ public class Node implements LinkEventListener {
 		link.addListener(this);
 	}
 	
+	public void pong(JSONObject JSONMsg)
+	{
+		JSONArray targets = new JSONArray();
+		targets.add("RuleManager");
+		JSONMsg.put("Targets", targets);
+		IoTMSEventBus.getInstance().postEvent(JSONMsg);
+	}
+	
 	@Override
 	public void onData(LinkEvent event) {
 		// TODO Auto-generated method stub
@@ -210,6 +218,8 @@ public class Node implements LinkEventListener {
 		strJob = (String)thingObj.get("Job");
 		if (strJob.equalsIgnoreCase("ActionCtrl")) {
 			returnThingCommand(thingObj);
+		} else if (strJob.equalsIgnoreCase("Pong")) {
+			pong(thingObj);
 		} else 
 			updateThingInfo(thingObj);
 	}
