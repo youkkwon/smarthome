@@ -34,12 +34,14 @@ insert into iotmsdb.messagehistory value ('2015-06-09 11:07','sent Confirm Twitt
 
 -- setting
 create table iotmsdb.setting (
-	security_settime int,
-	lightoff_settime int,
-	logging_duration int
+	`security_settime` INT(11) NULL DEFAULT NULL,
+	`lightoff_settime` INT(11) NULL DEFAULT NULL,
+	`logging_duration` INT(11) NULL DEFAULT NULL,
+	`malfunc_settime` INT(11) NULL DEFAULT NULL,
+	`doorsensor_settime` INT(11) NULL DEFAULT NULL
 ) engine=InnoDB character set = utf8;
 
-insert into iotmsdb.setting value (10,5,21600);
+insert into iotmsdb.setting value (10,5,21600,10,4);
 
 
 -- DROP TABLE iotmsdb.user_info;
