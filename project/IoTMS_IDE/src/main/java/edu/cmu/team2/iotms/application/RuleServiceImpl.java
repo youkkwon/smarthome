@@ -134,4 +134,15 @@ public class RuleServiceImpl implements RuleService {
 		
 	}
 
+	@Override
+	public void confirm(String set) {
+		JSONObject msgJSON = new JSONObject();
+		JSONArray target = new JSONArray();
+		target.add("RuleManager");
+		msgJSON.put("Targets",target);
+		msgJSON.put("Job", "MessageCtrl");
+		msgJSON.put("Value", set);
+		IoTMSEventBus.getInstance().postEvent(msgJSON);
+	}
+
 }

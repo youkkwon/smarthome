@@ -66,8 +66,8 @@ public class RuleController {
 	}
 	
 	@RequestMapping(value = "/rule/confirm", method = RequestMethod.POST)
-	public String confirmMessage(@RequestParam(value="yesno", required=false) String yesno) {
-		ruleService.confirm(yesno);
+	public String confirmMessage(@RequestParam(value="set", required=false) String set) {
+		ruleService.confirm(set);
 
 		return "";
 	}

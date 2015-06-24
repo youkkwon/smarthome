@@ -53,8 +53,8 @@ public class TwitterMessage extends IoTMSMessage {
 			String recipientId = user.getUserTwitter();
 			if(recipientId != null && recipientId.compareTo("")!=0) {
 				directMessage(recipientId, dateFormat.format(cal.getTime())+" Confirm : "+desc
-						+ " Alarm set http://"+getLocalIp()+":8080/iotms/rule/confirm?yesno=yes \n"
-						+ " Alarm unset http://"+getLocalIp()+"www.daum.net:8080/iotms/rule/confirm?yesno=no");
+						+ " Alarm Set http://"+getLocalIp()+":8080/iotms/rule/confirm?set=Set \n"
+						+ " Alarm Unset http://"+getLocalIp()+":8080/iotms/rule/confirm?set=Unset");
 				LoggerDao.getInstance().addMessageHistory("Send Confirm message("+desc+") to "+recipientId);
 			}
 		}

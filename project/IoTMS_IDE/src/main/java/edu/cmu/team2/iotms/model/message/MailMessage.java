@@ -61,8 +61,8 @@ public class MailMessage extends IoTMSMessage {
 		message.setSubject("[IoTMS] This is a Emergency Message");
 		message.setFrom("no-reply@iotms.com");
 		message.setText(" Confirm : "+desc
-				+ " Alarm set http://"+getLocalIp()+":8080/iotms/rule/confirm?yesno=yes \n"
-				+ " Alarm unset http://"+getLocalIp()+"www.daum.net:8080/iotms/rule/confirm?yesno=no");
+				+ " Alarm Set http://"+getLocalIp()+":8080/iotms/rule/confirm?set=Set \n"
+				+ " Alarm Unset http://"+getLocalIp()+":8080/iotms/rule/confirm?set=Unset");
 		message.setTo(address);
 		try {
 			mailSender.send(message);

@@ -162,13 +162,12 @@ public class NodeManager implements AdapterEventListener {
 	{
 		String nodeId = (String)JSONMsg.get("NodeID");
 		Node node = getNode(nodeId);
-		if(node != null)
-			node.disconnect();
+		if(node == null)
+			return;
 		
 		JSONMsg.remove("Targets");
-		JSONMsg.remove("Job");
 		node.send(JSONMsg.toString());
-		node.disconnect();
+		//node.disconnect();
 		
 		removeNode(node);
 	}
