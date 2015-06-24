@@ -107,7 +107,7 @@ public class Integrity_Tester {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testRegistNode(String NodeID)
+	public void testRegistNode(String NodeID, String serialNumber)
 	{
 		JSONObject	JSONMsg = new JSONObject();
 		JSONArray 	targets = new JSONArray();
@@ -118,7 +118,7 @@ public class Integrity_Tester {
 		JSONMsg.put("NodeID", NodeID);
 		JSONMsg.put("URL", "192.168.1.143");
 		JSONMsg.put("Port", (new Integer(CommUtil.getServerPort())).toString());
-		JSONMsg.put("SerialNumber", "12345678");
+		JSONMsg.put("SerialNumber", serialNumber);
 		
 		IoTMSEventBus.getInstance().postEvent(JSONMsg);
 	}
@@ -146,10 +146,10 @@ public class Integrity_Tester {
 					testUIDiscoverEvent();
 					break;
 				case "Register First" : 
-					testRegistNode("78:c4:e:1:7f:f9");
+					testRegistNode("78:c4:e:1:7f:f9", "12345678");
 					break;
 				case "Register Second" :
-					testRegistNode("78:c4:e:2:5c:a3");
+					testRegistNode("78:c4:e:2:5c:a3", "12345679");
 					break;
 				case "Open Door" :
 					testActionEvent (nodeID, "0001", "Door", "Open");		

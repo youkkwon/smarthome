@@ -93,78 +93,74 @@ public class RuleSet {
 		}
 	}
 		
-	public void addRule (String input)
+	public void addRule (String input) throws InvalidRuleException
 	{
 		parse_statement(input);
 		addRule (conditions, actions);
 	}
 	
-	public void deleteRule (String statement)
+	public boolean deleteRule (String statement) throws InvalidRuleException
 	{
 		parse_statement(statement);		
-		deleteRule (conditions, actions);
+		return deleteRule (conditions, actions);
 	}
 	
-	private  void addRule (String[] condStr, String[] actStr) 
+	private  void addRule (String[] condStr, String[] actStr) throws InvalidRuleException 
 	{
 		boolean 			exist = false; 
 		ListIterator<Rule>	iterator = rules.listIterator();
-		try {
-			while (iterator.hasNext()) 
-			{
-				Rule rule = iterator.next();
-				if (rule.isSameCondition(condStr))
-				{			
-					rule.addActions(actStr);				
-					exist = true;
-					break;
-				}
-			}
-			if (!exist)
-			{
-				Rule rule = new Rule(condStr, actStr);
-				rules.add(rule);
-			
+		
+		while (iterator.hasNext()) 
+		{
+			Rule rule = iterator.next();
+			if (rule.isSameCondition(condStr))
+			{		
+				// TODO - run test case.
+				// delete previous rule due to change.
+				RuleManagerDBStorage.getInstance().deleteRule(rule);
+				rule.addActions(actStr);				
+				exist = true;
+				// insert updated rule.
 				RuleManagerDBStorage.getInstance().insertRule(rule);
+				break;
 			}
-		} catch (InvalidRuleException e) {
-			System.out.println(e.getExceptionMsg());
-		}	
+		}
+		if (!exist)
+		{
+			Rule rule = new Rule(condStr, actStr);
+			rules.add(rule);
+		
+			RuleManagerDBStorage.getInstance().insertRule(rule);
+		}		
 	}
 	
-	private boolean deleteRule (String[] condStr, String[] actStr)
+	private boolean deleteRule (String[] condStr, String[] actStr) throws InvalidRuleException
 	{
 		boolean				delete = false;
 		ListIterator<Rule>	iterator = rules.listIterator();
 		
-		try {
-			while (iterator.hasNext()) 
+		while (iterator.hasNext()) 
+		{
+			Rule rule = iterator.next();
+			if (rule.isSameRule(condStr, actStr)) 
 			{
-				Rule rule = iterator.next();
-				if (rule.isSameRule(condStr, actStr)) 
-				{
-					rules.remove(rule);
-					delete = true;
-					//System.out.println ("[RM - Process] deleteRule - SameRule " + rules.size());
-					break;
-				}
-				else if (rule.isSameCondition(condStr))
-				{
-					rule.deleteActions(actStr);
-					delete = true;
-					//System.out.println ("[RM - Process] deleteRule - SameCondition " + rules.size());
-					break;
-				}
+				rules.remove(rule);
+				delete = true;
+				//System.out.println ("[RM - Process] deleteRule - SameRule " + rules.size());
+				break;
 			}
-		} catch (InvalidRuleException e) {
-			System.out.println(e.getExceptionMsg());
+			else if (rule.isSameCondition(condStr))
+			{
+				rule.deleteActions(actStr);
+				delete = true;
+				//System.out.println ("[RM - Process] deleteRule - SameCondition " + rules.size());
+				break;
+			}
 		}
-		
+				
 		if (delete) 
 			RuleManagerDBStorage.getInstance().storeRuleSet(rules);
-		else
-			System.out.println ("[RM - Process] There is no such a rule");
-		
+				
 		return delete;
 	}
 	
