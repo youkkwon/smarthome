@@ -4,8 +4,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.json.simple.JSONObject;
 
-import edu.cmu.team2.iotms.model.ruleManager.RM_Core.Scalability;
-
 public class RuleManager extends Thread {
 	
 	private static RuleManager rulemanager = new RuleManager(); 
@@ -43,8 +41,6 @@ public class RuleManager extends Thread {
 			ThingEvent.getInstance().execute(JSONMsg);
 		else if (job.equalsIgnoreCase("ConfigCtrl"))
 			ConfigEvent.getInstance().execute(JSONMsg);
-		else if (job.equalsIgnoreCase("Pong"))
-			Scalability.getInstance().execute(JSONMsg);
 		else
 			System.out.println ("[RM  - Process] Not valid event, ignore it.");
 		
