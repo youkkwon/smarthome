@@ -51,8 +51,6 @@ public class NM_EventBusReceiver extends Thread {
 			NodeManager.getInstance().registerNode(JSONMsg);
 		else if (job.equalsIgnoreCase("RemoveNode"))
 			NodeManager.getInstance().removeNode(JSONMsg);
-		else if (job.equalsIgnoreCase("Ping"))
-			NodeManager.getInstance().ping(JSONMsg);
 		else
 		{
 			System.out.println ("Not valid event, ignore it.");
